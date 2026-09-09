@@ -402,8 +402,8 @@ class Transformer(torch.nn.Module):
 def calculate_val_loss():
     # val loss:
     model.eval()
-    avg_smoothed_vloss = torch.zeros((),device=DEVICE)
     avg_vloss = torch.zeros((),device=DEVICE)
+    avg_metrics = torch.zeros((len(metrics),),device=DEVICE)
     with torch.no_grad():
         for x, y in val_loader:
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
@@ -413,24 +413,29 @@ def calculate_val_loss():
                 device_type=DEVICE, dtype=config["autocast_dtype"], enabled=config["use_amp"]
             ):
                 # switching to torch.bfloat16 on mac due to not full support on mac
-                logits_val = model(x, y[:, :-1]).reshape((-1, logits_val.shape[-1]))
+                logits_val = model(x, y[:, :-1])
+
+                logits_val = logits_val.reshape((-1, logits_val.shape[-1]))
                 y = y[:, 1:].reshape(-1)
 
-                smoothed_loss_val = loss_fn(logits_val, y)
-                loss_val = non_smoothed_loss_fn(logits_val,y)
+                loss_val = loss_fn(logits_val, y)
+                for i,m in enumerate(metrics):
+                    avg_metrics[i] += m(logits_val,y).detach()
 
-            avg_vloss+=loss_val
-            avg_smoothed_vloss += smoothed_loss_val.detach()
-    avg_smoothed_vloss /= len(val_loader)
-    avg_vloss/= len(val_loader)
-    return avg_smoothed_vloss.item(), avg_vloss.item()
+            
+            avg_vloss += loss_val.detach()
+    
+    avg_vloss /= len(val_loader)
+    avg_metrics /= len(val_loader)
 
+    return avg_vloss.item(), [m.item() for m in avg_metrics]
 
 def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*,save_weights=True,is_best=True):
     if model_path and optim_path and save_weights:
         torch.save(model.state_dict(), model_path)
         torch.save(optimizer.state_dict(), optim_path)
         torch.save(scheduler.state_dict(),scheduler_path)
+
         if is_best:
             model_best_path = f"{save_file_path_root}/best/model.pt"
             optim_best_path = f"{save_file_path_root}/best/optimizer.pt"
@@ -439,10 +444,12 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
             torch.save(model.state_dict(), model_best_path)
             torch.save(optimizer.state_dict(), optim_best_path)
             torch.save(scheduler.state_dict(), scheduler_best_path)
+            
     with open(history_path, "w") as f:
         json.dump(
             {
                 "history": history,
+                "config": {k:str(v) for k,v in config},
                 "last_epoch_vloss": last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": best_val_loss,
@@ -461,7 +468,7 @@ def train_one_epoch(epoch):
     print(f"{datetime.now()}: Epoch: {epoch}")
 
     total_loss = torch.zeros((),device=DEVICE)
-    total_non_smooothed_loss = torch.zeros((),deivce=DEVICE)
+    avg_metrics = torch.zeros(((len(metrics),)),device=DEVICE)
     total_time = 0
     total_batches = len(train_loader)
 
@@ -473,6 +480,7 @@ def train_one_epoch(epoch):
         x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
         y = y.to(device=DEVICE, non_blocking=config["pin_memory"])
         optimizer.zero_grad(set_to_none=True)  # default behaviour
+        avg_metric = torch.zeros(((len(metrics),)),device=DEVICE)
 
         with torch.autocast(
             device_type=DEVICE, dtype=config["autocast_dtype"], enabled=config["use_amp"]
@@ -483,7 +491,10 @@ def train_one_epoch(epoch):
             y = y[:,1:].reshape(-1) # (B*Sy,)
 
             loss_value = loss_fn(logits, y)  # input, target
-            smoothed_loss_value = non_smoothed_loss_fn(logits,y)
+
+            with torch.no_grad():
+                for i,m in enumerate(metrics):
+                    avg_metric[i]+=m(logits,y)
 
         scaler.scale(loss_value).backward()
         scaler.step(optimizer)
@@ -497,7 +508,7 @@ def train_one_epoch(epoch):
         # optimizer.step()
 
         total_loss += loss_value.detach()
-        total_non_smooothed_loss += smoothed_loss_value.detach()
+        avg_metrics += avg_metric.detach()
         delta = end_time - start_time
         total_time+=delta
 
@@ -518,8 +529,15 @@ def train_one_epoch(epoch):
                     f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, tokens/sec: {ts:,.3f}"
                 )
     epoch_end = time.time()
-    smoothed_avg_vloss, avg_vloss = calculate_val_loss()
-    return (total_loss / total_batches).item(), (total_non_smooothed_loss / total_batches).item(), avg_vloss, smoothed_avg_vloss,total_time/total_batches,epoch_end-epoch_start
+    avg_vloss, avg_val_metrics = calculate_val_loss()
+    return (
+        (total_loss / total_batches).item(), 
+        [m.item() for m in (avg_metrics / total_batches)], 
+        avg_vloss,
+        avg_val_metrics, 
+        total_time/total_batches,
+        epoch_end-epoch_start
+    )
 
 def lr_update_fn(step):
     step = max(step,1)
@@ -541,19 +559,26 @@ def load_model():
         eps=config["optim_eps"],
     )
     print(f"{datetime.now()}: optimizer loaded")
+
     scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer,
         lr_lambda=lr_update_fn
     )
     print(f"{datetime.now()}: scheduler loaded")
+
+    # B,C,d_1,..,d_n expected.
     loss_fn = torch.nn.CrossEntropyLoss(
         label_smoothing=config["label_smoothing"], ignore_index=config["pad_token"]
     )
+    print(f"{datetime.now()}: loss_fn loaded")
+
+    metrics = []
     non_smoothed_loss_fn = torch.nn.CrossEntropyLoss(
         ignore_index=config["pad_token"]
     )
-    # B,C,d_1,..,d_n expected.
-    print(f"{datetime.now()}: loss_fn loaded")
+    non_smoothed_loss_fn.name = "non_smoothed_loss_fn"
+    metrics.append(non_smoothed_loss_fn)
+    print("metrics loaded")
 
     history = []
     last_epoch_vloss = float("inf")
@@ -597,7 +622,7 @@ def load_model():
         print(
             f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
         )
-    return model,optimizer,scheduler,loss_fn,non_smoothed_loss_fn,history,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
+    return model,optimizer,scheduler,loss_fn,metrics,history,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
 
 if __name__ == "__main__":
     print(f"{datetime.now()}: code started: ")
@@ -605,7 +630,6 @@ if __name__ == "__main__":
     print("""
 Updates made this session:
 - Learning rate update with scheduler. 
-- Label Smoothing -> 0.1 still needs research into what it does
 - updated attention from loop -> one matrix multiply
 
 NOT RECORDED IN NOTES. \n\n\n\n""")
@@ -613,19 +637,33 @@ NOT RECORDED IN NOTES. \n\n\n\n""")
         print("WARNING: YOU ARE IN BENCH MARK MODE")
     train_loader, val_loader = load_data()
 
-    model, optimizer, scheduler, loss_fn, non_smoothed_loss_fn, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(history_path, optimizer_path, scheduler_path, LOAD_PRE_SAVED, config, Transformer, lr_update_fn)
+    model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(history_path, optimizer_path, scheduler_path, LOAD_PRE_SAVED, config, Transformer, lr_update_fn)
 
     print(f"{datetime.now()}: training started!")
     scaler = torch.amp.GradScaler(DEVICE, enabled=config["use_amp"] and DEVICE != "mps")
     for epoch in range(start_epoch+1, config["epochs"]):
         model.train(True)
-        avg_loss, avg_non_smoothed_loss,avg_vloss,smoothed_avg_vloss,avg_time,epoch_time = train_one_epoch(epoch)
-        print(
-            f"{datetime.now()}: [epoch {epoch}]: avg_loss: {avg_loss:.4f}, smoothed_avg_vloss: {smoothed_avg_vloss:.4f}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
-        )
-        history.append({"avg_loss": avg_loss, "avg_non_smoothed_loss": avg_non_smoothed_loss, "smoothed_avg_vloss": smoothed_avg_vloss, "avg_vloss": avg_vloss, "epoch": epoch,"avg_time":avg_time,"epoch_time":epoch_time})
+        avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
 
-        if smoothed_avg_vloss >= last_epoch_vloss:
+        metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
+        val_metrics_text = ", ".join([f"{metrics[i].name}_val: {avg_val_metrics[i]:.3f}" for i in range(len(metrics))])
+        print(
+            f"{datetime.now()}: [epoch {epoch}]: avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
+        )
+        history.append({
+            "avg_loss": avg_loss,
+            "avg_vloss": avg_vloss, 
+            "epoch": epoch,
+            "avg_time":avg_time,
+            "epoch_time":epoch_time
+        } | {
+            metrics[i].name:avg_metrics[i] for i in range(len(metrics))
+        } | {
+            metrics[i].name+"_val":avg_val_metrics[i] for i in range(len(metrics))
+        }
+        )
+
+        if avg_vloss >= last_epoch_vloss:
             non_improve_cnt += 1
             print(
                 f"{datetime.now()}: [epoch {epoch}]: epoch did not improve!"
@@ -639,13 +677,13 @@ NOT RECORDED IN NOTES. \n\n\n\n""")
             )
             break
 
-        last_epoch_vloss = smoothed_avg_vloss
+        last_epoch_vloss = avg_vloss
 
         is_best=False
-        model_path = f"{save_file_path_root}/model_{epoch}_{smoothed_avg_vloss}.pt"
-        if smoothed_avg_vloss < best_val_loss:
+        model_path = f"{save_file_path_root}/model_{epoch}_{avg_vloss}.pt"
+        if avg_vloss < best_val_loss:
             print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
-            best_val_loss = smoothed_avg_vloss
+            best_val_loss = avg_vloss
             is_best=True
         
         save_hist(
