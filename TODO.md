@@ -1,0 +1,3 @@
+- batched multi-head attention
+- register_buffer for positional encodings. 
+- the optimizer lr schedule

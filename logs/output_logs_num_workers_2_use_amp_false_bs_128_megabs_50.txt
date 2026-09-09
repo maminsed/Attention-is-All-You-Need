@@ -1,0 +1,44 @@
+2026-09-01 00:37:14.416030: code started: 
+2026-09-01 00:37:14.416097: DEVICE: mps
+WARNING: YOU ARE IN BENCH MARK MODE
+# train sentences 1,000
+# train docs 1,705
+# val sentences 888
+   Unnamed: 0  ...                                             detext
+0           0  ...                                Vielen Dank, Chris.
+1           1  ...  Es ist mir wirklich eine Ehre, zweimal auf die...
+2           2  ...  Ich bin wirklich begeistert von dieser Konfere...
+3           3  ...  Das meine ich ernst, teilweise deshalb -- weil...
+4           4  ...              Versetzen Sie sich mal in meine Lage!
+
+[5 rows x 6 columns]
+2026-09-01 00:37:14.488712: encoding done!
+2026-09-01 00:37:14.488761: 
+
+==============
+encode_as_ids:
+[1, 1215, 91, 2]
+batches/epoch: 8
+
+
+==============
+num_parameters: 47,685,632
+2026-09-01 00:37:15.193364: optimizer loaded
+2026-09-01 00:37:15.193422: loss_fn loaded
+2026-09-01 00:37:15.193433: training started!
+2026-09-01 00:37:15.194255: Epoch: 0
+2026-09-01 00:37:17.180208: [epoch 0] batch 0 loss_value: 309.2694, batch_time (s): 0.426, tokens/sec: 10,510.899
+2026-09-01 00:37:21.187511: [epoch 0] batch 5 loss_value: 65.7137, batch_time (s): 0.879, tokens/sec: 13,402.667
+2026-09-01 00:37:52.380837: [epoch 0]: avg_loss: 108.7530, avg_vloss: 52.7691, avg_time (s): 2.322, epoch_time (s): 20.112
+2026-09-01 00:37:55.028277: Epoch: 1
+2026-09-01 00:38:05.973799: [epoch 1] batch 0 loss_value: 56.6391, batch_time (s): 10.762, tokens/sec: 416.290
+2026-09-01 00:38:56.718980: [epoch 1] batch 5 loss_value: 47.0388, batch_time (s): 10.075, tokens/sec: 1,168.881
+2026-09-01 00:39:40.640765: [epoch 1]: avg_loss: 49.3552, avg_vloss: 39.7024, avg_time (s): 8.655, epoch_time (s): 69.577
+2026-09-01 00:39:46.633517: Epoch: 2
+2026-09-01 00:39:51.764028: [epoch 2] batch 0 loss_value: 41.8709, batch_time (s): 5.082, tokens/sec: 881.467
+2026-09-01 00:39:55.628442: [epoch 2] batch 5 loss_value: 40.6310, batch_time (s): 0.881, tokens/sec: 13,364.581
+2026-09-01 00:40:33.098890: [epoch 2]: avg_loss: 40.4335, avg_vloss: 34.6759, avg_time (s): 3.078, epoch_time (s): 24.691
+2026-09-01 00:40:36.307127: Epoch: 3
+2026-09-01 00:40:39.198227: [epoch 3] batch 0 loss_value: 36.0707, batch_time (s): 2.758, tokens/sec: 1,670.605
+2026-09-01 00:40:46.632519: [epoch 3] batch 5 loss_value: 36.8310, batch_time (s): 0.890, tokens/sec: 13,231.923
+2026-09-01 00:41:09.549840: [epoch 3]: avg_loss: 36.3733, avg_vloss: 31.1256, avg_time (s): 2.181, epoch_time (s): 17.589
