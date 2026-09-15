@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader, Dataset
 PAD_TOKEN = 3
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 CONTEXT_CAP = 128
-save_file_path_root = "./test/overnight_Sep_4"
+save_file_path_root = "./test/overnight_Sep_9"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -31,6 +31,7 @@ LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 200
 NUM_BATCHES = None
+STOP_AFTER_EPOCH=15
 
 if not path.exists(save_file_path_root):
     os.mkdir(save_file_path_root)
@@ -46,8 +47,8 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 6,  # number of encoder layers
-    "num_dec_layers": 6,  # number of encoder layers
+    "num_enc_layers": 4,  # number of encoder layers
+    "num_dec_layers": 4,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.1,
@@ -56,7 +57,7 @@ config = {
     # Training params
     "benchmark_mode": False,
     "batch_size": 64,
-    "epochs": 20,  # just for initial testing
+    "epochs": 18,  # just for initial testing
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -75,7 +76,7 @@ config = {
     "test_size": 0.2,
     "val_size": 0.2,
     "title_use_in_tokenization": True,
-    "mega_batch_size": 50, 
+    "mega_batch_size": 100, 
 
     # Device params
     "device": DEVICE,
@@ -444,12 +445,12 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
             torch.save(model.state_dict(), model_best_path)
             torch.save(optimizer.state_dict(), optim_best_path)
             torch.save(scheduler.state_dict(), scheduler_best_path)
-            
+        
     with open(history_path, "w") as f:
         json.dump(
             {
                 "history": history,
-                "config": {k:str(v) for k,v in config},
+                "config": {k:str(v) for k,v in config.items()},
                 "last_epoch_vloss": last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": best_val_loss,
@@ -493,8 +494,8 @@ def train_one_epoch(epoch):
             loss_value = loss_fn(logits, y)  # input, target
 
             with torch.no_grad():
-                for i,m in enumerate(metrics):
-                    avg_metric[i]+=m(logits,y)
+                for j,m in enumerate(metrics):
+                    avg_metric[j]+=m(logits,y)
 
         scaler.scale(loss_value).backward()
         scaler.step(optimizer)
@@ -513,7 +514,7 @@ def train_one_epoch(epoch):
         total_time+=delta
 
         if i % VERBOSE_FREQ == 0:
-            ts = (x.shape[0]*x.shape[1]+y.shape[0]*y.shape[1]) / delta
+            ts = (x.shape[0]*x.shape[1]+y.shape[0]) / delta
             history.append(
                 {
                     "batch_loss": loss_value.item(),
@@ -578,7 +579,7 @@ def load_model():
     )
     non_smoothed_loss_fn.name = "non_smoothed_loss_fn"
     metrics.append(non_smoothed_loss_fn)
-    print("metrics loaded")
+    print(f"{datetime.now()}: metrics loaded")
 
     history = []
     last_epoch_vloss = float("inf")
@@ -629,19 +630,18 @@ if __name__ == "__main__":
     print(f"{datetime.now()}: DEVICE: {DEVICE}")
     print("""
 Updates made this session:
-- Learning rate update with scheduler. 
-- updated attention from loop -> one matrix multiply
-
-NOT RECORDED IN NOTES. \n\n\n\n""")
+- added metrics for non smoothed loss val.\n\n\n\n""")
     if config["benchmark_mode"]:
         print("WARNING: YOU ARE IN BENCH MARK MODE")
     train_loader, val_loader = load_data()
 
-    model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(history_path, optimizer_path, scheduler_path, LOAD_PRE_SAVED, config, Transformer, lr_update_fn)
+    model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model()
 
     print(f"{datetime.now()}: training started!")
     scaler = torch.amp.GradScaler(DEVICE, enabled=config["use_amp"] and DEVICE != "mps")
     for epoch in range(start_epoch+1, config["epochs"]):
+        if epoch > STOP_AFTER_EPOCH:
+            break
         model.train(True)
         avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
 
@@ -682,9 +682,10 @@ NOT RECORDED IN NOTES. \n\n\n\n""")
         is_best=False
         model_path = f"{save_file_path_root}/model_{epoch}_{avg_vloss}.pt"
         if avg_vloss < best_val_loss:
-            print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
             best_val_loss = avg_vloss
             is_best=True
+        else:
+            print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
         
         save_hist(
             history_path,
