@@ -15,12 +15,13 @@ english_orig_translation = "Write your name in my book."
 german_text = "Schreib deinen Namen in mein Buch."
 ```
 
+## results:
+
 ## September 9th: 
 - Lowered depth from 4 -> 6:
 - Increased mega_batch_size from 50 -> 100: pad_tokens/step lowered from 
 
-### results:
-### Up until epoch 15:
+Results:
 - The translation was horrible, even thought it had almost the same val_loss (comparing with Sep 4). They were both 2.6 tho, so Im not even sure if thats helpful.
 - However, at 15, the early stopping still hadn't kicked in (not sure if its a good thing or not...)
 - out dist: english_pred_translation = "I Finger Finger Finger OverCats and dog systems, I don't know what I need". with BLEU=0.188
@@ -31,11 +32,22 @@ german_text = "Schreib deinen Namen in mein Buch."
 - out dist 2: "So, color your name in my book." BLEU=0.64. It was tryign to say book or something tho. 
 - For some reason the model performance improves a lot when theres a period at the end. I think that comes from input data that ends with . 
 
-## To be done:
-- reduce batch_size, needs experimenting
+## Septermber 15th:
+- Tried to train up to 20 epochs, however, it didn't improve more than 15. Even the non-smoothed loss seems to be overfitting. 
+- Learned about scaling laws of transformers and basically most research talks about number of parameters and data to be on the same scale. They also talk about training with low epochs, because transformers are subject to overfitting. 
 
+
+
+- think of a way to perform BLEU efficiently, so you can process it in background, while the next batch is doing it's thing.
+    - (check what metric did they use for early stopping)
+- try with reduced batch size
+
+
+
+## To be done:
 - update dropout with new dropouts. 
 - add BLEU to train.py
 - register_buffer for positional encodings. 
 
 - test with lower vocab size
+- More data.

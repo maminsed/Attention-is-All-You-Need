@@ -32,6 +32,7 @@ VERBOSE = True
 VERBOSE_FREQ = 200
 NUM_BATCHES = None
 STOP_AFTER_EPOCH=20
+NUM_TOKENS=0
 
 if not path.exists(save_file_path_root):
     os.mkdir(save_file_path_root)
@@ -159,12 +160,14 @@ def collate_fn(batch):
     return src, tgt
 
 
+
 def load_data() -> tuple[DataLoader, DataLoader]:
     sp_bpe = spm.SentencePieceProcessor()
     sp_bpe.load("bpe.model")
-
     def encode(item):
+        global NUM_TOKENS
         ids = sp_bpe.encode_as_ids(item, add_bos=True)
+        NUM_TOKENS+=len(ids)
         return np.array(ids[:CONTEXT_CAP-1]+[sp_bpe.eos_id()], dtype=np.int64)
 
     train_df = pd.read_csv("train_df.csv",nrows=1000 if config["benchmark_mode"] else None)
@@ -181,7 +184,7 @@ def load_data() -> tuple[DataLoader, DataLoader]:
 
     X_val = [encode(item) for item in val_df["detext"]]
     y_val = [encode(item) for item in val_df["entext"]]
-    print(f"{datetime.now()}: encoding done!")
+    print(f"{datetime.now()}: encoding done! Total number of tokens: {NUM_TOKENS:,}")
 
     print(f"{datetime.now()}: \n\n==============\nencode_as_ids:")
     print(
@@ -709,9 +712,6 @@ def load_model():
 if __name__ == "__main__":
     print(f"{datetime.now()}: code started: ")
     print(f"{datetime.now()}: DEVICE: {DEVICE}")
-    print("""
-Updates made this session:
-- added metrics for non smoothed loss val.\n\n\n\n""")
     if config["benchmark_mode"]:
         print("WARNING: YOU ARE IN BENCH MARK MODE")
     train_loader, val_loader = load_data()
@@ -729,7 +729,7 @@ Updates made this session:
         metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
         val_metrics_text = ", ".join([f"{metrics[i].name}_val: {avg_val_metrics[i]:.3f}" for i in range(len(metrics))])
         print(
-            f"{datetime.now()}: [epoch {epoch}]: avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
+            f"{datetime.now()}: [epoch {epoch}]: tokens_trained_so_far: {NUM_TOKENS*(epoch+1):,} avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
         )
         history.append({
             "avg_loss": avg_loss,
