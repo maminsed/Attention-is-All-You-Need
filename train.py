@@ -31,7 +31,7 @@ LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 200
 NUM_BATCHES = None
-STOP_AFTER_EPOCH=15
+STOP_AFTER_EPOCH=20
 
 if not path.exists(save_file_path_root):
     os.mkdir(save_file_path_root)
@@ -57,7 +57,7 @@ config = {
     # Training params
     "benchmark_mode": False,
     "batch_size": 64,
-    "epochs": 18,  # just for initial testing
+    "epochs": 20,  # just for initial testing
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -544,6 +544,87 @@ def lr_update_fn(step):
     step = max(step,1)
     lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5)
     return lr
+
+def load_best_model():
+    model = Transformer(config).to(config["device"], dtype=config["dtype"])
+    print("\n\n==============")
+    num_parameters=sum(p.numel() for p in model.parameters())
+    non_embd_parameters=sum(p.numel() for n,p in model.named_parameters() if n != 'embedding.weight')
+    print(f"num_parameters: {num_parameters:,} - num_non_embedding_params: {non_embd_parameters:,}")
+
+
+    optimizer = torch.optim.Adam(
+        model.parameters(),
+        lr=config["lr"],
+        betas=config["optim_betas"],
+        eps=config["optim_eps"],
+    )
+    print(f"{datetime.now()}: optimizer loaded")
+
+    scheduler = torch.optim.lr_scheduler.LambdaLR(
+        optimizer,
+        lr_lambda=lr_update_fn
+    )
+    print(f"{datetime.now()}: scheduler loaded")
+
+    # B,C,d_1,..,d_n expected.
+    loss_fn = torch.nn.CrossEntropyLoss(
+        label_smoothing=config["label_smoothing"], ignore_index=config["pad_token"]
+    )
+    print(f"{datetime.now()}: loss_fn loaded")
+
+    metrics = []
+    non_smoothed_loss_fn = torch.nn.CrossEntropyLoss(
+        ignore_index=config["pad_token"]
+    )
+    non_smoothed_loss_fn.name = "non_smoothed_loss_fn"
+    metrics.append(non_smoothed_loss_fn)
+    print(f"{datetime.now()}: metrics loaded")
+
+    history = []
+    last_epoch_vloss = float("inf")
+    non_improve_cnt = 0
+    best_val_loss = float("inf")
+    start_epoch = -1
+    if LOAD_PRE_SAVED:
+        print(f"{datetime.now()}: loading best pre saved")
+        assert path.exists(history_path)
+        assert path.exists(optimizer_path)
+        with open(history_path, "r") as f:
+            dic = json.load(f)
+            history = dic["history"]
+            last_epoch_vloss = dic["last_epoch_vloss"]
+            non_improve_cnt = dic["non_improve_cnt"]
+            best_val_loss = dic["best_val_loss"]
+            start_epoch = dic["epoch"]
+            model_path = dic["model_path"]
+        assert path.exists(model_path)
+
+        model_best_path = f"{save_file_path_root}/best/model.pt"
+        optimizer_best_path = f"{save_file_path_root}/best/optimizer.pt"
+        scheduler_best_path = f"{save_file_path_root}/best/scheduler.pt"
+
+        if path.exists(model_best_path):
+            print("best model path found.")
+            optimizer.load_state_dict(torch.load(optimizer_best_path))
+            scheduler.load_state_dict(torch.load(scheduler_best_path))
+            model.load_state_dict(torch.load(model_best_path))
+        else:
+            optimizer.load_state_dict(torch.load(optimizer_path))
+            scheduler.load_state_dict(torch.load(scheduler_path))
+            model.load_state_dict(torch.load(model_path))
+
+
+        model.to(
+            config["device"], dtype=config["dtype"]
+        )
+
+        
+        print(
+            f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
+        )
+    return model,optimizer,scheduler,loss_fn,metrics,history,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
+
 
 def load_model():
     model = Transformer(config).to(config["device"], dtype=config["dtype"])
