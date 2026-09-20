@@ -1637,6 +1637,586 @@
             "epoch_time": 578.7034029960632,
             "non_smoothed_loss_fn": 2.1662936210632324,
             "non_smoothed_loss_fn_val": 2.187898635864258
+        },
+        {
+            "batch_loss": 2.325329303741455,
+            "batch_percentage": 0.0,
+            "batch_idx": 0,
+            "epoch": 6,
+            "batch_time": 0.5497748851776123,
+            "tokens/sec": 1222.3184763758375
+        },
+        {
+            "batch_loss": 3.410893201828003,
+            "batch_percentage": 0.06210215804999224,
+            "batch_idx": 400,
+            "epoch": 6,
+            "batch_time": 0.07150101661682129,
+            "tokens/sec": 54153.07618282277
+        },
+        {
+            "batch_loss": 3.4460794925689697,
+            "batch_percentage": 0.12420431609998447,
+            "batch_idx": 800,
+            "epoch": 6,
+            "batch_time": 0.16028213500976562,
+            "tokens/sec": 20963.034962039175
+        },
+        {
+            "batch_loss": 2.9940602779388428,
+            "batch_percentage": 0.18630647414997673,
+            "batch_idx": 1200,
+            "epoch": 6,
+            "batch_time": 0.06993985176086426,
+            "tokens/sec": 28367.23198647345
+        },
+        {
+            "batch_loss": 3.5973801612854004,
+            "batch_percentage": 0.24840863219996895,
+            "batch_idx": 1600,
+            "epoch": 6,
+            "batch_time": 0.08550882339477539,
+            "tokens/sec": 58754.17062874669
+        },
+        {
+            "batch_loss": 2.966609477996826,
+            "batch_percentage": 0.3105107902499612,
+            "batch_idx": 2000,
+            "epoch": 6,
+            "batch_time": 0.05868792533874512,
+            "tokens/sec": 21265.02160021125
+        },
+        {
+            "batch_loss": 3.800747871398926,
+            "batch_percentage": 0.37261294829995345,
+            "batch_idx": 2400,
+            "epoch": 6,
+            "batch_time": 0.0846250057220459,
+            "tokens/sec": 62771.044500102835
+        },
+        {
+            "batch_loss": 3.2873306274414062,
+            "batch_percentage": 0.43471510634994565,
+            "batch_idx": 2800,
+            "epoch": 6,
+            "batch_time": 0.06712508201599121,
+            "tokens/sec": 42428.253559846984
+        },
+        {
+            "batch_loss": 3.236182928085327,
+            "batch_percentage": 0.4968172643999379,
+            "batch_idx": 3200,
+            "epoch": 6,
+            "batch_time": 0.06840300559997559,
+            "tokens/sec": 36021.80895982266
+        },
+        {
+            "batch_loss": 3.685389518737793,
+            "batch_percentage": 0.5589194224499301,
+            "batch_idx": 3600,
+            "epoch": 6,
+            "batch_time": 0.20386314392089844,
+            "tokens/sec": 29823.929343300617
+        },
+        {
+            "batch_loss": 2.604201555252075,
+            "batch_percentage": 0.6210215804999224,
+            "batch_idx": 4000,
+            "epoch": 6,
+            "batch_time": 0.06417322158813477,
+            "tokens/sec": 12964.909340843062
+        },
+        {
+            "batch_loss": 1.8690569400787354,
+            "batch_percentage": 0.6831237385499146,
+            "batch_idx": 4400,
+            "epoch": 6,
+            "batch_time": 0.06831073760986328,
+            "tokens/sec": 6558.266177107038
+        },
+        {
+            "batch_loss": 3.306936264038086,
+            "batch_percentage": 0.7452258965999069,
+            "batch_idx": 4800,
+            "epoch": 6,
+            "batch_time": 0.058470726013183594,
+            "tokens/sec": 45424.44024726395
+        },
+        {
+            "batch_loss": 3.4809231758117676,
+            "batch_percentage": 0.8073280546498991,
+            "batch_idx": 5200,
+            "epoch": 6,
+            "batch_time": 0.14895272254943848,
+            "tokens/sec": 22772.326292150658
+        },
+        {
+            "batch_loss": 3.171292781829834,
+            "batch_percentage": 0.8694302126998913,
+            "batch_idx": 5600,
+            "epoch": 6,
+            "batch_time": 0.0958859920501709,
+            "tokens/sec": 26030.913865854418
+        },
+        {
+            "batch_loss": 3.236891746520996,
+            "batch_percentage": 0.9315323707498836,
+            "batch_idx": 6000,
+            "epoch": 6,
+            "batch_time": 0.07522010803222656,
+            "tokens/sec": 48923.088470218325
+        },
+        {
+            "batch_loss": 2.9887595176696777,
+            "batch_percentage": 0.9936345287998758,
+            "batch_idx": 6400,
+            "epoch": 6,
+            "batch_time": 0.06852126121520996,
+            "tokens/sec": 15411.275000956857
+        },
+        {
+            "avg_loss": 3.0188732147216797,
+            "avg_vloss": 3.1245522499084473,
+            "epoch": 6,
+            "avg_time": 0.09650723927880903,
+            "epoch_time": 629.8284561634064,
+            "non_smoothed_loss_fn": 2.0834264755249023,
+            "non_smoothed_loss_fn_val": 2.127028703689575
+        },
+        {
+            "batch_loss": 2.9812307357788086,
+            "batch_percentage": 0.0,
+            "batch_idx": 0,
+            "epoch": 7,
+            "batch_time": 0.054290056228637695,
+            "tokens/sec": 32418.459700758423
+        },
+        {
+            "batch_loss": 2.9398272037506104,
+            "batch_percentage": 0.06210215804999224,
+            "batch_idx": 400,
+            "epoch": 7,
+            "batch_time": 0.06783580780029297,
+            "tokens/sec": 33492.6357284447
+        },
+        {
+            "batch_loss": 2.9613723754882812,
+            "batch_percentage": 0.12420431609998447,
+            "batch_idx": 800,
+            "epoch": 7,
+            "batch_time": 0.08663558959960938,
+            "tokens/sec": 24377.97226013826
+        },
+        {
+            "batch_loss": 2.4928860664367676,
+            "batch_percentage": 0.18630647414997673,
+            "batch_idx": 1200,
+            "epoch": 7,
+            "batch_time": 0.13254880905151367,
+            "tokens/sec": 7001.1945534670385
+        },
+        {
+            "batch_loss": 3.0291600227355957,
+            "batch_percentage": 0.24840863219996895,
+            "batch_idx": 1600,
+            "epoch": 7,
+            "batch_time": 0.05791115760803223,
+            "tokens/sec": 33154.232781796396
+        },
+        {
+            "batch_loss": 2.82645845413208,
+            "batch_percentage": 0.3105107902499612,
+            "batch_idx": 2000,
+            "epoch": 7,
+            "batch_time": 0.0859079360961914,
+            "tokens/sec": 17507.113642166496
+        },
+        {
+            "batch_loss": 3.725614547729492,
+            "batch_percentage": 0.37261294829995345,
+            "batch_idx": 2400,
+            "epoch": 7,
+            "batch_time": 0.21983575820922852,
+            "tokens/sec": 28821.51680696876
+        },
+        {
+            "batch_loss": 3.0708365440368652,
+            "batch_percentage": 0.43471510634994565,
+            "batch_idx": 2800,
+            "epoch": 7,
+            "batch_time": 0.08031702041625977,
+            "tokens/sec": 26694.21735129455
+        },
+        {
+            "batch_loss": 3.247670888900757,
+            "batch_percentage": 0.4968172643999379,
+            "batch_idx": 3200,
+            "epoch": 7,
+            "batch_time": 0.21976184844970703,
+            "tokens/sec": 15434.89019558491
+        },
+        {
+            "batch_loss": 3.0117416381835938,
+            "batch_percentage": 0.5589194224499301,
+            "batch_idx": 3600,
+            "epoch": 7,
+            "batch_time": 0.09458279609680176,
+            "tokens/sec": 17254.723558074053
+        },
+        {
+            "batch_loss": 3.0999484062194824,
+            "batch_percentage": 0.6210215804999224,
+            "batch_idx": 4000,
+            "epoch": 7,
+            "batch_time": 0.1712791919708252,
+            "tokens/sec": 13451.721563425237
+        },
+        {
+            "batch_loss": 2.8462700843811035,
+            "batch_percentage": 0.6831237385499146,
+            "batch_idx": 4400,
+            "epoch": 7,
+            "batch_time": 0.11271119117736816,
+            "tokens/sec": 17886.422625305397
+        },
+        {
+            "batch_loss": 4.077068328857422,
+            "batch_percentage": 0.7452258965999069,
+            "batch_idx": 4800,
+            "epoch": 7,
+            "batch_time": 0.1806797981262207,
+            "tokens/sec": 45162.76907891785
+        },
+        {
+            "batch_loss": 3.286661148071289,
+            "batch_percentage": 0.8073280546498991,
+            "batch_idx": 5200,
+            "epoch": 7,
+            "batch_time": 0.09247803688049316,
+            "tokens/sec": 32526.64201649475
+        },
+        {
+            "batch_loss": 2.5308332443237305,
+            "batch_percentage": 0.8694302126998913,
+            "batch_idx": 5600,
+            "epoch": 7,
+            "batch_time": 0.13762903213500977,
+            "tokens/sec": 5812.727064847953
+        },
+        {
+            "batch_loss": 3.2491037845611572,
+            "batch_percentage": 0.9315323707498836,
+            "batch_idx": 6000,
+            "epoch": 7,
+            "batch_time": 0.11289191246032715,
+            "tokens/sec": 28345.69749294091
+        },
+        {
+            "batch_loss": 2.4056403636932373,
+            "batch_percentage": 0.9936345287998758,
+            "batch_idx": 6400,
+            "epoch": 7,
+            "batch_time": 0.08096981048583984,
+            "tokens/sec": 8694.59858897801
+        },
+        {
+            "avg_loss": 2.9619975090026855,
+            "avg_vloss": 3.091273069381714,
+            "epoch": 7,
+            "avg_time": 0.09554902127654892,
+            "epoch_time": 619.0936059951782,
+            "non_smoothed_loss_fn": 2.0181641578674316,
+            "non_smoothed_loss_fn_val": 2.085054874420166
+        },
+        {
+            "batch_loss": 2.648219347000122,
+            "batch_percentage": 0.0,
+            "batch_idx": 0,
+            "epoch": 8,
+            "batch_time": 0.14475798606872559,
+            "tokens/sec": 5747.524006067603
+        },
+        {
+            "batch_loss": 2.8460018634796143,
+            "batch_percentage": 0.06210215804999224,
+            "batch_idx": 400,
+            "epoch": 8,
+            "batch_time": 0.0770871639251709,
+            "tokens/sec": 20340.610811964358
+        },
+        {
+            "batch_loss": 2.6190977096557617,
+            "batch_percentage": 0.12420431609998447,
+            "batch_idx": 800,
+            "epoch": 8,
+            "batch_time": 0.0875701904296875,
+            "tokens/sec": 17540.215368531102
+        },
+        {
+            "batch_loss": 3.1471729278564453,
+            "batch_percentage": 0.18630647414997673,
+            "batch_idx": 1200,
+            "epoch": 8,
+            "batch_time": 0.0895090103149414,
+            "tokens/sec": 26455.43718635797
+        },
+        {
+            "batch_loss": 3.1590373516082764,
+            "batch_percentage": 0.24840863219996895,
+            "batch_idx": 1600,
+            "epoch": 8,
+            "batch_time": 0.051191091537475586,
+            "tokens/sec": 47508.266125163595
+        },
+        {
+            "batch_loss": 3.502586841583252,
+            "batch_percentage": 0.3105107902499612,
+            "batch_idx": 2000,
+            "epoch": 8,
+            "batch_time": 0.14032220840454102,
+            "tokens/sec": 39452.0586794075
+        },
+        {
+            "batch_loss": 3.1325864791870117,
+            "batch_percentage": 0.37261294829995345,
+            "batch_idx": 2400,
+            "epoch": 8,
+            "batch_time": 0.08817815780639648,
+            "tokens/sec": 25766.017985864386
+        },
+        {
+            "batch_loss": 3.313607931137085,
+            "batch_percentage": 0.43471510634994565,
+            "batch_idx": 2800,
+            "epoch": 8,
+            "batch_time": 0.07819509506225586,
+            "tokens/sec": 44197.14557861294
+        },
+        {
+            "batch_loss": 2.791416645050049,
+            "batch_percentage": 0.4968172643999379,
+            "batch_idx": 3200,
+            "epoch": 8,
+            "batch_time": 0.10108208656311035,
+            "tokens/sec": 15195.570770504448
+        },
+        {
+            "batch_loss": 2.6590323448181152,
+            "batch_percentage": 0.5589194224499301,
+            "batch_idx": 3600,
+            "epoch": 8,
+            "batch_time": 0.11424684524536133,
+            "tokens/sec": 16525.620431314772
+        },
+        {
+            "batch_loss": 2.620715379714966,
+            "batch_percentage": 0.6210215804999224,
+            "batch_idx": 4000,
+            "epoch": 8,
+            "batch_time": 0.12067914009094238,
+            "tokens/sec": 6894.314952634022
+        },
+        {
+            "batch_loss": 3.341200828552246,
+            "batch_percentage": 0.6831237385499146,
+            "batch_idx": 4400,
+            "epoch": 8,
+            "batch_time": 0.1652541160583496,
+            "tokens/sec": 19557.757937229308
+        },
+        {
+            "batch_loss": 3.3201494216918945,
+            "batch_percentage": 0.7452258965999069,
+            "batch_idx": 4800,
+            "epoch": 8,
+            "batch_time": 0.10987997055053711,
+            "tokens/sec": 32617.409542821188
+        },
+        {
+            "batch_loss": 3.2854557037353516,
+            "batch_percentage": 0.8073280546498991,
+            "batch_idx": 5200,
+            "epoch": 8,
+            "batch_time": 0.14159417152404785,
+            "tokens/sec": 16045.858212561607
+        },
+        {
+            "batch_loss": 2.9655704498291016,
+            "batch_percentage": 0.8694302126998913,
+            "batch_idx": 5600,
+            "epoch": 8,
+            "batch_time": 0.0517420768737793,
+            "tokens/sec": 40199.3913981071
+        },
+        {
+            "batch_loss": 2.4403579235076904,
+            "batch_percentage": 0.9315323707498836,
+            "batch_idx": 6000,
+            "epoch": 8,
+            "batch_time": 0.08660483360290527,
+            "tokens/sec": 12193.314807830484
+        },
+        {
+            "batch_loss": 3.3463053703308105,
+            "batch_percentage": 0.9936345287998758,
+            "batch_idx": 6400,
+            "epoch": 8,
+            "batch_time": 0.09784412384033203,
+            "tokens/sec": 33686.233476612375
+        },
+        {
+            "avg_loss": 2.9172706604003906,
+            "avg_vloss": 3.056825637817383,
+            "epoch": 8,
+            "avg_time": 0.09928689323547298,
+            "epoch_time": 643.3775610923767,
+            "non_smoothed_loss_fn": 1.9667730331420898,
+            "non_smoothed_loss_fn_val": 2.042253255844116
+        },
+        {
+            "batch_loss": 3.5499415397644043,
+            "batch_percentage": 0.0,
+            "batch_idx": 0,
+            "epoch": 9,
+            "batch_time": 0.10213088989257812,
+            "tokens/sec": 60158.097187464984
+        },
+        {
+            "batch_loss": 2.6599583625793457,
+            "batch_percentage": 0.06210215804999224,
+            "batch_idx": 400,
+            "epoch": 9,
+            "batch_time": 0.16893696784973145,
+            "tokens/sec": 7766.21018300161
+        },
+        {
+            "batch_loss": 3.204719066619873,
+            "batch_percentage": 0.12420431609998447,
+            "batch_idx": 800,
+            "epoch": 9,
+            "batch_time": 0.06254291534423828,
+            "tokens/sec": 45536.7324072521
+        },
+        {
+            "batch_loss": 3.317777633666992,
+            "batch_percentage": 0.18630647414997673,
+            "batch_idx": 1200,
+            "epoch": 9,
+            "batch_time": 0.10866594314575195,
+            "tokens/sec": 29742.529319098332
+        },
+        {
+            "batch_loss": 2.2101354598999023,
+            "batch_percentage": 0.24840863219996895,
+            "batch_idx": 1600,
+            "epoch": 9,
+            "batch_time": 0.09497785568237305,
+            "tokens/sec": 7412.254097990291
+        },
+        {
+            "batch_loss": 3.1212964057922363,
+            "batch_percentage": 0.3105107902499612,
+            "batch_idx": 2000,
+            "epoch": 9,
+            "batch_time": 0.07317709922790527,
+            "tokens/sec": 25800.421442232193
+        },
+        {
+            "batch_loss": 3.275979995727539,
+            "batch_percentage": 0.37261294829995345,
+            "batch_idx": 2400,
+            "epoch": 9,
+            "batch_time": 0.15679121017456055,
+            "tokens/sec": 25511.634201602727
+        },
+        {
+            "batch_loss": 3.2024009227752686,
+            "batch_percentage": 0.43471510634994565,
+            "batch_idx": 2800,
+            "epoch": 9,
+            "batch_time": 0.10495781898498535,
+            "tokens/sec": 28964.016491566814
+        },
+        {
+            "batch_loss": 3.215360403060913,
+            "batch_percentage": 0.4968172643999379,
+            "batch_idx": 3200,
+            "epoch": 9,
+            "batch_time": 0.06455230712890625,
+            "tokens/sec": 38170.595437891505
+        },
+        {
+            "batch_loss": 3.3107452392578125,
+            "batch_percentage": 0.5589194224499301,
+            "batch_idx": 3600,
+            "epoch": 9,
+            "batch_time": 0.13332772254943848,
+            "tokens/sec": 29041.222080158506
+        },
+        {
+            "batch_loss": 2.8941235542297363,
+            "batch_percentage": 0.6210215804999224,
+            "batch_idx": 4000,
+            "epoch": 9,
+            "batch_time": 0.12211132049560547,
+            "tokens/sec": 14675.134072147637
+        },
+        {
+            "batch_loss": 3.2192788124084473,
+            "batch_percentage": 0.6831237385499146,
+            "batch_idx": 4400,
+            "epoch": 9,
+            "batch_time": 0.09339499473571777,
+            "tokens/sec": 30494.139520635545
+        },
+        {
+            "batch_loss": 2.5163769721984863,
+            "batch_percentage": 0.7452258965999069,
+            "batch_idx": 4800,
+            "epoch": 9,
+            "batch_time": 0.04269003868103027,
+            "tokens/sec": 20238.91349585323
+        },
+        {
+            "batch_loss": 2.5476303100585938,
+            "batch_percentage": 0.8073280546498991,
+            "batch_idx": 5200,
+            "epoch": 9,
+            "batch_time": 0.05522513389587402,
+            "tokens/sec": 18542.2818880029
+        },
+        {
+            "batch_loss": 2.2234442234039307,
+            "batch_percentage": 0.8694302126998913,
+            "batch_idx": 5600,
+            "epoch": 9,
+            "batch_time": 0.06108283996582031,
+            "tokens/sec": 11001.453114754098
+        },
+        {
+            "batch_loss": 3.356041431427002,
+            "batch_percentage": 0.9315323707498836,
+            "batch_idx": 6000,
+            "epoch": 9,
+            "batch_time": 0.13768291473388672,
+            "tokens/sec": 30679.187814727335
+        },
+        {
+            "batch_loss": 3.851093292236328,
+            "batch_percentage": 0.9936345287998758,
+            "batch_idx": 6400,
+            "epoch": 9,
+            "batch_time": 0.060630083084106445,
+            "tokens/sec": 134586.6537685656
+        },
+        {
+            "avg_loss": 2.879629373550415,
+            "avg_vloss": 3.0354859828948975,
+            "epoch": 9,
+            "avg_time": 0.0963759198726991,
+            "epoch_time": 624.932783126831,
+            "non_smoothed_loss_fn": 1.9235776662826538,
+            "non_smoothed_loss_fn_val": 2.0223188400268555
         }
     ],
     "config": {
@@ -1653,7 +2233,7 @@
         "drop_post_emb": 0.2,
         "benchmark_mode": false,
         "batch_size": 32,
-        "epochs": 6,
+        "epochs": 10,
         "early_stopping_limit": 5,
         "optimizer": "adam",
         "lr": 1.0,
@@ -1679,11 +2259,11 @@
         "num_workers": 2,
         "pin_memory": false
     },
-    "last_epoch_vloss": 3.177083730697632,
+    "last_epoch_vloss": 3.0354859828948975,
     "non_improve_cnt": 0,
-    "best_val_loss": 3.177083730697632,
-    "epoch": 5,
-    "model_path": "./test/overnight_Sep_20/model_5_3.177083730697632.pt",
+    "best_val_loss": 3.0354859828948975,
+    "epoch": 9,
+    "model_path": "./test/overnight_Sep_20/model_9_3.0354859828948975.pt",
     "history_path": "./test/overnight_Sep_20/history.json",
     "optim_path": "./test/overnight_Sep_20/optimizer.pt",
     "scheduler_path": "./test/overnight_Sep_20/scheduler.pt"

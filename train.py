@@ -22,12 +22,12 @@ from torch.utils.data import DataLoader, Dataset
 PAD_TOKEN = 3
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 CONTEXT_CAP = 128
-save_file_path_root = "./test/overnight_Sep_9"
+save_file_path_root = "./test/overnight_Sep_20_v2"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
 VERBOSE_FREQ = 400
 NUM_BATCHES = None
@@ -168,12 +168,10 @@ def load_data() -> tuple[DataLoader, DataLoader]:
         NUM_TOKENS+=len(ids)
         return np.array(ids[:CONTEXT_CAP-1]+[sp_bpe.eos_id()], dtype=np.int64)
 
-    train_df = pd.read_csv("train_df.csv",nrows=1000 if config["benchmark_mode"] else None)
-    val_df = pd.read_csv("val_df.csv")
-    title_df = pd.read_csv("title_df.csv")
+    train_df = pd.read_csv("train_filtered_df.csv",nrows=1000 if config["benchmark_mode"] else None)
+    val_df = pd.read_csv("val_sorted_df.csv")
 
     print(f"{datetime.now()}: # train sentences {train_df.shape[0]:,}")
-    print(f"{datetime.now()}: # train docs {title_df.shape[0]:,}")
     print(f"{datetime.now()}: # val sentences {val_df.shape[0]:,}")
     print(train_df.head())
 
@@ -509,7 +507,10 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
         json.dump(
             {
                 "history": history,
-                "config": {k:(v if (type(v) == int or type(v) == str or type(v) == list) else str(v)) for k,v in config.items()},
+                "config": {k:(v if (
+                    not type(v).__module__.startswith("torch")
+                    ) else str(v)) 
+                    for k,v in config.items()},
                 "last_epoch_vloss": last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": best_val_loss,
@@ -616,7 +617,7 @@ def load_best_model():
         best_val_loss = dic["best_val_loss"]
         start_epoch = dic["epoch"]
         model_path = dic["model_path"]
-        config = {k:(v if k not in ["device","autocast","dtype"] else config[k]) for k,v in dic["config"].items()}
+        config = {k:(v if k not in ["device","autocast_dtype","dtype"] else config[k]) for k,v in dic["config"].items()}
 
     model = Transformer(config).to(config["device"], dtype=config["dtype"])
     print("\n\n==============")
