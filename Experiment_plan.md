@@ -42,7 +42,7 @@ Results:
     - (check what metric did they use for early stopping)
 - try with reduced batch size
 
-## September 19th: 
+## September 19th (v2): 
 - BLEU
 - reduce epochs to 20->6
 - reduce warmup steps 3000 -> 1000

@@ -6,7 +6,6 @@ import time
 from os import path
 import os
 import re
-import sys
 
 import numpy as np
 import pandas as pd
@@ -15,6 +14,7 @@ import torch
 from frozendict import frozendict
 from torch.nn import ModuleList
 from torch.nn.utils.rnn import pad_sequence
+from torchmetrics.text import BLEUScore
 
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
@@ -22,12 +22,12 @@ from torch.utils.data import DataLoader, Dataset
 PAD_TOKEN = 3
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 CONTEXT_CAP = 128
-save_file_path_root = "./test/overnight_Sep_19_v2"
+save_file_path_root = "./test/overnight_Sep_9"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 200
 NUM_BATCHES = None
@@ -48,8 +48,8 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 6,  # number of encoder layers
-    "num_dec_layers": 6,  # number of encoder layers
+    "num_enc_layers": 6,#3,  # number of encoder layers
+    "num_dec_layers": 6,#3,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.2,
@@ -57,7 +57,7 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 64,
+    "batch_size": 64, #32,
     "epochs": 6,  # just for initial testing
     "early_stopping_limit": 5,
     ## Optimizer
@@ -162,7 +162,6 @@ def collate_fn(batch):
 
 
 def load_data() -> tuple[DataLoader, DataLoader]:
-    sp_bpe = spm.SentencePieceProcessor()
     sp_bpe.load("bpe.model")
     def encode(item):
         global NUM_TOKENS
@@ -313,30 +312,30 @@ class Transformer(torch.nn.Module):
 
         self.config = config
         self.pad_token = self.config["pad_token"]
-        self.embedding = torch.nn.Embedding(config["vocab_size"], config["d_model"])
+        self.embedding = torch.nn.Embedding(self.config["vocab_size"], self.config["d_model"])
         torch.nn.init.uniform_(self.embedding.weight,-SQRT_INV_DM,SQRT_INV_DM)
-        self.dropout = torch.nn.Dropout(config["drop_post_emb"])
+        self.dropout = torch.nn.Dropout(self.config["drop_post_emb"])
 
         # encoder
         self.encoder_attention = ModuleList(
-            [SelfAttention(config) for _ in range(config["num_enc_layers"])]
+            [SelfAttention(self.config) for _ in range(self.config["num_enc_layers"])]
         )
         self.encoder_MLP = ModuleList(
-            [MLP(config) for _ in range(config["num_enc_layers"])]
+            [MLP(self.config) for _ in range(self.config["num_enc_layers"])]
         )
 
         # decoder
         self.decoder_attention = ModuleList(
             [
-                SelfAttention(config, lookahead_mask=True, pad_mask=False)
-                for _ in range(config["num_dec_layers"])
+                SelfAttention(self.config, lookahead_mask=True, pad_mask=False)
+                for _ in range(self.config["num_dec_layers"])
             ]
         )
         self.cross_attention = ModuleList(
-            [SelfAttention(config) for _ in range(config["num_dec_layers"])]
+            [SelfAttention(self.config) for _ in range(self.config["num_dec_layers"])]
         )
         self.decoder_MLP = ModuleList(
-            [MLP(config) for _ in range(config["num_dec_layers"])]
+            [MLP(self.config) for _ in range(self.config["num_dec_layers"])]
         )
 
     def positional_encoding(self, seq_len, device=None, d_model=None, n=10000):
@@ -351,7 +350,7 @@ class Transformer(torch.nn.Module):
         return pe  # CUDA- S,d_m
 
     def forward(self, x, y):
-        # the device names are written next to it assuming that config["device"] is CUDA and the rest is the shape. we assume input shape is:
+        # the device names are written next to it assuming that self.config["device"] is CUDA and the rest is the shape. we assume input shape is:
         # x.shape = CUDA- B,S
         # y.shape = CUDA- B,Sy
         # returns: CUDA- B,Sy,VS
@@ -400,6 +399,62 @@ class Transformer(torch.nn.Module):
         # unembedding
         y = y @ self.embedding.weight.T  # CUDA - B,Sy,VS
         return y  # CUDA- B,Sy,VS
+
+
+def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
+    bleu_fn = BLEUScore()
+    model.eval()
+    avg_bleu = 0
+    avg_cnt = 0
+    total_sample = 0
+    EOS_ID = sp_bpe.eos_id()
+    BOS_ID = sp_bpe.bos_id()
+    with torch.no_grad():
+        for i,(x, y) in enumerate(loader):
+            print(f"at: {i}/{len(loader)}")
+            B = x.shape[0]
+            x = x.tolist()
+            eng_list = [[BOS_ID] for _ in range(B)]
+
+            eos_idx = [-1 for _ in range(B)]
+            has_eos = [False for _ in range(B)]
+            num_without_eos=B
+            cnt=0
+            while cnt < CONTEXT_CAP:
+                cnt+=1
+                cur_eng = []
+                cur_idx = []
+                new_x = []
+                for idx in range(len(eng_list)):
+                    if not has_eos[idx]:
+                        cur_eng.append(eng_list[idx])
+                        cur_idx.append(idx)
+                        new_x.append(x[idx])
+
+                eng_decs = torch.tensor(cur_eng, device=DEVICE,dtype=torch.long) # B,Sy
+                new_x = torch.tensor(new_x,device=DEVICE,dtype=torch.long)
+                output = torch.argmax(model(new_x,eng_decs)[:,-1,:],dim=1) # B
+
+                for mi,v in enumerate(output.cpu().tolist()):
+                    idx = cur_idx[mi]
+                    eng_list[idx].append(v)
+
+                    is_eos = (v == EOS_ID)
+                    has_eos[idx]=has_eos[idx] or is_eos
+                    eos_idx[idx]=eos_idx[idx] if is_eos else cnt
+                    num_without_eos-=1 if is_eos else 0
+                
+                if num_without_eos == 0:
+                    break
+            
+            avg_cnt+=sum(eos_idx)
+            total_sample+=B
+            eng_decod = [sp_bpe.decode_ids(row) for row in eng_list]
+            orig_decod = [[sp_bpe.decode_ids(idx)] for idx in y.tolist()]
+            avg_bleu+=bleu_fn(eng_decod,orig_decod)
+            print(f"avg_bleu: {avg_bleu/(i+1)*100:.2f}, avg_cnt: {avg_cnt/total_sample:.2f}")
+    return avg_bleu/len(loader),avg_cnt/total_sample,total_sample
+
 
 
 
@@ -453,7 +508,7 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
         json.dump(
             {
                 "history": history,
-                "config": {k:str(v) for k,v in config.items()},
+                "config": {k:(v if type(v) != int or type(v) != str else str(v)) for k,v in config.items()},
                 "last_epoch_vloss": last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": best_val_loss,
@@ -549,26 +604,25 @@ def lr_update_fn(step):
     return lr
 
 def load_best_model():
+    global config
+    # ONLY USE IN EVALUATION
+    assert path.exists(history_path)
+    with open(history_path, "r") as f:
+        dic = json.load(f)
+        history = dic["history"]
+        last_epoch_vloss = dic["last_epoch_vloss"]
+        non_improve_cnt = dic["non_improve_cnt"]
+        best_val_loss = dic["best_val_loss"]
+        start_epoch = dic["epoch"]
+        model_path = dic["model_path"]
+        config = {k:(v if k not in ["device","autocast","dtype"] else config[k]) for k,v in dic["config"].items()}
+
     model = Transformer(config).to(config["device"], dtype=config["dtype"])
     print("\n\n==============")
+
     num_parameters=sum(p.numel() for p in model.parameters())
     non_embd_parameters=sum(p.numel() for n,p in model.named_parameters() if n != 'embedding.weight')
     print(f"num_parameters: {num_parameters:,} - num_non_embedding_params: {non_embd_parameters:,}")
-
-
-    optimizer = torch.optim.Adam(
-        model.parameters(),
-        lr=config["lr"],
-        betas=config["optim_betas"],
-        eps=config["optim_eps"],
-    )
-    print(f"{datetime.now()}: optimizer loaded")
-
-    scheduler = torch.optim.lr_scheduler.LambdaLR(
-        optimizer,
-        lr_lambda=lr_update_fn
-    )
-    print(f"{datetime.now()}: scheduler loaded")
 
     # B,C,d_1,..,d_n expected.
     loss_fn = torch.nn.CrossEntropyLoss(
@@ -576,57 +630,21 @@ def load_best_model():
     )
     print(f"{datetime.now()}: loss_fn loaded")
 
-    metrics = []
-    non_smoothed_loss_fn = torch.nn.CrossEntropyLoss(
-        ignore_index=config["pad_token"]
-    )
-    non_smoothed_loss_fn.name = "non_smoothed_loss_fn"
-    metrics.append(non_smoothed_loss_fn)
-    print(f"{datetime.now()}: metrics loaded")
+    print(f"{datetime.now()}: loading best pre saved")
+    model_best_path = f"{save_file_path_root}/best/model.pt"
+    if path.exists(model_best_path):
+        print("best model path found.")
+        model.load_state_dict(torch.load(model_best_path))
+    else:
+        model.load_state_dict(torch.load(model_path))
 
-    history = []
-    last_epoch_vloss = float("inf")
-    non_improve_cnt = 0
-    best_val_loss = float("inf")
-    start_epoch = -1
-    if LOAD_PRE_SAVED:
-        print(f"{datetime.now()}: loading best pre saved")
-        assert path.exists(history_path)
-        assert path.exists(optimizer_path)
-        with open(history_path, "r") as f:
-            dic = json.load(f)
-            history = dic["history"]
-            last_epoch_vloss = dic["last_epoch_vloss"]
-            non_improve_cnt = dic["non_improve_cnt"]
-            best_val_loss = dic["best_val_loss"]
-            start_epoch = dic["epoch"]
-            model_path = dic["model_path"]
-        assert path.exists(model_path)
-
-        model_best_path = f"{save_file_path_root}/best/model.pt"
-        optimizer_best_path = f"{save_file_path_root}/best/optimizer.pt"
-        scheduler_best_path = f"{save_file_path_root}/best/scheduler.pt"
-
-        if path.exists(model_best_path):
-            print("best model path found.")
-            optimizer.load_state_dict(torch.load(optimizer_best_path))
-            scheduler.load_state_dict(torch.load(scheduler_best_path))
-            model.load_state_dict(torch.load(model_best_path))
-        else:
-            optimizer.load_state_dict(torch.load(optimizer_path))
-            scheduler.load_state_dict(torch.load(scheduler_path))
-            model.load_state_dict(torch.load(model_path))
-
-
-        model.to(
-            config["device"], dtype=config["dtype"]
-        )
+    model.to(config["device"], dtype=config["dtype"])
 
         
-        print(
-            f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
-        )
-    return model,optimizer,scheduler,loss_fn,metrics,history,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
+    print(
+        f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
+    )
+    return model,loss_fn,history
 
 
 def load_model():
@@ -714,6 +732,8 @@ if __name__ == "__main__":
     print(f"{datetime.now()}: DEVICE: {DEVICE}")
     if config["benchmark_mode"]:
         print("WARNING: YOU ARE IN BENCH MARK MODE")
+        
+    sp_bpe = spm.SentencePieceProcessor()
     train_loader, val_loader = load_data()
 
     model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model()
