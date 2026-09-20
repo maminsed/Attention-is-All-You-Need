@@ -42,6 +42,22 @@ Results:
     - (check what metric did they use for early stopping)
 - try with reduced batch size
 
+## September 19th: 
+- BLEU
+- reduce epochs to 20->6
+- reduce warmup steps 3000 -> 1000
+- increase model size if it confirms with scaling laws 
+    - number of layers 4 -> 6
+- increase dropout. 
+    - drop_pre_norm, drop_post_emb 0.1 -> 0.3
+
+dataset size: 10^7, params: 10^7
+
+Results:
+- worked horribly. 
+- avg_vloss: 6!
+- stopped improving at epoch 2...
+
 
 
 ## To be done:

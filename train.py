@@ -22,12 +22,12 @@ from torch.utils.data import DataLoader, Dataset
 PAD_TOKEN = 3
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 CONTEXT_CAP = 128
-save_file_path_root = "./test/overnight_Sep_9"
+save_file_path_root = "./test/overnight_Sep_19_v2"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
 VERBOSE_FREQ = 200
 NUM_BATCHES = None
@@ -48,17 +48,17 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 4,  # number of encoder layers
-    "num_dec_layers": 4,  # number of encoder layers
+    "num_enc_layers": 6,  # number of encoder layers
+    "num_dec_layers": 6,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
-    "drop_pre_norm": 0.1,
-    "drop_post_emb": 0.1,
+    "drop_pre_norm": 0.2,
+    "drop_post_emb": 0.2,
 
     # Training params
     "benchmark_mode": False,
     "batch_size": 64,
-    "epochs": 20,  # just for initial testing
+    "epochs": 6,  # just for initial testing
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -66,7 +66,7 @@ config = {
     "optim_betas": [0.9, 0.98],
     "optim_eps": 1e-9,
     ### Scheduler
-    "warmup_steps": 3000, # lowering a bit since were training for less epochs
+    "warmup_steps": 1000, # lowering a bit since were training for less epochs
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,

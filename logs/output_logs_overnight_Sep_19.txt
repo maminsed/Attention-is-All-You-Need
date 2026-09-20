@@ -1,0 +1,104 @@
+2026-09-19 16:43:33.759723: code started: 
+2026-09-19 16:43:33.759772: DEVICE: mps
+2026-09-19 16:43:34.192420: # train sentences 206,112
+2026-09-19 16:43:34.192462: # train docs 1,705
+2026-09-19 16:43:34.192471: # val sentences 888
+   Unnamed: 0  ...                                             detext
+0           0  ...                                Vielen Dank, Chris.
+1           1  ...  Es ist mir wirklich eine Ehre, zweimal auf die...
+2           2  ...  Ich bin wirklich begeistert von dieser Konfere...
+3           3  ...  Das meine ich ernst, teilweise deshalb -- weil...
+4           4  ...              Versetzen Sie sich mal in meine Lage!
+
+[5 rows x 6 columns]
+2026-09-19 16:43:40.346534: encoding done! Total number of tokens: 11,180,994
+2026-09-19 16:43:40.346573: 
+
+==============
+encode_as_ids:
+[1, 1215, 91, 2]
+2026-09-19 16:43:40.346633: batches/epoch: 3,221
+
+
+==============
+num_parameters: 62,386,176 - num_non_embedding_params: 58,802,176
+2026-09-19 16:43:41.666133: optimizer loaded
+2026-09-19 16:43:41.666188: scheduler loaded
+2026-09-19 16:43:41.666218: loss_fn loaded
+2026-09-19 16:43:41.666235: metrics loaded
+2026-09-19 16:43:41.666244: training started!
+2026-09-19 16:43:41.666590: Epoch: 0
+2026-09-19 16:43:46.896634: [epoch 0] batch 0 loss_value: 9.0491, batch_time (s): 0.873, tokens/sec: 5,867.448
+2026-09-19 16:48:30.095737: [epoch 0] batch 200 loss_value: 5.4329, batch_time (s): 0.267, tokens/sec: 10,803.681
+2026-09-19 16:52:58.555729: [epoch 0] batch 400 loss_value: 5.8761, batch_time (s): 0.381, tokens/sec: 12,251.947
+2026-09-19 16:56:11.660736: [epoch 0] batch 600 loss_value: 5.7983, batch_time (s): 0.282, tokens/sec: 12,024.838
+2026-09-19 16:59:52.733569: [epoch 0] batch 800 loss_value: 5.9586, batch_time (s): 4.681, tokens/sec: 1,408.289
+2026-09-19 17:04:58.345847: [epoch 0] batch 1000 loss_value: 5.8182, batch_time (s): 0.260, tokens/sec: 11,323.991
+2026-09-19 17:07:55.941156: [epoch 0] batch 1200 loss_value: 6.6498, batch_time (s): 0.227, tokens/sec: 10,146.657
+2026-09-19 17:11:32.003300: [epoch 0] batch 1400 loss_value: 6.6293, batch_time (s): 0.255, tokens/sec: 11,291.283
+2026-09-19 17:15:36.513835: [epoch 0] batch 1600 loss_value: 6.1571, batch_time (s): 0.187, tokens/sec: 9,245.980
+2026-09-19 17:19:07.589621: [epoch 0] batch 1800 loss_value: 6.3804, batch_time (s): 0.363, tokens/sec: 6,530.611
+2026-09-19 17:22:13.331030: [epoch 0] batch 2000 loss_value: 6.7246, batch_time (s): 0.290, tokens/sec: 12,139.020
+2026-09-19 17:26:08.501631: [epoch 0] batch 2200 loss_value: 6.2728, batch_time (s): 1.057, tokens/sec: 2,239.966
+2026-09-19 17:31:30.842122: [epoch 0] batch 2400 loss_value: 6.1678, batch_time (s): 0.195, tokens/sec: 9,853.820
+2026-09-19 17:39:41.376496: [epoch 0] batch 2600 loss_value: 6.7993, batch_time (s): 0.403, tokens/sec: 12,060.899
+2026-09-19 17:48:06.169009: [epoch 0] batch 2800 loss_value: 6.5499, batch_time (s): 0.231, tokens/sec: 11,913.423
+2026-09-19 17:54:12.402566: [epoch 0] batch 3000 loss_value: 6.3311, batch_time (s): 0.292, tokens/sec: 7,678.673
+2026-09-19 18:00:06.283274: [epoch 0] batch 3200 loss_value: 6.5672, batch_time (s): 0.273, tokens/sec: 11,721.909
+2026-09-19 18:01:07.529960: [epoch 0]: tokens_trained_so_far: 11,180,994 avg_loss: 6.4067, non_smoothed_loss_fn: 5.981, non_smoothed_loss_fn_val: 8.869, avg_vloss: 9.1674, avg_time (s): 1.430, epoch_time (s): 4,626.097
+2026-09-19 18:01:11.439673: [epoch 0]: history saved
+2026-09-19 18:01:11.441358: Epoch: 1
+2026-09-19 18:01:13.512865: [epoch 1] batch 0 loss_value: 6.2762, batch_time (s): 1.757, tokens/sec: 1,238.729
+2026-09-19 18:09:03.334736: [epoch 1] batch 200 loss_value: 5.7826, batch_time (s): 0.268, tokens/sec: 5,978.225
+2026-09-19 18:18:36.624999: [epoch 1] batch 400 loss_value: 6.1409, batch_time (s): 0.339, tokens/sec: 5,473.664
+2026-09-19 18:30:18.874248: [epoch 1] batch 600 loss_value: 6.6913, batch_time (s): 0.417, tokens/sec: 10,908.650
+2026-09-19 18:39:41.341082: [epoch 1] batch 800 loss_value: 6.4013, batch_time (s): 0.251, tokens/sec: 10,956.549
+2026-09-19 18:49:02.934461: [epoch 1] batch 1000 loss_value: 6.5298, batch_time (s): 3.077, tokens/sec: 936.122
+2026-09-19 18:55:11.771361: [epoch 1] batch 1200 loss_value: 6.8814, batch_time (s): 6.353, tokens/sec: 1,823.377
+2026-09-19 19:02:03.208110: [epoch 1] batch 1400 loss_value: 6.8753, batch_time (s): 0.484, tokens/sec: 12,299.509
+2026-09-19 19:07:49.437735: [epoch 1] batch 1600 loss_value: 6.3621, batch_time (s): 0.375, tokens/sec: 7,680.513
+2026-09-19 19:15:34.132368: [epoch 1] batch 1800 loss_value: 6.7539, batch_time (s): 0.461, tokens/sec: 11,241.068
+2026-09-19 19:24:10.706612: [epoch 1] batch 2000 loss_value: 6.6465, batch_time (s): 0.741, tokens/sec: 5,528.196
+2026-09-19 19:33:30.830215: [epoch 1] batch 2200 loss_value: 6.8870, batch_time (s): 12.396, tokens/sec: 557.607
+2026-09-19 19:39:46.228671: [epoch 1] batch 2400 loss_value: 6.7771, batch_time (s): 0.441, tokens/sec: 11,745.831
+2026-09-19 19:46:51.563764: [epoch 1] batch 2600 loss_value: 6.3757, batch_time (s): 0.258, tokens/sec: 9,666.740
+2026-09-19 19:54:34.819313: [epoch 1] batch 2800 loss_value: 6.4303, batch_time (s): 0.388, tokens/sec: 7,259.378
+2026-09-19 19:59:26.506669: [epoch 1] batch 3000 loss_value: 6.2697, batch_time (s): 1.210, tokens/sec: 1,904.445
+2026-09-19 20:08:33.113823: [epoch 1] batch 3200 loss_value: 6.7267, batch_time (s): 0.379, tokens/sec: 11,826.385
+2026-09-19 20:09:40.137347: [epoch 1]: tokens_trained_so_far: 22,361,988 avg_loss: 6.5185, non_smoothed_loss_fn: 6.109, non_smoothed_loss_fn_val: 10.389, avg_vloss: 10.6519, avg_time (s): 2.381, epoch_time (s): 7,690.894
+2026-09-19 20:09:40.139391: [epoch 1]: epoch did not improve!
+2026-09-19 20:09:40.139605: [epoch 1]: Still not better than max epoch.
+2026-09-19 20:09:41.843737: [epoch 1]: history saved
+2026-09-19 20:09:41.844275: Epoch: 2
+2026-09-19 20:09:49.295778: [epoch 2] batch 0 loss_value: 6.7481, batch_time (s): 7.235, tokens/sec: 698.783
+2026-09-19 20:17:34.701827: [epoch 2] batch 200 loss_value: 6.7525, batch_time (s): 0.365, tokens/sec: 12,639.543
+2026-09-19 20:23:31.723374: [epoch 2] batch 400 loss_value: 6.7331, batch_time (s): 0.402, tokens/sec: 11,613.455
+Traceback (most recent call last):
+  File "/Users/mohammadaminsedaghat/Desktop/attention/train.py", line 727, in <module>
+    avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/train.py", line 504, in train_one_epoch
+    scaler.step(optimizer)
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/amp/grad_scaler.py", line 400, in step
+    return optimizer.step(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/lr_scheduler.py", line 166, in wrapper
+    return func.__get__(opt, opt.__class__)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/optimizer.py", line 530, in wrapper
+    out = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/optimizer.py", line 80, in _use_grad
+    ret = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/adam.py", line 248, in step
+    adam(
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/optimizer.py", line 148, in maybe_fallback
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/adam.py", line 970, in adam
+    func(
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/optim/adam.py", line 546, in _single_tensor_adam
+    param.addcdiv_(exp_avg, denom, value=-step_size)  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
