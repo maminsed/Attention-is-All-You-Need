@@ -29,7 +29,7 @@ scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
 LOAD_PRE_SAVED = True
 VERBOSE = True
-VERBOSE_FREQ = 200
+VERBOSE_FREQ = 400
 NUM_BATCHES = None
 STOP_AFTER_EPOCH=20
 NUM_TOKENS=0
@@ -48,8 +48,8 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 6,#3,  # number of encoder layers
-    "num_dec_layers": 6,#3,  # number of encoder layers
+    "num_enc_layers": 3,  # number of encoder layers
+    "num_dec_layers": 3,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.2,
@@ -57,8 +57,8 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 64, #32,
-    "epochs": 6,  # just for initial testing
+    "batch_size": 32,
+    "epochs": 10,  # just for initial testing
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -101,7 +101,6 @@ SQRT_INV_DM = 1/math.sqrt(config["d_model"])
 
 # make all temp changes here to not mess up anything else and forget:
 if config["benchmark_mode"]:
-    config["epochs"] = 4 
     config["warmup_steps"] = 12
 
     config["num_workers"] = 4
@@ -409,6 +408,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
     total_sample = 0
     EOS_ID = sp_bpe.eos_id()
     BOS_ID = sp_bpe.bos_id()
+    translations = []
     with torch.no_grad():
         for i,(x, y) in enumerate(loader):
             print(f"at: {i}/{len(loader)}")
@@ -452,8 +452,9 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
             eng_decod = [sp_bpe.decode_ids(row) for row in eng_list]
             orig_decod = [[sp_bpe.decode_ids(idx)] for idx in y.tolist()]
             avg_bleu+=bleu_fn(eng_decod,orig_decod)
+            translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
             print(f"avg_bleu: {avg_bleu/(i+1)*100:.2f}, avg_cnt: {avg_cnt/total_sample:.2f}")
-    return avg_bleu/len(loader),avg_cnt/total_sample,total_sample
+    return avg_bleu/len(loader),avg_cnt/total_sample,total_sample, translations
 
 
 
@@ -508,7 +509,7 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
         json.dump(
             {
                 "history": history,
-                "config": {k:(v if type(v) != int or type(v) != str else str(v)) for k,v in config.items()},
+                "config": {k:(v if (type(v) == int or type(v) == str or type(v) == list) else str(v)) for k,v in config.items()},
                 "last_epoch_vloss": last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": best_val_loss,
@@ -675,12 +676,16 @@ def load_model():
     )
     print(f"{datetime.now()}: loss_fn loaded")
 
+    # needs a .name and __call__
     metrics = []
     non_smoothed_loss_fn = torch.nn.CrossEntropyLoss(
         ignore_index=config["pad_token"]
     )
     non_smoothed_loss_fn.name = "non_smoothed_loss_fn"
     metrics.append(non_smoothed_loss_fn)
+
+
+
     print(f"{datetime.now()}: metrics loaded")
 
     history = []
