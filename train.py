@@ -58,6 +58,7 @@ config = {
     # Training params
     "benchmark_mode": False,
     "batch_size": 32,
+    "val_batch_size": 64,
     "epochs": 10,  # just for initial testing
     "early_stopping_limit": 5,
     ## Optimizer
@@ -161,6 +162,7 @@ def collate_fn(batch):
 
 
 def load_data() -> tuple[DataLoader, DataLoader]:
+    sp_bpe = spm.SentencePieceProcessor()
     sp_bpe.load("bpe.model")
     def encode(item):
         global NUM_TOKENS
@@ -213,7 +215,7 @@ def load_data() -> tuple[DataLoader, DataLoader]:
     )
 
     val_loader = DataLoader(
-        val_set, batch_size=config["batch_size"], collate_fn=collate_fn, pin_memory=config["pin_memory"]
+        val_set, batch_size=config["val_batch_size"], collate_fn=collate_fn, pin_memory=config["pin_memory"]
     )
     return train_loader, val_loader
 
@@ -399,60 +401,70 @@ class Transformer(torch.nn.Module):
 
 
 def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
+    start_time = time.time()
+    print(f"{datetime.now()} started calculating bleu")
     bleu_fn = BLEUScore()
     model.eval()
-    avg_bleu = 0
-    avg_cnt = 0
+    avg_eos_idx = 0
     total_sample = 0
     EOS_ID = sp_bpe.eos_id()
     BOS_ID = sp_bpe.bos_id()
     translations = []
     with torch.no_grad():
         for i,(x, y) in enumerate(loader):
+            x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
             print(f"at: {i}/{len(loader)}")
             B = x.shape[0]
-            x = x.tolist()
-            eng_list = [[BOS_ID] for _ in range(B)]
+            final_trans = torch.full((B,CONTEXT_CAP), EOS_ID, dtype=torch.long,device=DEVICE) # (B,CP)
+            eos_idx = torch.full((B,1), -1,dtype=torch.long,device=DEVICE)
 
-            eos_idx = [-1 for _ in range(B)]
-            has_eos = [False for _ in range(B)]
+            cur_x = x
+            cur_eng_trans = torch.full((B,1),BOS_ID,dtype=torch.long,device=DEVICE) # (B,Sy)
+            cur_indecies = torch.arange(B,device=DEVICE)
             num_without_eos=B
+
             cnt=0
-            while cnt < CONTEXT_CAP:
+            while cnt < CONTEXT_CAP-1 and cur_x.shape[0] > 0:
                 cnt+=1
-                cur_eng = []
-                cur_idx = []
-                new_x = []
-                for idx in range(len(eng_list)):
-                    if not has_eos[idx]:
-                        cur_eng.append(eng_list[idx])
-                        cur_idx.append(idx)
-                        new_x.append(x[idx])
+                output = model(cur_x,cur_eng_trans)
+                output = torch.argmax(output[:,-1,:],dim=1,keepdim=True) # B,1
 
-                eng_decs = torch.tensor(cur_eng, device=DEVICE,dtype=torch.long) # B,Sy
-                new_x = torch.tensor(new_x,device=DEVICE,dtype=torch.long)
-                output = torch.argmax(model(new_x,eng_decs)[:,-1,:],dim=1) # B
+                cur_eng_trans = torch.cat([cur_eng_trans,output],dim=1)
 
-                for mi,v in enumerate(output.cpu().tolist()):
-                    idx = cur_idx[mi]
-                    eng_list[idx].append(v)
+                is_eos = (output.squeeze(1) == EOS_ID)
+                if is_eos.any():
+                    finished_indecies = cur_indecies[is_eos]
+                    eos_idx[finished_indecies] = cnt
+                    final_trans[finished_indecies,:cnt+1] = cur_eng_trans[is_eos]
+                    num_without_eos-=is_eos.sum()
 
-                    is_eos = (v == EOS_ID)
-                    has_eos[idx]=has_eos[idx] or is_eos
-                    eos_idx[idx]=eos_idx[idx] if is_eos else cnt
-                    num_without_eos-=1 if is_eos else 0
-                
-                if num_without_eos == 0:
-                    break
+                    keep = ~is_eos
+                    cur_x = cur_x[keep]
+                    cur_eng_trans = cur_eng_trans[keep]
+                    cur_indecies = cur_indecies[keep]
+
+            if cur_x.shape[0] > 0:
+                final_trans[cur_indecies, :cnt+1] = cur_eng_trans
+                eos_idx[cur_indecies] = cnt
             
-            avg_cnt+=sum(eos_idx)
+            eos_idx_cpu = eos_idx.squeeze().detach().cpu().tolist()
+            avg_eos_idx+=sum(eos_idx_cpu)
             total_sample+=B
-            eng_decod = [sp_bpe.decode_ids(row) for row in eng_list]
+
             orig_decod = [[sp_bpe.decode_ids(idx)] for idx in y.tolist()]
-            avg_bleu+=bleu_fn(eng_decod,orig_decod)
+
+            final_trans_cpu = final_trans.detach().cpu().tolist()
+            eng_decod = []
+            for idx in range(B):
+                valid_counts = eos_idx_cpu[idx]+1
+                eng_decod.append(sp_bpe.decode_ids(final_trans_cpu[idx][:valid_counts]))
+
+            val = bleu_fn(eng_decod,orig_decod)
             translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
-            print(f"avg_bleu: {avg_bleu/(i+1)*100:.2f}, avg_cnt: {avg_cnt/total_sample:.2f}")
-    return avg_bleu/len(loader),avg_cnt/total_sample,total_sample, translations
+            print(f"batch_avg_bleu: {val*100:.2f}, avg_eos_idx: {avg_eos_idx/total_sample:.2f}")
+    end_time = time.time()
+    print(f"{datetime.now()} finished calculating bleu - total_time: {end_time - start_time}")
+    return bleu_fn.compute(),avg_eos_idx/total_sample,total_sample, translations, bleu_fn
 
 
 
@@ -739,7 +751,6 @@ if __name__ == "__main__":
     if config["benchmark_mode"]:
         print("WARNING: YOU ARE IN BENCH MARK MODE")
         
-    sp_bpe = spm.SentencePieceProcessor()
     train_loader, val_loader = load_data()
 
     model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model()
