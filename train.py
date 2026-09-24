@@ -14,7 +14,7 @@ import torch
 from frozendict import frozendict
 from torch.nn import ModuleList
 from torch.nn.utils.rnn import pad_sequence
-from torchmetrics.text import BLEUScore
+from torchmetrics.text import BLEUScore,SacreBLEUScore
 
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
@@ -27,12 +27,13 @@ history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 400
 NUM_BATCHES = None
-STOP_AFTER_EPOCH=20
+STOP_AFTER_EPOCH=30
 NUM_TOKENS=0
+sp_bpe = None
 
 if not path.exists(save_file_path_root):
     os.mkdir(save_file_path_root)
@@ -59,7 +60,7 @@ config = {
     "benchmark_mode": False,
     "batch_size": 32,
     "val_batch_size": 64,
-    "epochs": 10,  # just for initial testing
+    "epochs": 25,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -162,6 +163,7 @@ def collate_fn(batch):
 
 
 def load_data() -> tuple[DataLoader, DataLoader]:
+    global sp_bpe
     sp_bpe = spm.SentencePieceProcessor()
     sp_bpe.load("bpe.model")
     def encode(item):
@@ -400,10 +402,10 @@ class Transformer(torch.nn.Module):
         return y  # CUDA- B,Sy,VS
 
 
-def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
+def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translations:bool=False):
     start_time = time.time()
     print(f"{datetime.now()} started calculating bleu")
-    bleu_fn = BLEUScore()
+    bleu_fn = SacreBLEUScore(lowercase=True)
     model.eval()
     avg_eos_idx = 0
     total_sample = 0
@@ -413,7 +415,6 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
     with torch.no_grad():
         for i,(x, y) in enumerate(loader):
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
-            print(f"at: {i}/{len(loader)}")
             B = x.shape[0]
             final_trans = torch.full((B,CONTEXT_CAP), EOS_ID, dtype=torch.long,device=DEVICE) # (B,CP)
             eos_idx = torch.full((B,1), -1,dtype=torch.long,device=DEVICE)
@@ -460,16 +461,24 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe):
                 eng_decod.append(sp_bpe.decode_ids(final_trans_cpu[idx][:valid_counts]))
 
             val = bleu_fn(eng_decod,orig_decod)
-            translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
-            print(f"batch_avg_bleu: {val*100:.2f}, avg_eos_idx: {avg_eos_idx/total_sample:.2f}")
+            if return_translations:
+                translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
     end_time = time.time()
-    print(f"{datetime.now()} finished calculating bleu - total_time: {end_time - start_time}")
-    return bleu_fn.compute(),avg_eos_idx/total_sample,total_sample, translations, bleu_fn
+    avg_bleu = bleu_fn.compute()
+    print(f"{datetime.now()} finished calculating bleu - avg bleu: {avg_bleu*100:.2f} - total_time: {end_time - start_time} - avg_eos_idx: {avg_eos_idx/total_sample:.2f}")
+    if return_translations:
+        return avg_bleu,total_sample, translations, bleu_fn
+    else:
+        return avg_bleu
 
+class noop():
+    # noops in training. 
+    def __init__(self):
+        self.name = "bleu_calculations"
+    def __call__(self,logits,preds):
+        return torch.zeros((),device=DEVICE)
 
-
-
-def calculate_val_loss():
+def calculate_val_loss(epoch:int):
     # val loss:
     model.eval()
     avg_vloss = torch.zeros((),device=DEVICE)
@@ -494,9 +503,12 @@ def calculate_val_loss():
 
             
             avg_vloss += loss_val.detach()
-    
+        
     avg_vloss /= len(val_loader)
     avg_metrics /= len(val_loader)
+
+    if epoch % 2 == 1:
+        avg_metrics[-1] = calculate_bleu(val_loader,model,sp_bpe)
 
     return avg_vloss.item(), [m.item() for m in avg_metrics]
 
@@ -602,7 +614,7 @@ def train_one_epoch(epoch):
                     f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, tokens/sec: {ts:,.3f}"
                 )
     epoch_end = time.time()
-    avg_vloss, avg_val_metrics = calculate_val_loss()
+    avg_vloss, avg_val_metrics = calculate_val_loss(epoch)
     return (
         (total_loss / total_batches).item(), 
         [m.item() for m in (avg_metrics / total_batches)], 
@@ -689,13 +701,16 @@ def load_model():
     )
     print(f"{datetime.now()}: loss_fn loaded")
 
-    # needs a .name and __call__
+    # needs a .name and __call__(logits,preds)
     metrics = []
     non_smoothed_loss_fn = torch.nn.CrossEntropyLoss(
         ignore_index=config["pad_token"]
     )
     non_smoothed_loss_fn.name = "non_smoothed_loss_fn"
     metrics.append(non_smoothed_loss_fn)
+
+    bleu_metrics = noop()
+    metrics.append(bleu_metrics)
 
 
 
