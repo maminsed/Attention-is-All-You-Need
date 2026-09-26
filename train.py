@@ -19,20 +19,24 @@ from torchmetrics.text import BLEUScore,SacreBLEUScore
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-PAD_TOKEN = 3
-DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-CONTEXT_CAP = 128
-save_file_path_root = "./test/overnight_Sep_20_v2"
+save_file_path_root = "./test/overnight_Sep_25"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
 VERBOSE_FREQ = 400
-NUM_BATCHES = None
 STOP_AFTER_EPOCH=30
+PAD_TOKEN = 3
+CONTEXT_CAP = 128
+DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+DATAS_SOURCE = "wmt14" # wmpt14 or iwslt17 or iwslt17_curated
+
+
+NUM_BATCHES = None
 NUM_TOKENS=0
+NUM_DROPPED=0
 sp_bpe = None
 
 if not path.exists(save_file_path_root):
@@ -78,8 +82,13 @@ config = {
     "pad_token": PAD_TOKEN,
     "test_size": 0.2,
     "val_size": 0.2,
-    "title_use_in_tokenization": True,
     "mega_batch_size": 100, 
+    "data_source": DATAS_SOURCE,
+    "filtering_strategy": "drop", # drop or cut. 
+
+    # tokenization
+    "title_use_in_tokenization": True,
+    "tokenizer_source": "iwslt17",
 
     # Device params
     "device": DEVICE,
@@ -93,6 +102,7 @@ config = {
 }
 assert config["h"] * config["d_v"] == config["d_model"]
 assert DEVICE == "mps"
+assert config["filtering_strategy"] in ["drop","cut"]
 
 random.seed(config["seed"])
 np.random.seed(config["seed"])
@@ -161,46 +171,61 @@ def collate_fn(batch):
     return src, tgt
 
 
+def encode_single(item):
+    global NUM_TOKENS,NUM_DROPPED
+    ids = sp_bpe.encode_as_ids(item, add_bos=True,add_eos=config["filtering_strategy"] == "drop")
+    if config["filtering_strategy"] == "cut":
+        NUM_TOKENS+=len(ids)
+        return np.array(ids[:CONTEXT_CAP-1]+[sp_bpe.eos_id()], dtype=np.int64)
+    if len(ids) <= CONTEXT_CAP:
+        NUM_TOKENS+=len(ids)
+        return np.array(ids+[sp_bpe.eos_id()], dtype=np.int64)
+    NUM_DROPPED+=1
+    return None
+
+
+def encode_ds(path:str,nrows=None):
+    start_tokens=NUM_TOKENS
+    df = pd.read_csv(path,nrows=nrows)
+    X =  [encode_single(item) for item in df["detext"]]
+    Y = [encode_single(item) for item in df["entext"]]
+
+    if config["filtering_strategy"] == "cut":
+        return X,Y
+    is_not_null = [i for i,x,y in zip(range(len(X)),X,Y) if not (x is None or y is None)]
+    new_X,new_Y = [],[]
+
+    null_idx = 0
+    for i in range(len(X)):
+        if is_not_null[null_idx] == i:
+            new_X.append(X[i])
+            new_Y.append(Y[i])
+            null_idx+=1
+    return new_X,new_Y,NUM_TOKENS-start_tokens
+
 
 def load_data() -> tuple[DataLoader, DataLoader]:
     global sp_bpe
     sp_bpe = spm.SentencePieceProcessor()
-    sp_bpe.load("bpe.model")
-    def encode(item):
-        global NUM_TOKENS
-        ids = sp_bpe.encode_as_ids(item, add_bos=True)
-        NUM_TOKENS+=len(ids)
-        return np.array(ids[:CONTEXT_CAP-1]+[sp_bpe.eos_id()], dtype=np.int64)
+    sp_bpe.load(f"{config["tokenizer_source"]}_bpe.model")
 
-    train_df = pd.read_csv("train_filtered_df.csv",nrows=1000 if config["benchmark_mode"] else None)
-    val_df = pd.read_csv("val_sorted_df.csv")
+    X_train,Y_train,size_train = encode_ds(f"data/{config['data_source']}_train_df.csv",nrows=1000 if config["benchmark_mode"] else None)
+    X_val, Y_val, size_val = encode_ds(f"data/{config['data_source']}_val_df.csv")
 
-    print(f"{datetime.now()}: # train sentences {train_df.shape[0]:,}")
-    print(f"{datetime.now()}: # val sentences {val_df.shape[0]:,}")
-    print(train_df.head())
-
-    X_train = [encode(item) for item in train_df["detext"]]
-    y_train = [encode(item) for item in train_df["entext"]]
-
-    X_val = [encode(item) for item in val_df["detext"]]
-    y_val = [encode(item) for item in val_df["entext"]]
-    print(f"{datetime.now()}: encoding done! Total number of tokens: {NUM_TOKENS:,}")
-
-    print(f"{datetime.now()}: \n\n==============\nencode_as_ids:")
-    print(
-        sp_bpe.encode_as_ids(train_df.loc[0, "entext"][:10], add_bos=True, add_eos=True)
-    )
+    print(f"{datetime.now()}: # train size: #Tokens: {size_train:,} #Sentences: {len(X_train):,}")
+    print(f"{datetime.now()}: # val size:   #Tokens: {size_val:,}   #Sentences: {len(X_val):,}")
+    print(f"{datetime.now()}: encoding done! Total number of tokens: {NUM_TOKENS:,}. NUM_DROPPED: {NUM_DROPPED}")
 
     global NUM_BATCHES
-    NUM_BATCHES = math.ceil(train_df.shape[0] / config["batch_size"])
+    NUM_BATCHES = math.ceil(len(X_train) / config["batch_size"])
     print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}")
     if NUM_BATCHES * config["epochs"] * 0.5 < config["warmup_steps"]:
         print(f"{datetime.now()}: WARNING: more than half of epochs are warmup steps. ")
 
     # setting up the data
 
-    train_set = AttnDataset(X_train, y_train)
-    val_set = AttnDataset(X_val, y_val)
+    train_set = AttnDataset(X_train, Y_train)
+    val_set = AttnDataset(X_val, Y_val)
     # test_set = AttnDataset(X_test,y_test)
 
     train_lengths=[len(x) for x in X_train]

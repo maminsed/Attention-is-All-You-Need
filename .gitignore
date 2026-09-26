@@ -4,3 +4,5 @@ test/**/*.pt
 
 # data
 wmt14_*.csv
+# get your own data
+data/ 
