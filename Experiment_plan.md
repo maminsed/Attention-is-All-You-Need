@@ -96,18 +96,42 @@ Results:
 - It did not overfit. However, Im not so sure if training it for longer is good, because scaling laws says train for less. 
 
 
-## September 21th:
+## September 21st:
 - Updated BLEU to be GPU efficient and added it to pipeline. Trained up to 15 epochs. 
+- (After the run: updated BLEU to be SacreBLEU)
 
 Results:
 - Higher BLEU and lower val, early signs of overfitting but again not that much. 
 - Sep 9th Ran for 20 epochs and had higher BLEU. 
 - For comparision: BLEU increased from 22.1 to 23.7 from 10-15 epochs, Sep9th had 25 with 20 epochs. 
-- Personally it looks better to me, but I'm biased. Also 
+- Personally it looks better to me, but I'm biased. Also it seems like sometimes pass-k will get the right answer even though pass-1 gives straight up bs data. 
+
+
+## Report on being poor: 
+- I trained a bunch of data on a small 11M token dataset for translation and heres what I got out:
+- Regularization is still important, but I noticed that going up to 0.5 dropout is a bit extensive. 
+- num_enc,num_dec layer of 4 gave the highest performance so far. BLEU 30
+- num_enc,num_dec layer of 3 gave closest performance but it still not as good BLEU 20.8. However, it could be trained for much more without overfitting. (rate of improvement was kinda slow tho) - also might be because of batch size
+- num_enc,num_dec layer 8 diverged like crazy as in it didn't even try to learn. 
+- basically model size is important, it looks like the bigger the better, until you hit a wall. 
+- Deep Post layernorm (`LayerNorm(x + sublayer(x))`) are known to be unstable early in training unless warmup is long or you use Pre-LN. bigger models should have lower learning rate during early training (thats because with larger model sizes, even small changes can cause massive shifts and at the start the model is at it's most sensetive point.)
+- goign forward only change one param at a time (grid search..?)
+
+
+## September 24th:
+- Getting wmt14 data.
+
+
+
 
 Next step:
-- Then will run for one more 10 epoch and then scale up data. 
-- beam search + scarsebleu? 
+- new bpe
+- Extract figures/values for here. 
+- Pull val and sort/filter val as well. 
+- Move all data into a data folder and untrack. 
+- Increase everywhere as required. 
+- Start training. 
+- fix the git account thing and push to github. 
 
 
 ## To be done:
