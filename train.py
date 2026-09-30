@@ -9,35 +9,34 @@ import re
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 import sentencepiece as spm
 import torch
 from frozendict import frozendict
 from torch.nn import ModuleList
 from torch.nn.utils.rnn import pad_sequence
 from torchmetrics.text import BLEUScore,SacreBLEUScore
+import pyarrow as pa
 
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./test/overnight_Sep_25"
+save_file_path_root = "./test/overnight_Sep_27"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 400
+VERBOSE_FREQ = 800
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-DATAS_SOURCE = "wmt14" # wmpt14 or iwslt17 or iwslt17_curated
+DATAS_SOURCE = "iwslt17" # wmpt14 or iwslt17 or iwslt17_curated
 
 
 NUM_BATCHES = None
-NUM_TOKENS=0
-NUM_DROPPED=0
-sp_bpe = None
 
 if not path.exists(save_file_path_root):
     os.mkdir(save_file_path_root)
@@ -62,7 +61,7 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 32,
+    "batch_size": 64,
     "val_batch_size": 64,
     "epochs": 25,
     "early_stopping_limit": 5,
@@ -87,8 +86,9 @@ config = {
     "filtering_strategy": "drop", # drop or cut. 
 
     # tokenization
-    "title_use_in_tokenization": True,
     "tokenizer_source": "iwslt17",
+    "tokenizer_num_threads": 2,
+    "tokenization_cache": False,
 
     # Device params
     "device": DEVICE,
@@ -103,6 +103,10 @@ config = {
 assert config["h"] * config["d_v"] == config["d_model"]
 assert DEVICE == "mps"
 assert config["filtering_strategy"] in ["drop","cut"]
+if not config["tokenization_cache"]:
+    print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
+
+sp_bpe = None
 
 random.seed(config["seed"])
 np.random.seed(config["seed"])
@@ -122,16 +126,29 @@ if config["benchmark_mode"]:
 
 
 class AttnDataset(Dataset):
-    def __init__(self, X: pd.Series, y: pd.Series):
+    def __init__(self, X: np.array, Y: np.array, X_offset: np.array, Y_offset: np.array):
         super().__init__()
-        self.X = X
-        self.y = y
+        # Keeping it in cpu so it doesn't face the issues with CUDA or mps and multiprocessing .
+        self.X = torch.from_numpy(X)
+        self.Y = torch.from_numpy(Y)
+        self.X_offset = torch.from_numpy(X_offset).long()
+        self.Y_offset = torch.from_numpy(Y_offset).long()
 
     def __len__(self):
-        return len(self.X)
+        return len(self.X_offset)-1
 
     def __getitem__(self, idx):
-        return self.X[idx], self.y[idx]
+        return (
+            self.X[self.X_offset[idx]:self.X_offset[idx+1]], 
+            self.Y[self.Y_offset[idx]:self.Y_offset[idx+1]]
+        )
+    
+    def __getitems__(self, indecies):
+        return (
+            [self.X[self.X_offset[idx]:self.X_offset[idx+1]] for idx in indecies],
+            [self.Y[self.Y_offset[idx]:self.Y_offset[idx+1]] for idx in indecies]
+        )
+
 
 class ShuffledNearSampler:
     def __init__(self, data, batch_size,lengths):
@@ -159,76 +176,107 @@ class ShuffledNearSampler:
 
 
 def collate_fn(batch):
-    src, tgt = zip(*batch)
-
-    src = [torch.tensor(item) for item in src]  # np type carries over
-    tgt = [torch.tensor(item) for item in tgt]
+    src, tgt = batch
 
     src = pad_sequence(src, batch_first=True, padding_value=PAD_TOKEN)
-
     tgt = pad_sequence(tgt, batch_first=True, padding_value=PAD_TOKEN)
 
     return src, tgt
 
+def encode_ds(data_path:str,cache_path:str,nrows=None,num_threads=None):
+    if not path.exists(cache_path) or not config["tokenization_cache"]:
+        print(f"{datetime.now()} cache does not exist")
+        df = pd.read_csv(data_path,nrows=nrows)
+        cut=config["filtering_strategy"] == "cut"
 
-def encode_single(item):
-    global NUM_TOKENS,NUM_DROPPED
-    ids = sp_bpe.encode_as_ids(item, add_bos=True,add_eos=config["filtering_strategy"] == "drop")
-    if config["filtering_strategy"] == "cut":
-        NUM_TOKENS+=len(ids)
-        return np.array(ids[:CONTEXT_CAP-1]+[sp_bpe.eos_id()], dtype=np.int64)
-    if len(ids) <= CONTEXT_CAP:
-        NUM_TOKENS+=len(ids)
-        return np.array(ids+[sp_bpe.eos_id()], dtype=np.int64)
-    NUM_DROPPED+=1
-    return None
+        print(f"{datetime.now()} encoding X started: ")
+        x_enc = sp_bpe.encode_as_ids(df["detext"].tolist(), add_bos=True, add_eos=not cut, num_threads=num_threads)
 
+        print(f"{datetime.now()} encoding Y started: ")
+        y_enc = sp_bpe.encode_as_ids(df["entext"].tolist(), add_bos=True, add_eos=not cut, num_threads=num_threads)
 
-def encode_ds(path:str,nrows=None):
-    start_tokens=NUM_TOKENS
-    df = pd.read_csv(path,nrows=nrows)
-    X =  [encode_single(item) for item in df["detext"]]
-    Y = [encode_single(item) for item in df["entext"]]
+        print(f"{datetime.now()} converting to pyarrow")
+        X = pa.array(x_enc,type=pa.list_(pa.int16())) 
+        Y = pa.array(y_enc,type=pa.list_(pa.int16()))
 
-    if config["filtering_strategy"] == "cut":
-        return X,Y
-    is_not_null = [i for i,x,y in zip(range(len(X)),X,Y) if not (x is None or y is None)]
-    new_X,new_Y = [],[]
+        num_dropped=0
+        if cut:
+            raise ValueError("cut is not implemented yet")
+        else:
+            x_keep = np.diff(X.offsets)  <= CONTEXT_CAP
+            y_keep = np.diff(Y.offsets)  <= CONTEXT_CAP
+            keep = x_keep & y_keep
+            X = X.filter(keep)
+            Y = Y.filter(keep)
+            num_dropped = int((~keep).sum())
+        if config["tokenization_cache"]:
+            print(f"{datetime.now()} storing to patable")
+            patable = pa.table({
+                "Y": Y,
+                "X": X,
+            }, metadata={
+                "CONTEXT_CAP": str(CONTEXT_CAP),
+                "filtering_strategy": config["filtering_strategy"],
+                "nrows": str(nrows),
+                "num_dropped": str(num_dropped)
+            })
+            pq.write_table(patable,cache_path)
+    else:
+        print(f"{datetime.now()} cache found")
+        patable = pq.read_table(cache_path)
+        metadata = {k.decode("utf-8"):v.decode("utf-8") for k,v in patable.schema.metadata.items()}
+        if (
+            str(CONTEXT_CAP) != metadata["CONTEXT_CAP"] or
+            str(config["filtering_strategy"]) != metadata["filtering_strategy"] or
+            str(nrows) != metadata["nrows"]
+        ):
+            raise ValueError("CONTEXT_CAP or filtering_strategy do not match expected")
+        num_dropped=0
+        X = patable["X"].combine_chunks()
+        Y = patable["Y"].combine_chunks()
 
-    null_idx = 0
-    for i in range(len(X)):
-        if is_not_null[null_idx] == i:
-            new_X.append(X[i])
-            new_Y.append(Y[i])
-            null_idx+=1
-    return new_X,new_Y,NUM_TOKENS-start_tokens
+    return (
+        X.values.to_numpy(zero_copy_only=True),
+        Y.values.to_numpy(zero_copy_only=True), 
+        X.offsets.to_numpy(zero_copy_only=True),
+        Y.offsets.to_numpy(zero_copy_only=True), 
+        num_dropped
+    )
 
 
 def load_data() -> tuple[DataLoader, DataLoader]:
-    global sp_bpe
-    sp_bpe = spm.SentencePieceProcessor()
-    sp_bpe.load(f"{config["tokenizer_source"]}_bpe.model")
 
-    X_train,Y_train,size_train = encode_ds(f"data/{config['data_source']}_train_df.csv",nrows=1000 if config["benchmark_mode"] else None)
-    X_val, Y_val, size_val = encode_ds(f"data/{config['data_source']}_val_df.csv")
+    print(f"{datetime.now()}: encoding train started")
+    X_train,Y_train,X_train_offset,Y_train_offset,dropped_train = encode_ds(
+        f"data/{config['data_source']}/train_df.csv",
+        f"data/{config['data_source']}/train_{config["tokenizer_source"]}.parquet",
+        nrows=1000 if config["benchmark_mode"] else None,
+        num_threads=config["tokenizer_num_threads"]
+    )
 
-    print(f"{datetime.now()}: # train size: #Tokens: {size_train:,} #Sentences: {len(X_train):,}")
-    print(f"{datetime.now()}: # val size:   #Tokens: {size_val:,}   #Sentences: {len(X_val):,}")
-    print(f"{datetime.now()}: encoding done! Total number of tokens: {NUM_TOKENS:,}. NUM_DROPPED: {NUM_DROPPED}")
+    print(f"{datetime.now()}: encoding val started")
+    X_val, Y_val,X_val_offset,Y_val_offset, dropped_val = encode_ds(
+        f"data/{config['data_source']}/val_df.csv",
+        f"data/{config['data_source']}/val_{config["tokenizer_source"]}.parquet",
+        num_threads=config["tokenizer_num_threads"]
+    )
+
+    print(f"{datetime.now()}: # train size: #Tokens: X: {len(X_train):,} Y: {len(Y_train):,} #Sentences: {len(X_train_offset)-1:,}, num_dropped: {dropped_train:,}")
+    print(f"{datetime.now()}: # val size: #Tokens: X: {len(X_val):,} Y: {len(Y_val):,} #Sentences: {len(X_val_offset)-1:,}, num_dropped: {dropped_val:,}")
 
     global NUM_BATCHES
-    NUM_BATCHES = math.ceil(len(X_train) / config["batch_size"])
+    NUM_BATCHES = math.ceil((len(X_train_offset)-1) / config["batch_size"])
     print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}")
     if NUM_BATCHES * config["epochs"] * 0.5 < config["warmup_steps"]:
         print(f"{datetime.now()}: WARNING: more than half of epochs are warmup steps. ")
 
     # setting up the data
 
-    train_set = AttnDataset(X_train, Y_train)
-    val_set = AttnDataset(X_val, Y_val)
+    train_set = AttnDataset(X_train, Y_train, X_train_offset, Y_train_offset)
+    val_set = AttnDataset(X_val, Y_val, X_val_offset, Y_val_offset)
     # test_set = AttnDataset(X_test,y_test)
 
-    train_lengths=[len(x) for x in X_train]
+    train_lengths=np.diff(Y_train_offset)
     bs = ShuffledNearSampler(train_set,config["batch_size"],lengths=train_lengths)
     train_loader = DataLoader(
         train_set,
@@ -244,7 +292,7 @@ def load_data() -> tuple[DataLoader, DataLoader]:
     val_loader = DataLoader(
         val_set, batch_size=config["val_batch_size"], collate_fn=collate_fn, pin_memory=config["pin_memory"]
     )
-    return train_loader, val_loader
+    return train_loader, val_loader, len(X_train)
 
 
 def activation_lookup(activation="relu"):
@@ -510,8 +558,8 @@ def calculate_val_loss(epoch:int):
     avg_metrics = torch.zeros((len(metrics),),device=DEVICE)
     with torch.no_grad():
         for x, y in val_loader:
-            x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
-            y = y.to(device=DEVICE, non_blocking=config["pin_memory"])
+            x = x.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
+            y = y.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
 
             with torch.autocast(
                 device_type=DEVICE, dtype=config["autocast_dtype"], enabled=config["use_amp"]
@@ -583,12 +631,13 @@ def train_one_epoch(epoch):
     total_batches = len(train_loader)
 
     epoch_start = time.time()
+    prev_end = epoch_start
     for i, (x, y) in enumerate(train_loader):
         # x: B,S
         # y: B,Sy
         start_time = time.time()
-        x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
-        y = y.to(device=DEVICE, non_blocking=config["pin_memory"])
+        x = x.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
+        y = y.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
         optimizer.zero_grad(set_to_none=True)  # default behaviour
         avg_metric = torch.zeros(((len(metrics),)),device=DEVICE)
 
@@ -631,14 +680,17 @@ def train_one_epoch(epoch):
                     "batch_idx": i,
                     "epoch": epoch,
                     "batch_time": delta,
+                    "data_loading_time": start_time - prev_end,
                     "tokens/sec": ts,
                 }
             )
             if VERBOSE:
                 print(
-                    f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, tokens/sec: {ts:,.3f}"
+                    f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, data_loading_time (ms): {(start_time - prev_end)*1000:.3f}, tokens/sec: {ts:,.3f}"
                 )
+        prev_end = time.time()
     epoch_end = time.time()
+    
     avg_vloss, avg_val_metrics = calculate_val_loss(epoch)
     return (
         (total_loss / total_batches).item(), 
@@ -791,7 +843,9 @@ if __name__ == "__main__":
     if config["benchmark_mode"]:
         print("WARNING: YOU ARE IN BENCH MARK MODE")
         
-    train_loader, val_loader = load_data()
+    sp_bpe = spm.SentencePieceProcessor()
+    sp_bpe.load(f"tokenizers/{config["tokenizer_source"]}/bpe.model")
+    train_loader, val_loader, train_size = load_data()
 
     model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model()
 
@@ -806,7 +860,7 @@ if __name__ == "__main__":
         metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
         val_metrics_text = ", ".join([f"{metrics[i].name}_val: {avg_val_metrics[i]:.3f}" for i in range(len(metrics))])
         print(
-            f"{datetime.now()}: [epoch {epoch}]: tokens_trained_so_far: {NUM_TOKENS*(epoch+1):,} avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
+            f"{datetime.now()}: [epoch {epoch}]: tokens_trained_so_far: {train_size*(epoch+1):,} avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
         )
         history.append({
             "avg_loss": avg_loss,

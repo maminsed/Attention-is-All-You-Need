@@ -118,24 +118,24 @@ Results:
 - goign forward only change one param at a time (grid search..?)
 
 
-## September 24th:
+## September 27th:
 - Getting wmt14 data.
-
-
+- allowed for different tokenizers. 
+- implemented tokenization caching
 
 
 Next step:
 - new bpe
-- Extract figures/values for here. 
 - Pull val and sort/filter val as well. 
-- Move all data into a data folder and untrack. 
 - Increase everywhere as required. 
 - Start training. 
 - fix the git account thing and push to github. 
 
 
 ## To be done:
-- update dropout with new dropouts. 
+- optimzie AttnDataset and combine with collate_fn()
+- add word dropout
+- setup max tokens
 - register_buffer for positional encodings. 
 
 - More data.
