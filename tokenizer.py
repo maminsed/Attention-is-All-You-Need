@@ -1,19 +1,21 @@
 import train
 import sentencepiece as spm
 import os.path as path
+import os
 from datetime import datetime
 import pandas as pd
 
 if __name__ == "__main__":
-    DATA_SOURCE = train.DATAS_SOURCE
-    TOKENIZER_SOURCE = train.config["tokenizer_source"]
+    DATA_SOURCE = "wmt14"
+    TOKENIZER_SOURCE = "wmt14"
 
     TOKENIZER_INPUT = f"data/{DATA_SOURCE}/alltext.txt"
 
     test_sentence="Hi this is a test sentence"
     if not path.exists(TOKENIZER_INPUT):
         print(f"{datetime.now()} Tokenizer input does not exist, have to create a new one")
-        df = pd.read_csv(f"data/{DATA_SOURCE}/train_df.csv")
+        df = pd.read_csv(f"data/{DATA_SOURCE}/train_df.csv",nrows=1_500_000)
+        print(f"{datetime.now()} dataset loaded")
         with open(TOKENIZER_INPUT,"w") as f:
             for idx,row in df.iterrows():
                 f.write(row["detext"]+"\n")
@@ -21,8 +23,15 @@ if __name__ == "__main__":
         del df
 
     print(f"{datetime.now()} Training tokenizer started")
-    spm.SentencePieceTrainer(
-        f"--model_type=bpe --vocab_size={train.config["vocab_size"]} --input={TOKENIZER_INPUT} --mode_prefix=tokenizers/{TOKENIZER_SOURCE}/bpe --pad_id={train.PAD_TOKEN}"
+    os.makedirs(f"tokenizers/{TOKENIZER_SOURCE}/",exist_ok=True)
+    # maybe added: split_digits, byte_fallback, character_coverage
+    spm.SentencePieceTrainer.train(
+        model_type="bpe",
+        vocab_size=train.config["vocab_size"],
+        input=TOKENIZER_INPUT,
+        model_prefix=f"tokenizers/{TOKENIZER_SOURCE}/bpe",
+        pad_id=train.PAD_TOKEN,
+        shuffle_input_sentence=True,
     )
     print(f"{datetime.now()} Training tokenizer finished")
 
