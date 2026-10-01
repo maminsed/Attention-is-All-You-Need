@@ -28,12 +28,12 @@ scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 800
+VERBOSE_FREQ = 200
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-DATAS_SOURCE = "iwslt17" # wmpt14 or iwslt17 or iwslt17_curated
+DATAS_SOURCE = "wmt14" # wmt14 or iwslt17 or iwslt17_curated
 
 
 NUM_BATCHES = None
@@ -46,14 +46,14 @@ if not path.exists(f"{save_file_path_root}/best/"):
 
 config = {
     # model params
-    "vocab_size": 7000,
+    "vocab_size": 37000,
     "d_model": 512,
     "d_v": 64,
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 3,  # number of encoder layers
-    "num_dec_layers": 3,  # number of encoder layers
+    "num_enc_layers": 6,  # number of encoder layers
+    "num_dec_layers": 6,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.2,
@@ -61,9 +61,10 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 64,
-    "val_batch_size": 64,
-    "epochs": 25,
+    # MPS couldn't handle 128
+    "batch_size": 32,
+    "val_batch_size": 32,
+    "epochs": 5,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -71,7 +72,7 @@ config = {
     "optim_betas": [0.9, 0.98],
     "optim_eps": 1e-9,
     ### Scheduler
-    "warmup_steps": 1000, # lowering a bit since were training for less epochs
+    "warmup_steps": 3000, # lowering a bit since were training for less epochs
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,
@@ -86,16 +87,16 @@ config = {
     "filtering_strategy": "drop", # drop or cut. 
 
     # tokenization
-    "tokenizer_source": "iwslt17",
+    "tokenizer_source": "wmt14",
     "tokenizer_num_threads": 2,
-    "tokenization_cache": False,
+    "tokenization_cache": True,
 
     # Device params
     "device": DEVICE,
     "dtype": torch.float32,
     "seed": 42,
     ## Multiproccessing
-    "use_amp": False,
+    "use_amp": True,
     "autocast_dtype": torch.bfloat16 if DEVICE=="mps" else torch.float16,
     "num_workers": 2, # will time. 
     "pin_memory": False,  # doesn't help much in mac and non_blocking weird.
@@ -196,8 +197,8 @@ def encode_ds(data_path:str,cache_path:str,nrows=None,num_threads=None):
         y_enc = sp_bpe.encode_as_ids(df["entext"].tolist(), add_bos=True, add_eos=not cut, num_threads=num_threads)
 
         print(f"{datetime.now()} converting to pyarrow")
-        X = pa.array(x_enc,type=pa.list_(pa.int16())) 
-        Y = pa.array(y_enc,type=pa.list_(pa.int16()))
+        X = pa.array(x_enc,type=pa.large_list(pa.int32())) 
+        Y = pa.array(y_enc,type=pa.large_list(pa.int32()))
 
         num_dropped=0
         if cut:
@@ -867,7 +868,8 @@ if __name__ == "__main__":
             "avg_vloss": avg_vloss, 
             "epoch": epoch,
             "avg_time":avg_time,
-            "epoch_time":epoch_time
+            "epoch_time":epoch_time,
+            "cpu_alloc_memory": torch.mps.current_allocated_memory()/torch.mps.driver_allocated_memory(),
         } | {
             metrics[i].name:avg_metrics[i] for i in range(len(metrics))
         } | {
