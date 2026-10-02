@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 from os import path
 import os
-import re
+import pickle
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,8 @@ scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 200
+VERBOSE_FREQ = 400
+SAVE_FREQ=20_000
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
@@ -108,6 +109,7 @@ if not config["tokenization_cache"]:
     print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
 
 sp_bpe = None
+batch_sampler = None
 
 random.seed(config["seed"])
 np.random.seed(config["seed"])
@@ -158,22 +160,33 @@ class ShuffledNearSampler:
         self.batch_size = batch_size
         self.lengths = lengths
 
+        self.mbi=0
+        self.epoch=0
+
+    def set_epoch(self,epoch):
+        self.epoch = epoch
+
     def __iter__(self):
+        cur_rng = np.random.default_rng(seed=config["seed"]+self.epoch)
         size = len(self.data)
         meg_size = self.batch_size * config["mega_batch_size"]
 
-        indecies = np.random.permutation(size)
+        indecies = cur_rng.permutation(size)
         megabatches = [sorted(indecies[i:i+meg_size],key=lambda x :self.lengths[x]) for i in range(0,size,meg_size)]
 
         megabatches = [[idx[i:i+self.batch_size] for i in range(0,len(idx),self.batch_size)] for idx in megabatches]
         megabatches = [i for megabatch in megabatches for i in megabatch]
 
-        mb_indecies = np.random.permutation(len(megabatches))
-        for mbi in mb_indecies:
-            yield megabatches[mbi]
+        mb_indecies = cur_rng.permutation(len(megabatches))
+        for mbi in range(self.mbi,len(mb_indecies)):
+            yield megabatches[mb_indecies[mbi]]
+        self.mbi=0
 
     def __len__(self):
-        return math.ceil(len(self.data) / self.batch_size)
+        return math.ceil(len(self.data) / self.batch_size) - self.mbi
+
+    def load_bit(self,mbi):
+        self.mbi = mbi
 
 
 def collate_fn(batch):
@@ -278,12 +291,13 @@ def load_data() -> tuple[DataLoader, DataLoader]:
     # test_set = AttnDataset(X_test,y_test)
 
     train_lengths=np.diff(Y_train_offset)
-    bs = ShuffledNearSampler(train_set,config["batch_size"],lengths=train_lengths)
+    global batch_sampler
+    batch_sampler = ShuffledNearSampler(train_set,config["batch_size"],lengths=train_lengths)
     train_loader = DataLoader(
         train_set,
         # batch_size=config["batch_size"],
         # shuffle=True,
-        batch_sampler=bs,
+        batch_sampler=batch_sampler,
         collate_fn=collate_fn,
         pin_memory=config["pin_memory"],
         num_workers=config["num_workers"],
@@ -552,7 +566,7 @@ class noop():
     def __call__(self,logits,preds):
         return torch.zeros((),device=DEVICE)
 
-def calculate_val_loss(epoch:int):
+def calculate_val_loss(bleu_calc:bool):
     # val loss:
     model.eval()
     avg_vloss = torch.zeros((),device=DEVICE)
@@ -581,12 +595,12 @@ def calculate_val_loss(epoch:int):
     avg_vloss /= len(val_loader)
     avg_metrics /= len(val_loader)
 
-    if epoch % 2 == 1:
+    if bleu_calc:
         avg_metrics[-1] = calculate_bleu(val_loader,model,sp_bpe)
 
     return avg_vloss.item(), [m.item() for m in avg_metrics]
 
-def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*,save_weights=True,is_best=True):
+def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*,save_weights=True,is_best=True,batches_done=0):
     if model_path and optim_path and save_weights:
         torch.save(model.state_dict(), model_path)
         torch.save(optimizer.state_dict(), optim_path)
@@ -613,10 +627,12 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": best_val_loss,
                 "epoch": epoch,
+                "last_completed_epoch": last_completed_epoch,
                 "model_path": model_path,
                 "history_path": history_path,
                 "optim_path": optim_path,
-                "scheduler_path": scheduler_path
+                "scheduler_path": scheduler_path,
+                "in_epoch_batches": batches_done
             },
             f,
         )
@@ -633,66 +649,103 @@ def train_one_epoch(epoch):
 
     epoch_start = time.time()
     prev_end = epoch_start
-    for i, (x, y) in enumerate(train_loader):
-        # x: B,S
-        # y: B,Sy
-        start_time = time.time()
-        x = x.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
-        y = y.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
-        optimizer.zero_grad(set_to_none=True)  # default behaviour
-        avg_metric = torch.zeros(((len(metrics),)),device=DEVICE)
+    batch_sampler.set_epoch(epoch)
+    start_batch=batch_sampler.mbi
+    if start_batch != 0:
+        print(f"{datetime.now()} Starting From starting batch: {start_batch}")
+    i=0
+    try:
+        for idx, (x, y) in enumerate(train_loader):
+            i=idx+start_batch
+            # x: B,S
+            # y: B,Sy
+            start_time = time.time()
+            x = x.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
+            y = y.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
+            optimizer.zero_grad(set_to_none=True)  # default behaviour
+            avg_metric = torch.zeros(((len(metrics),)),device=DEVICE)
 
-        with torch.autocast(
-            device_type=DEVICE, dtype=config["autocast_dtype"], enabled=config["use_amp"]
-        ):
-            logits = model(x, y[:, :-1])  # CUDA - B,Sy,VS
+            with torch.autocast(
+                device_type=DEVICE, dtype=config["autocast_dtype"], enabled=config["use_amp"]
+            ):
+                logits = model(x, y[:, :-1])  # CUDA - B,Sy,VS
 
-            logits = logits.reshape((-1,logits.shape[-1])) # (B*Sy,VS)
-            y = y[:,1:].reshape(-1) # (B*Sy,)
+                logits = logits.reshape((-1,logits.shape[-1])) # (B*Sy,VS)
+                y = y[:,1:].reshape(-1) # (B*Sy,)
 
-            loss_value = loss_fn(logits, y)  # input, target
+                loss_value = loss_fn(logits, y)  # input, target
 
-            with torch.no_grad():
-                for j,m in enumerate(metrics):
-                    avg_metric[j]+=m(logits,y)
+                with torch.no_grad():
+                    for j,m in enumerate(metrics):
+                        avg_metric[j]+=m(logits,y)
 
-        scaler.scale(loss_value).backward()
-        scaler.step(optimizer)
-        scheduler.step()
-        scaler.update()
-        if config["benchmark_mode"]:
-            torch.mps.synchronize()
-        end_time = time.time()
+            scaler.scale(loss_value).backward()
+            scaler.step(optimizer)
+            scheduler.step()
+            scaler.update()
+            if config["benchmark_mode"]:
+                torch.mps.synchronize()
+            end_time = time.time()
 
-        # loss.backward()
-        # optimizer.step()
+            # loss.backward()
+            # optimizer.step()
 
-        total_loss += loss_value.detach()
-        avg_metrics += avg_metric.detach()
-        delta = end_time - start_time
-        total_time+=delta
+            total_loss += loss_value.detach()
+            avg_metrics += avg_metric.detach()
+            delta = end_time - start_time
+            total_time+=delta
 
-        if i % VERBOSE_FREQ == 0:
-            ts = (x.shape[0]*x.shape[1]+y.shape[0]) / delta
-            history.append(
-                {
-                    "batch_loss": loss_value.item(),
-                    "batch_percentage": i / NUM_BATCHES,
-                    "batch_idx": i,
-                    "epoch": epoch,
-                    "batch_time": delta,
-                    "data_loading_time": start_time - prev_end,
-                    "tokens/sec": ts,
-                }
-            )
-            if VERBOSE:
-                print(
-                    f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, data_loading_time (ms): {(start_time - prev_end)*1000:.3f}, tokens/sec: {ts:,.3f}"
+            if i % VERBOSE_FREQ == 0:
+                ts = (x.shape[0]*x.shape[1]+y.shape[0]) / delta
+                history.append(
+                    {
+                        "batch_loss": loss_value.item(),
+                        "batch_percentage": i / NUM_BATCHES,
+                        "batch_idx": i,
+                        "epoch": epoch,
+                        "batch_time": delta,
+                        "data_loading_time": start_time - prev_end,
+                        "tokens/sec": ts,
+                    }
                 )
-        prev_end = time.time()
+                if VERBOSE:
+                    print(
+                        f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, data_loading_time (ms): {(start_time - prev_end)*1000:.3f}, tokens/sec: {ts:,.3f}"
+                    )
+
+            if (i+1) % SAVE_FREQ == 0:
+                model_path=f"{save_file_path_root}/model_{epoch}_in_batch.pt"
+                print(f"Saved mid-epoch to: {model_path}")
+
+                save_hist(
+                    history_path,
+                    model_path,
+                    optimizer_path,
+                    scheduler_path,
+                    save_weights=True,
+                    is_best=False,
+                    batches_done=i+1
+                )
+
+            prev_end = time.time()
+    except KeyboardInterrupt as e:
+        print(f"{datetime.now()} keyboard interrupt detected after finishing batches: {i}")
+        print(e)
+        model_path=f"{save_file_path_root}/model_{epoch}_keyboard_intrrupt.pt"
+        save_hist(
+            history_path,
+            model_path,
+            optimizer_path,
+            scheduler_path,
+            save_weights=True,
+            is_best=False,
+            batches_done=i
+        )
+        raise
+
     epoch_end = time.time()
     
-    avg_vloss, avg_val_metrics = calculate_val_loss(epoch)
+    avg_vloss, avg_val_metrics = calculate_val_loss(epoch%2==0)
     return (
         (total_loss / total_batches).item(), 
         [m.item() for m in (avg_metrics / total_batches)], 
@@ -809,30 +862,21 @@ def load_model():
             last_epoch_vloss = dic["last_epoch_vloss"]
             non_improve_cnt = dic["non_improve_cnt"]
             best_val_loss = dic["best_val_loss"]
-            start_epoch = dic["epoch"]
+            start_epoch = dic.get("last_completed_epoch",dic["epoch"])
             model_path = dic["model_path"]
+            in_epoch_batches = dic.get("in_epoch_batches",0)
         assert path.exists(model_path)
 
 
         optimizer.load_state_dict(torch.load(optimizer_path))
         scheduler.load_state_dict(torch.load(scheduler_path))
         model.load_state_dict(torch.load(model_path))
+        batch_sampler.load_bit(in_epoch_batches)
+
         model.to(
             config["device"], dtype=config["dtype"]
         )
 
-        # fixing the history to be until the last improving epoch
-        new_start_epoch = int(re.search(r"model_(\d*)_.*\.pt", model_path).group(1))
-        if new_start_epoch != start_epoch:
-            start_epoch = new_start_epoch
-            idx = len(history)-1
-            while idx > 0 and history[idx]["epoch"] > start_epoch: idx-=1
-            # the last one should be main history append. 
-            print(history[idx])
-            best_val_loss = history[idx]["avg_vloss"]
-            last_epoch_vloss = best_val_loss
-            non_improve_cnt = 0 # last improved is 0. 
-            history=history[:idx+1]
         print(
             f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
         )
@@ -852,12 +896,14 @@ if __name__ == "__main__":
 
     print(f"{datetime.now()}: training started!")
     scaler = torch.amp.GradScaler(DEVICE, enabled=config["use_amp"] and DEVICE != "mps")
+    last_completed_epoch=start_epoch
     for epoch in range(start_epoch+1, config["epochs"]):
         if epoch > STOP_AFTER_EPOCH:
             break
         model.train(True)
         avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
-
+        last_completed_epoch=epoch
+        
         metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
         val_metrics_text = ", ".join([f"{metrics[i].name}_val: {avg_val_metrics[i]:.3f}" for i in range(len(metrics))])
         print(
