@@ -119,17 +119,17 @@ Results:
 
 
 ## September 27th:
-- Getting wmt14 data.
+- Getting wmt14 data. -> 10^8
 - allowed for different tokenizers. 
 - implemented tokenization caching
+- Sort Val
+- Setup mid epoch save. 
+- validation in epoch. 
 
 
 Next step:
-- new bpe
-- Pull val and sort/filter val as well. 
-- Increase everywhere as required. 
-- Start training. 
 - fix the git account thing and push to github. 
+- read the article on how to speed up and come up with ways. 
 
 
 ## To be done:

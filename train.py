@@ -713,10 +713,22 @@ def train_one_epoch(epoch):
                         f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, data_loading_time (ms): {(start_time - prev_end)*1000:.3f}, tokens/sec: {ts:,.3f}"
                     )
 
+            del logits,loss_value
             if (i+1) % SAVE_FREQ == 0:
                 model_path=f"{save_file_path_root}/model_{epoch}_in_batch.pt"
-                print(f"Saved mid-epoch to: {model_path}")
-
+                print(f"{datetime.now()} Saving mid-epoch to: {model_path}")
+                
+                avg_vloss, avg_val_metrics = calculate_val_loss(False)
+                history.append({
+                    "avg_vloss": avg_vloss, 
+                    "epoch": epoch,
+                    "batch_idx": i,
+                } | {
+                    metrics[k].name+"_val":avg_val_metrics[k] for k in range(len(metrics))
+                })
+                model.train(True)
+                print(f"{datetime.now()} Val loss calculation done")
+                
                 save_hist(
                     history_path,
                     model_path,
