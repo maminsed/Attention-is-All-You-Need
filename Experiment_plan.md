@@ -128,7 +128,6 @@ Results:
 
 
 Next step:
-- fix the git account thing and push to github. 
 - read the article on how to speed up and come up with ways. 
 
 

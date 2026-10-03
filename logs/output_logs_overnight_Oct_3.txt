@@ -1,0 +1,66 @@
+2026-10-03 00:57:07.033980: code started: 
+2026-10-03 00:57:07.034045: DEVICE: mps
+2026-10-03 00:57:07.040650: encoding train started
+2026-10-03 00:57:07.041035 cache found
+2026-10-03 00:57:07.675919: encoding val started
+2026-10-03 00:57:07.676260 cache found
+2026-10-03 00:57:07.677602: # train size: #Tokens: X: 140,258,426 Y: 133,374,357 #Sentences: 4,399,220, num_dropped: 0
+2026-10-03 00:57:07.677624: # val size: #Tokens: X: 85,219 Y: 80,564 #Sentences: 2,996, num_dropped: 0
+2026-10-03 00:57:07.677636: batches/epoch: 137,476
+/Users/mohammadaminsedaghat/Desktop/attention/train.py:135: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:219.)
+  self.X = torch.from_numpy(X)
+
+
+==============
+num_parameters: 63,045,632 - num_non_embedding_params: 44,101,632
+2026-10-03 00:57:09.061772: optimizer loaded
+2026-10-03 00:57:09.061832: scheduler loaded
+2026-10-03 00:57:09.061867: loss_fn loaded
+2026-10-03 00:57:09.061885: metrics loaded
+2026-10-03 00:57:09.061893: loading pre saved
+2026-10-03 00:57:09.373419: Starting from pre saved with: start_epoch: -1, best_val_loss: inf, last_epoch_vloss: inf, non_improve_cnt: 0.00
+2026-10-03 00:57:09.373473: training started!
+2026-10-03 00:57:09.373721: Epoch: 0
+2026-10-03 00:57:09.568718 Starting From starting batch: 86481
+2026-10-03 00:59:13.211600: [epoch 0] batch 86800 loss_value: 3.5537, batch_time (s): 0.424, data_loading_time (ms): 3.399, tokens/sec: 6,333.155
+2026-10-03 01:02:34.850505: [epoch 0] batch 87200 loss_value: 4.1703, batch_time (s): 0.296, data_loading_time (ms): 2.364, tokens/sec: 9,175.362
+2026-10-03 01:06:30.095718: [epoch 0] batch 87600 loss_value: 3.9380, batch_time (s): 1.663, data_loading_time (ms): 2.193, tokens/sec: 2,674.003
+2026-10-03 01:15:28.810664: [epoch 0] batch 88000 loss_value: 3.9572, batch_time (s): 3.035, data_loading_time (ms): 3.153, tokens/sec: 1,349.615
+2026-10-03 01:22:22.883814: [epoch 0] batch 88400 loss_value: 4.3127, batch_time (s): 0.246, data_loading_time (ms): 0.368, tokens/sec: 10,404.384
+2026-10-03 01:25:00.771693: [epoch 0] batch 88800 loss_value: 4.0308, batch_time (s): 0.198, data_loading_time (ms): 5.444, tokens/sec: 10,188.814
+2026-10-03 01:31:08.872087: [epoch 0] batch 89200 loss_value: 3.8667, batch_time (s): 0.272, data_loading_time (ms): 6.206, tokens/sec: 4,587.104
+2026-10-03 01:37:20.828856: [epoch 0] batch 89600 loss_value: 4.9581, batch_time (s): 4.269, data_loading_time (ms): 1.008, tokens/sec: 1,851.352
+2026-10-03 01:40:56.152694: [epoch 0] batch 90000 loss_value: 3.8881, batch_time (s): 0.272, data_loading_time (ms): 1.313, tokens/sec: 12,019.530
+2026-10-03 01:45:45.953227: [epoch 0] batch 90400 loss_value: 3.9404, batch_time (s): 0.251, data_loading_time (ms): 1.400, tokens/sec: 11,596.156
+2026-10-03 01:47:53.889948: [epoch 0] batch 90800 loss_value: 4.2460, batch_time (s): 0.249, data_loading_time (ms): 1.915, tokens/sec: 11,289.236
+2026-10-03 01:49:33.771290: [epoch 0] batch 91200 loss_value: 4.0707, batch_time (s): 0.207, data_loading_time (ms): 0.361, tokens/sec: 10,348.333
+2026-10-03 01:51:13.227115: [epoch 0] batch 91600 loss_value: 3.3937, batch_time (s): 0.214, data_loading_time (ms): 0.342, tokens/sec: 13,780.054
+2026-10-03 01:52:56.540978: [epoch 0] batch 92000 loss_value: 4.6845, batch_time (s): 0.443, data_loading_time (ms): 1.110, tokens/sec: 11,628.061
+2026-10-03 01:54:36.945041: [epoch 0] batch 92400 loss_value: 3.8371, batch_time (s): 0.287, data_loading_time (ms): 0.346, tokens/sec: 12,713.138
+2026-10-03 01:56:18.286501: [epoch 0] batch 92800 loss_value: 4.1311, batch_time (s): 0.429, data_loading_time (ms): 0.707, tokens/sec: 11,873.730
+2026-10-03 01:58:00.613749: [epoch 0] batch 93200 loss_value: 3.9295, batch_time (s): 0.348, data_loading_time (ms): 0.344, tokens/sec: 11,763.625
+2026-10-03 01:59:42.566369: [epoch 0] batch 93600 loss_value: 3.7762, batch_time (s): 0.227, data_loading_time (ms): 0.854, tokens/sec: 11,700.588
+2026-10-03 02:01:23.092016: [epoch 0] batch 94000 loss_value: 4.5768, batch_time (s): 0.302, data_loading_time (ms): 0.518, tokens/sec: 11,123.727
+2026-10-03 02:03:03.634375: [epoch 0] batch 94400 loss_value: 4.5465, batch_time (s): 0.445, data_loading_time (ms): 0.542, tokens/sec: 12,221.401
+2026-10-03 02:04:40.384453: [epoch 0] batch 94800 loss_value: 4.2164, batch_time (s): 0.324, data_loading_time (ms): 0.602, tokens/sec: 11,250.612
+2026-10-03 02:06:27.748585: [epoch 0] batch 95200 loss_value: 4.2467, batch_time (s): 0.333, data_loading_time (ms): 0.343, tokens/sec: 11,234.904
+2026-10-03 02:08:10.795590: [epoch 0] batch 95600 loss_value: 4.7082, batch_time (s): 0.680, data_loading_time (ms): 0.355, tokens/sec: 11,572.846
+2026-10-03 02:09:49.960888: [epoch 0] batch 96000 loss_value: 4.4180, batch_time (s): 0.313, data_loading_time (ms): 0.343, tokens/sec: 13,500.474
+2026-10-03 02:11:26.352078: [epoch 0] batch 96400 loss_value: 4.0806, batch_time (s): 0.186, data_loading_time (ms): 0.388, tokens/sec: 11,339.846
+2026-10-03 02:13:07.617935: [epoch 0] batch 96800 loss_value: 3.6245, batch_time (s): 0.226, data_loading_time (ms): 0.868, tokens/sec: 10,752.030
+2026-10-03 02:14:48.256001: [epoch 0] batch 97200 loss_value: 4.0678, batch_time (s): 0.205, data_loading_time (ms): 1.475, tokens/sec: 11,553.481
+2026-10-03 02:16:29.810588: [epoch 0] batch 97600 loss_value: 3.5502, batch_time (s): 0.198, data_loading_time (ms): 0.555, tokens/sec: 11,475.731
+2026-10-03 02:18:12.810860: [epoch 0] batch 98000 loss_value: 3.8380, batch_time (s): 0.212, data_loading_time (ms): 0.551, tokens/sec: 12,985.797
+2026-10-03 02:19:52.934657: [epoch 0] batch 98400 loss_value: 3.3000, batch_time (s): 0.138, data_loading_time (ms): 0.378, tokens/sec: 9,993.251
+2026-10-03 02:21:34.974080: [epoch 0] batch 98800 loss_value: 4.0391, batch_time (s): 0.183, data_loading_time (ms): 0.384, tokens/sec: 10,815.822
+2026-10-03 02:23:13.720420: [epoch 0] batch 99200 loss_value: 4.6293, batch_time (s): 0.290, data_loading_time (ms): 0.355, tokens/sec: 12,917.249
+2026-10-03 02:24:55.248253: [epoch 0] batch 99600 loss_value: 3.8097, batch_time (s): 0.161, data_loading_time (ms): 0.363, tokens/sec: 8,947.438
+2026-10-03 02:26:41.546082 Saving mid-epoch to: ./test/overnight_Oct_2/model_0_in_batch.pt
+Traceback (most recent call last):
+  File "/Users/mohammadaminsedaghat/Desktop/attention/train.py", line 920, in <module>
+    avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/train.py", line 724, in train_one_epoch
+    "avg_loss": avg_loss,
+                ^^^^^^^^
+NameError: name 'avg_loss' is not defined. Did you mean: 'avg_vloss'?

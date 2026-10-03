@@ -21,12 +21,12 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./test/overnight_Sep_27"
+save_file_path_root = "./test/overnight_Oct_2"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 400
 SAVE_FREQ=20_000
@@ -34,7 +34,7 @@ STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-DATAS_SOURCE = "wmt14" # wmt14 or iwslt17 or iwslt17_curated
+DATAS_SOURCE = "wmt14_curated" # wmt14 or iwslt17 or iwslt17_curated or wmt14_curated
 
 
 NUM_BATCHES = None
@@ -623,9 +623,9 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
                     not type(v).__module__.startswith("torch")
                     ) else str(v)) 
                     for k,v in config.items()},
-                "last_epoch_vloss": last_epoch_vloss,
+                "last_epoch_vloss": str(last_epoch_vloss) if last_epoch_vloss == float("inf") else last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
-                "best_val_loss": best_val_loss,
+                "best_val_loss": str(best_val_loss) if best_val_loss == float("inf") else best_val_loss,
                 "epoch": epoch,
                 "last_completed_epoch": last_completed_epoch,
                 "model_path": model_path,
@@ -721,8 +721,12 @@ def train_one_epoch(epoch):
                 avg_vloss, avg_val_metrics = calculate_val_loss(False)
                 history.append({
                     "avg_vloss": avg_vloss, 
+                    "avg_loss": total_loss.item() / (i+1),
                     "epoch": epoch,
                     "batch_idx": i,
+                    "batch_percentage": i / NUM_BATCHES
+                } | {
+                    metrics[i].name:avg_metrics[i].item()/(i+1) for i in range(len(metrics))
                 } | {
                     metrics[k].name+"_val":avg_val_metrics[k] for k in range(len(metrics))
                 })
@@ -753,6 +757,7 @@ def train_one_epoch(epoch):
             is_best=False,
             batches_done=i
         )
+        print(f"{datetime.now()} History saved")
         raise
 
     epoch_end = time.time()
@@ -779,9 +784,9 @@ def load_best_model():
     with open(history_path, "r") as f:
         dic = json.load(f)
         history = dic["history"]
-        last_epoch_vloss = dic["last_epoch_vloss"]
+        last_epoch_vloss = float(dic["last_epoch_vloss"])
         non_improve_cnt = dic["non_improve_cnt"]
-        best_val_loss = dic["best_val_loss"]
+        best_val_loss = float(dic["best_val_loss"])
         start_epoch = dic["epoch"]
         model_path = dic["model_path"]
         config = {k:(v if k not in ["device","autocast_dtype","dtype"] else config[k]) for k,v in dic["config"].items()}
@@ -809,7 +814,6 @@ def load_best_model():
 
     model.to(config["device"], dtype=config["dtype"])
 
-        
     print(
         f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
     )
@@ -871,9 +875,9 @@ def load_model():
         with open(history_path, "r") as f:
             dic = json.load(f)
             history = dic["history"]
-            last_epoch_vloss = dic["last_epoch_vloss"]
+            last_epoch_vloss = float(dic["last_epoch_vloss"])
             non_improve_cnt = dic["non_improve_cnt"]
-            best_val_loss = dic["best_val_loss"]
+            best_val_loss = float(dic["best_val_loss"])
             start_epoch = dic.get("last_completed_epoch",dic["epoch"])
             model_path = dic["model_path"]
             in_epoch_batches = dic.get("in_epoch_batches",0)
