@@ -1,0 +1,368 @@
+2026-10-04 00:50:29.838605: code started: 
+2026-10-04 00:50:29.838670: DEVICE: mps
+2026-10-04 00:50:29.846015: encoding train started
+2026-10-04 00:50:29.846224 cache found
+2026-10-04 00:50:31.082003: encoding val started
+2026-10-04 00:50:31.082799 cache found
+2026-10-04 00:50:31.085124: # train size: #Tokens: X: 140,258,426 Y: 133,374,357 #Sentences: 4,399,220, num_dropped: 0
+2026-10-04 00:50:31.085151: # val size: #Tokens: X: 85,219 Y: 80,564 #Sentences: 2,996, num_dropped: 0
+2026-10-04 00:50:31.085178: batches/epoch: 137,476. LR peak: 0.0008068715304598784
+/Users/mohammadaminsedaghat/Desktop/attention/train.py:192: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /Users/runner/work/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:219.)
+  self.X = torch.from_numpy(X)
+
+
+==============
+num_parameters: 63,045,632 - num_non_embedding_params: 44,101,632
+2026-10-04 00:50:32.214168: optimizer loaded
+2026-10-04 00:50:32.214220: scheduler loaded
+2026-10-04 00:50:32.214249: loss_fn loaded
+2026-10-04 00:50:32.214269: metrics loaded
+2026-10-04 00:50:32.214276: loading pre saved
+2026-10-04 00:50:32.527774: Starting from pre saved with: start_epoch: -1, best_val_loss: inf, last_epoch_vloss: inf, non_improve_cnt: 0.00
+2026-10-04 00:50:32.527851: training started!
+2026-10-04 00:50:32.528121: Epoch: 0
+2026-10-04 00:50:32.723399 Starting From starting batch: 86481
+2026-10-04 00:52:33.150675: [epoch 0] batch 86800 loss_value: 3.5579, batch_time (s): 0.255, data_loading_time (ms): 0.741, tokens/sec: 10,541.556
+2026-10-04 00:56:02.228456: [epoch 0] batch 87200 loss_value: 4.1699, batch_time (s): 0.243, data_loading_time (ms): 0.496, tokens/sec: 11,175.443
+2026-10-04 00:59:40.930873: [epoch 0] batch 87600 loss_value: 3.9344, batch_time (s): 0.347, data_loading_time (ms): 0.429, tokens/sec: 12,801.718
+2026-10-04 01:04:56.569490: [epoch 0] batch 88000 loss_value: 3.9802, batch_time (s): 0.269, data_loading_time (ms): 2.653, tokens/sec: 15,220.207
+2026-10-04 01:09:13.507017: [epoch 0] batch 88400 loss_value: 4.3377, batch_time (s): 0.290, data_loading_time (ms): 0.326, tokens/sec: 8,832.213
+2026-10-04 01:11:42.329812: [epoch 0] batch 88800 loss_value: 4.0345, batch_time (s): 0.368, data_loading_time (ms): 121.333, tokens/sec: 5,485.489
+2026-10-04 01:22:25.594607: [epoch 0] batch 89200 loss_value: 3.8359, batch_time (s): 0.190, data_loading_time (ms): 2.091, tokens/sec: 6,576.457
+2026-10-04 01:28:58.041295: [epoch 0] batch 89600 loss_value: 4.9781, batch_time (s): 2.744, data_loading_time (ms): 2.146, tokens/sec: 2,880.659
+2026-10-04 01:35:08.475351: [epoch 0] batch 90000 loss_value: 3.9005, batch_time (s): 0.239, data_loading_time (ms): 1.363, tokens/sec: 13,685.076
+2026-10-04 01:40:46.773577: [epoch 0] batch 90400 loss_value: 3.9235, batch_time (s): 0.254, data_loading_time (ms): 2.047, tokens/sec: 11,485.139
+2026-10-04 01:46:50.125215: [epoch 0] batch 90800 loss_value: 4.2469, batch_time (s): 0.257, data_loading_time (ms): 2.175, tokens/sec: 10,954.771
+2026-10-04 01:51:52.920809: [epoch 0] batch 91200 loss_value: 4.0927, batch_time (s): 0.219, data_loading_time (ms): 1.552, tokens/sec: 9,809.161
+2026-10-04 02:00:09.515940: [epoch 0] batch 91600 loss_value: 3.3927, batch_time (s): 1.823, data_loading_time (ms): 3.302, tokens/sec: 1,614.689
+2026-10-04 02:06:31.585326: [epoch 0] batch 92000 loss_value: 4.6792, batch_time (s): 0.689, data_loading_time (ms): 0.980, tokens/sec: 7,472.284
+2026-10-04 02:09:47.572729: [epoch 0] batch 92400 loss_value: 3.8513, batch_time (s): 0.287, data_loading_time (ms): 0.360, tokens/sec: 12,726.324
+2026-10-04 02:11:28.786397: [epoch 0] batch 92800 loss_value: 4.1404, batch_time (s): 0.554, data_loading_time (ms): 0.607, tokens/sec: 9,188.174
+2026-10-04 02:13:11.778589: [epoch 0] batch 93200 loss_value: 3.9250, batch_time (s): 0.350, data_loading_time (ms): 0.356, tokens/sec: 11,688.695
+2026-10-04 02:14:54.198644: [epoch 0] batch 93600 loss_value: 3.7849, batch_time (s): 0.225, data_loading_time (ms): 3.026, tokens/sec: 11,805.087
+2026-10-04 02:16:35.116751: [epoch 0] batch 94000 loss_value: 4.5465, batch_time (s): 0.304, data_loading_time (ms): 0.367, tokens/sec: 11,057.500
+2026-10-04 02:18:14.739633: [epoch 0] batch 94400 loss_value: 4.5545, batch_time (s): 0.449, data_loading_time (ms): 0.670, tokens/sec: 12,117.515
+2026-10-04 02:19:50.515136: [epoch 0] batch 94800 loss_value: 4.2312, batch_time (s): 0.325, data_loading_time (ms): 0.393, tokens/sec: 11,233.225
+2026-10-04 02:21:35.731308: [epoch 0] batch 95200 loss_value: 4.2616, batch_time (s): 0.342, data_loading_time (ms): 0.804, tokens/sec: 10,952.171
+2026-10-04 02:23:21.358745: [epoch 0] batch 95600 loss_value: 4.7233, batch_time (s): 0.690, data_loading_time (ms): 0.491, tokens/sec: 11,400.942
+2026-10-04 02:25:01.594463: [epoch 0] batch 96000 loss_value: 4.4354, batch_time (s): 0.313, data_loading_time (ms): 0.850, tokens/sec: 13,495.034
+2026-10-04 02:26:39.469361: [epoch 0] batch 96400 loss_value: 4.0778, batch_time (s): 0.188, data_loading_time (ms): 0.775, tokens/sec: 11,225.845
+2026-10-04 02:28:21.445437: [epoch 0] batch 96800 loss_value: 3.6359, batch_time (s): 0.225, data_loading_time (ms): 0.346, tokens/sec: 10,797.852
+2026-10-04 02:30:03.276647: [epoch 0] batch 97200 loss_value: 4.0400, batch_time (s): 0.211, data_loading_time (ms): 1.211, tokens/sec: 11,202.725
+2026-10-04 02:31:47.267702: [epoch 0] batch 97600 loss_value: 3.5438, batch_time (s): 0.196, data_loading_time (ms): 0.352, tokens/sec: 11,606.585
+2026-10-04 02:33:28.893430: [epoch 0] batch 98000 loss_value: 3.8561, batch_time (s): 0.209, data_loading_time (ms): 0.355, tokens/sec: 13,184.121
+2026-10-04 02:35:08.838086: [epoch 0] batch 98400 loss_value: 3.2638, batch_time (s): 0.137, data_loading_time (ms): 0.477, tokens/sec: 10,059.510
+2026-10-04 02:36:51.089744: [epoch 0] batch 98800 loss_value: 4.0116, batch_time (s): 0.186, data_loading_time (ms): 0.379, tokens/sec: 10,682.983
+2026-10-04 02:38:30.345445: [epoch 0] batch 99200 loss_value: 4.6220, batch_time (s): 0.288, data_loading_time (ms): 0.374, tokens/sec: 13,005.141
+2026-10-04 02:40:10.833065: [epoch 0] batch 99600 loss_value: 3.8345, batch_time (s): 0.158, data_loading_time (ms): 0.359, tokens/sec: 9,134.462
+2026-10-04 02:41:57.945554 Saving mid-epoch to: ./test/overnight_Oct_2/model_0_in_batch.pt
+2026-10-04 02:42:05.045966 Val loss calculation done
+2026-10-04 02:42:06.253224: [epoch 0] batch 100000 loss_value: 3.3726, batch_time (s): 0.224, data_loading_time (ms): 0.350, tokens/sec: 9,713.852
+2026-10-04 02:43:48.331380: [epoch 0] batch 100400 loss_value: 3.6359, batch_time (s): 0.171, data_loading_time (ms): 0.341, tokens/sec: 9,892.213
+2026-10-04 02:45:24.141901: [epoch 0] batch 100800 loss_value: 3.9873, batch_time (s): 0.216, data_loading_time (ms): 0.366, tokens/sec: 10,960.080
+2026-10-04 02:47:03.524241: [epoch 0] batch 101200 loss_value: 3.5481, batch_time (s): 0.204, data_loading_time (ms): 0.326, tokens/sec: 11,897.500
+2026-10-04 02:48:41.858873: [epoch 0] batch 101600 loss_value: 3.1506, batch_time (s): 0.117, data_loading_time (ms): 0.566, tokens/sec: 7,389.789
+2026-10-04 02:50:25.111013: [epoch 0] batch 102000 loss_value: 3.7395, batch_time (s): 0.190, data_loading_time (ms): 0.481, tokens/sec: 11,136.132
+2026-10-04 02:52:06.155850: [epoch 0] batch 102400 loss_value: 4.2772, batch_time (s): 0.218, data_loading_time (ms): 0.527, tokens/sec: 11,014.032
+2026-10-04 02:53:48.924346: [epoch 0] batch 102800 loss_value: 3.7504, batch_time (s): 0.187, data_loading_time (ms): 0.427, tokens/sec: 9,935.773
+2026-10-04 02:55:33.367446: [epoch 0] batch 103200 loss_value: 4.0730, batch_time (s): 0.284, data_loading_time (ms): 0.355, tokens/sec: 10,935.438
+2026-10-04 02:57:13.832374: [epoch 0] batch 103600 loss_value: 3.8506, batch_time (s): 0.173, data_loading_time (ms): 0.413, tokens/sec: 9,965.457
+2026-10-04 02:58:55.973383: [epoch 0] batch 104000 loss_value: 4.1472, batch_time (s): 0.218, data_loading_time (ms): 0.471, tokens/sec: 11,131.655
+2026-10-04 03:00:39.348654: [epoch 0] batch 104400 loss_value: 3.9291, batch_time (s): 0.256, data_loading_time (ms): 0.397, tokens/sec: 12,380.809
+2026-10-04 03:02:18.861238: [epoch 0] batch 104800 loss_value: 3.8594, batch_time (s): 0.182, data_loading_time (ms): 0.351, tokens/sec: 10,746.664
+2026-10-04 03:04:02.003434: [epoch 0] batch 105200 loss_value: 3.8389, batch_time (s): 0.170, data_loading_time (ms): 0.341, tokens/sec: 9,986.536
+2026-10-04 03:05:40.633812: [epoch 0] batch 105600 loss_value: 4.1145, batch_time (s): 0.224, data_loading_time (ms): 0.373, tokens/sec: 12,278.358
+2026-10-04 03:07:23.295351: [epoch 0] batch 106000 loss_value: 3.2254, batch_time (s): 0.136, data_loading_time (ms): 0.498, tokens/sec: 8,733.953
+2026-10-04 03:09:06.111935: [epoch 0] batch 106400 loss_value: 3.6178, batch_time (s): 0.245, data_loading_time (ms): 0.364, tokens/sec: 10,851.846
+2026-10-04 03:10:48.974913: [epoch 0] batch 106800 loss_value: 3.5275, batch_time (s): 0.213, data_loading_time (ms): 0.314, tokens/sec: 11,709.132
+2026-10-04 03:12:30.703883: [epoch 0] batch 107200 loss_value: 3.9751, batch_time (s): 0.179, data_loading_time (ms): 0.411, tokens/sec: 10,009.712
+2026-10-04 03:14:15.635777: [epoch 0] batch 107600 loss_value: 4.0330, batch_time (s): 0.279, data_loading_time (ms): 0.343, tokens/sec: 13,639.454
+2026-10-04 03:15:58.775544: [epoch 0] batch 108000 loss_value: 4.3060, batch_time (s): 0.302, data_loading_time (ms): 0.567, tokens/sec: 11,869.600
+2026-10-04 03:17:42.358367: [epoch 0] batch 108400 loss_value: 4.5669, batch_time (s): 0.351, data_loading_time (ms): 0.368, tokens/sec: 12,942.508
+2026-10-04 03:19:25.162168: [epoch 0] batch 108800 loss_value: 3.7354, batch_time (s): 0.195, data_loading_time (ms): 0.339, tokens/sec: 11,672.336
+2026-10-04 03:21:08.057773: [epoch 0] batch 109200 loss_value: 4.1762, batch_time (s): 0.326, data_loading_time (ms): 0.499, tokens/sec: 11,175.212
+2026-10-04 03:22:50.544865: [epoch 0] batch 109600 loss_value: 4.1259, batch_time (s): 0.170, data_loading_time (ms): 0.504, tokens/sec: 9,954.687
+2026-10-04 03:24:35.124015: [epoch 0] batch 110000 loss_value: 4.2233, batch_time (s): 0.299, data_loading_time (ms): 0.520, tokens/sec: 11,241.939
+2026-10-04 03:26:16.012755: [epoch 0] batch 110400 loss_value: 4.4232, batch_time (s): 0.272, data_loading_time (ms): 0.347, tokens/sec: 11,872.495
+2026-10-04 03:27:59.988643: [epoch 0] batch 110800 loss_value: 4.9549, batch_time (s): 0.419, data_loading_time (ms): 0.560, tokens/sec: 11,607.815
+2026-10-04 03:29:40.898349: [epoch 0] batch 111200 loss_value: 4.2802, batch_time (s): 0.193, data_loading_time (ms): 0.560, tokens/sec: 11,096.795
+2026-10-04 03:31:23.485887: [epoch 0] batch 111600 loss_value: 3.9149, batch_time (s): 0.225, data_loading_time (ms): 0.347, tokens/sec: 10,659.702
+2026-10-04 03:33:04.721146: [epoch 0] batch 112000 loss_value: 3.9140, batch_time (s): 0.293, data_loading_time (ms): 0.477, tokens/sec: 11,265.492
+2026-10-04 03:34:48.988475: [epoch 0] batch 112400 loss_value: 3.8588, batch_time (s): 0.183, data_loading_time (ms): 0.521, tokens/sec: 10,169.032
+2026-10-04 03:36:30.059375: [epoch 0] batch 112800 loss_value: 4.3267, batch_time (s): 0.238, data_loading_time (ms): 0.389, tokens/sec: 10,477.134
+2026-10-04 03:38:13.534106: [epoch 0] batch 113200 loss_value: 4.0469, batch_time (s): 0.414, data_loading_time (ms): 0.796, tokens/sec: 13,125.296
+2026-10-04 03:39:55.902477: [epoch 0] batch 113600 loss_value: 2.8312, batch_time (s): 0.109, data_loading_time (ms): 0.342, tokens/sec: 5,864.301
+2026-10-04 03:41:35.138515: [epoch 0] batch 114000 loss_value: 3.4351, batch_time (s): 0.161, data_loading_time (ms): 0.602, tokens/sec: 9,557.228
+2026-10-04 03:43:20.837910: [epoch 0] batch 114400 loss_value: 4.1721, batch_time (s): 0.498, data_loading_time (ms): 0.367, tokens/sec: 11,237.267
+2026-10-04 03:45:02.420934: [epoch 0] batch 114800 loss_value: 3.7079, batch_time (s): 0.239, data_loading_time (ms): 0.374, tokens/sec: 10,866.181
+2026-10-04 03:46:47.196405: [epoch 0] batch 115200 loss_value: 4.0019, batch_time (s): 0.290, data_loading_time (ms): 0.344, tokens/sec: 13,135.604
+2026-10-04 03:48:25.558785: [epoch 0] batch 115600 loss_value: 3.5634, batch_time (s): 0.187, data_loading_time (ms): 0.507, tokens/sec: 11,132.261
+2026-10-04 03:50:07.179224: [epoch 0] batch 116000 loss_value: 4.1247, batch_time (s): 0.342, data_loading_time (ms): 0.363, tokens/sec: 12,825.508
+2026-10-04 03:51:48.507456: [epoch 0] batch 116400 loss_value: 4.0855, batch_time (s): 0.289, data_loading_time (ms): 0.340, tokens/sec: 11,962.039
+2026-10-04 03:53:29.823533: [epoch 0] batch 116800 loss_value: 3.6650, batch_time (s): 0.213, data_loading_time (ms): 0.528, tokens/sec: 11,736.278
+2026-10-04 03:55:10.695633: [epoch 0] batch 117200 loss_value: 3.2232, batch_time (s): 0.163, data_loading_time (ms): 0.533, tokens/sec: 10,574.431
+2026-10-04 03:56:52.611846: [epoch 0] batch 117600 loss_value: 3.8325, batch_time (s): 0.175, data_loading_time (ms): 0.341, tokens/sec: 10,807.716
+2026-10-04 03:58:36.323294: [epoch 0] batch 118000 loss_value: 4.2900, batch_time (s): 0.343, data_loading_time (ms): 0.345, tokens/sec: 13,231.794
+2026-10-04 04:00:20.376189: [epoch 0] batch 118400 loss_value: 4.2052, batch_time (s): 0.250, data_loading_time (ms): 0.552, tokens/sec: 11,666.670
+2026-10-04 04:02:04.848910: [epoch 0] batch 118800 loss_value: 3.7268, batch_time (s): 0.220, data_loading_time (ms): 0.455, tokens/sec: 10,636.208
+2026-10-04 04:03:46.923729: [epoch 0] batch 119200 loss_value: 3.6320, batch_time (s): 0.181, data_loading_time (ms): 0.376, tokens/sec: 11,344.191
+2026-10-04 04:05:26.478113: [epoch 0] batch 119600 loss_value: 4.1596, batch_time (s): 0.264, data_loading_time (ms): 0.311, tokens/sec: 12,228.711
+2026-10-04 04:07:06.921751 Saving mid-epoch to: ./test/overnight_Oct_2/model_0_in_batch.pt
+2026-10-04 04:07:13.883994 Val loss calculation done
+2026-10-04 04:07:14.820996: [epoch 0] batch 120000 loss_value: 3.3455, batch_time (s): 0.208, data_loading_time (ms): 0.334, tokens/sec: 10,624.168
+2026-10-04 04:08:52.563419: [epoch 0] batch 120400 loss_value: 4.2975, batch_time (s): 0.305, data_loading_time (ms): 0.555, tokens/sec: 10,926.027
+2026-10-04 04:10:34.873318: [epoch 0] batch 120800 loss_value: 4.6626, batch_time (s): 0.451, data_loading_time (ms): 0.340, tokens/sec: 11,559.825
+2026-10-04 04:12:17.922503: [epoch 0] batch 121200 loss_value: 4.1699, batch_time (s): 0.338, data_loading_time (ms): 0.418, tokens/sec: 11,827.526
+2026-10-04 04:13:57.312643: [epoch 0] batch 121600 loss_value: 4.3093, batch_time (s): 0.269, data_loading_time (ms): 0.347, tokens/sec: 12,113.846
+2026-10-04 04:15:43.284950: [epoch 0] batch 122000 loss_value: 4.1912, batch_time (s): 0.250, data_loading_time (ms): 0.348, tokens/sec: 12,781.959
+2026-10-04 04:17:22.369772: [epoch 0] batch 122400 loss_value: 3.7489, batch_time (s): 0.187, data_loading_time (ms): 0.329, tokens/sec: 10,591.960
+2026-10-04 04:19:08.657977: [epoch 0] batch 122800 loss_value: 4.3348, batch_time (s): 0.374, data_loading_time (ms): 0.346, tokens/sec: 11,557.070
+2026-10-04 04:20:48.640351: [epoch 0] batch 123200 loss_value: 4.1823, batch_time (s): 0.280, data_loading_time (ms): 0.518, tokens/sec: 12,357.906
+2026-10-04 04:22:32.843101: [epoch 0] batch 123600 loss_value: 4.1595, batch_time (s): 0.383, data_loading_time (ms): 0.528, tokens/sec: 11,856.963
+2026-10-04 04:24:16.047925: [epoch 0] batch 124000 loss_value: 3.9432, batch_time (s): 0.244, data_loading_time (ms): 0.554, tokens/sec: 12,475.939
+2026-10-04 04:25:59.554652: [epoch 0] batch 124400 loss_value: 3.8673, batch_time (s): 0.190, data_loading_time (ms): 0.340, tokens/sec: 10,930.056
+2026-10-04 04:27:40.131238: [epoch 0] batch 124800 loss_value: 4.3405, batch_time (s): 0.345, data_loading_time (ms): 0.348, tokens/sec: 12,228.266
+2026-10-04 04:29:24.640854: [epoch 0] batch 125200 loss_value: 3.9509, batch_time (s): 0.242, data_loading_time (ms): 0.576, tokens/sec: 12,827.300
+2026-10-04 04:31:10.188666: [epoch 0] batch 125600 loss_value: 3.9045, batch_time (s): 0.248, data_loading_time (ms): 0.318, tokens/sec: 10,581.748
+2026-10-04 04:32:54.525675: [epoch 0] batch 126000 loss_value: 3.8623, batch_time (s): 0.227, data_loading_time (ms): 0.355, tokens/sec: 11,976.681
+2026-10-04 04:34:37.078023: [epoch 0] batch 126400 loss_value: 3.9658, batch_time (s): 0.265, data_loading_time (ms): 0.912, tokens/sec: 11,605.019
+2026-10-04 04:36:16.625762: [epoch 0] batch 126800 loss_value: 4.0402, batch_time (s): 0.274, data_loading_time (ms): 0.533, tokens/sec: 10,877.113
+2026-10-04 04:37:58.430829: [epoch 0] batch 127200 loss_value: 3.6862, batch_time (s): 0.187, data_loading_time (ms): 0.505, tokens/sec: 10,945.659
+2026-10-04 04:39:41.602637: [epoch 0] batch 127600 loss_value: 3.6109, batch_time (s): 0.264, data_loading_time (ms): 0.329, tokens/sec: 11,879.960
+2026-10-04 04:41:21.597304: [epoch 0] batch 128000 loss_value: 4.0239, batch_time (s): 0.177, data_loading_time (ms): 0.526, tokens/sec: 11,200.362
+2026-10-04 04:43:07.176683: [epoch 0] batch 128400 loss_value: 3.8762, batch_time (s): 0.228, data_loading_time (ms): 0.558, tokens/sec: 11,653.367
+2026-10-04 04:44:51.138254: [epoch 0] batch 128800 loss_value: 4.3036, batch_time (s): 0.288, data_loading_time (ms): 0.345, tokens/sec: 11,985.975
+2026-10-04 04:46:31.833533: [epoch 0] batch 129200 loss_value: 3.8757, batch_time (s): 0.188, data_loading_time (ms): 0.523, tokens/sec: 10,905.624
+2026-10-04 04:48:12.427588: [epoch 0] batch 129600 loss_value: 3.4787, batch_time (s): 0.172, data_loading_time (ms): 0.321, tokens/sec: 11,351.155
+2026-10-04 04:49:52.162133: [epoch 0] batch 130000 loss_value: 4.3445, batch_time (s): 0.383, data_loading_time (ms): 0.398, tokens/sec: 12,023.229
+2026-10-04 04:51:33.962771: [epoch 0] batch 130400 loss_value: 3.7204, batch_time (s): 0.170, data_loading_time (ms): 0.485, tokens/sec: 10,896.187
+2026-10-04 04:53:21.845026: [epoch 0] batch 130800 loss_value: 4.3026, batch_time (s): 0.310, data_loading_time (ms): 0.380, tokens/sec: 12,285.234
+2026-10-04 04:55:04.037121: [epoch 0] batch 131200 loss_value: 4.4547, batch_time (s): 0.441, data_loading_time (ms): 0.499, tokens/sec: 11,838.456
+2026-10-04 04:56:43.552528: [epoch 0] batch 131600 loss_value: 3.9860, batch_time (s): 0.255, data_loading_time (ms): 0.549, tokens/sec: 10,914.315
+2026-10-04 04:58:24.911009: [epoch 0] batch 132000 loss_value: 4.1372, batch_time (s): 0.245, data_loading_time (ms): 0.478, tokens/sec: 10,832.546
+2026-10-04 05:00:08.263270: [epoch 0] batch 132400 loss_value: 4.5532, batch_time (s): 0.357, data_loading_time (ms): 0.542, tokens/sec: 11,732.335
+2026-10-04 05:01:46.104364: [epoch 0] batch 132800 loss_value: 4.0050, batch_time (s): 0.269, data_loading_time (ms): 0.517, tokens/sec: 10,835.389
+2026-10-04 05:03:27.619905: [epoch 0] batch 133200 loss_value: 4.5867, batch_time (s): 0.388, data_loading_time (ms): 1.102, tokens/sec: 12,297.939
+2026-10-04 05:05:08.083145: [epoch 0] batch 133600 loss_value: 4.3377, batch_time (s): 0.452, data_loading_time (ms): 1.417, tokens/sec: 10,839.917
+2026-10-04 05:06:49.878794: [epoch 0] batch 134000 loss_value: 4.1330, batch_time (s): 0.230, data_loading_time (ms): 0.565, tokens/sec: 11,564.164
+2026-10-04 05:08:30.245327: [epoch 0] batch 134400 loss_value: 3.9280, batch_time (s): 0.150, data_loading_time (ms): 0.524, tokens/sec: 9,839.429
+2026-10-04 05:10:13.778716: [epoch 0] batch 134800 loss_value: 4.0120, batch_time (s): 0.199, data_loading_time (ms): 0.342, tokens/sec: 11,273.482
+2026-10-04 05:11:56.487736: [epoch 0] batch 135200 loss_value: 4.7720, batch_time (s): 0.450, data_loading_time (ms): 0.817, tokens/sec: 12,372.781
+2026-10-04 05:13:39.099068: [epoch 0] batch 135600 loss_value: 4.1071, batch_time (s): 0.294, data_loading_time (ms): 0.502, tokens/sec: 11,644.071
+2026-10-04 05:15:22.410880: [epoch 0] batch 136000 loss_value: 3.7405, batch_time (s): 0.204, data_loading_time (ms): 0.367, tokens/sec: 10,995.376
+2026-10-04 05:17:04.775481: [epoch 0] batch 136400 loss_value: 3.8190, batch_time (s): 0.214, data_loading_time (ms): 0.570, tokens/sec: 10,617.166
+2026-10-04 05:18:46.808686: [epoch 0] batch 136800 loss_value: 4.3174, batch_time (s): 0.430, data_loading_time (ms): 0.335, tokens/sec: 11,766.345
+2026-10-04 05:20:29.402524: [epoch 0] batch 137200 loss_value: 3.9409, batch_time (s): 0.183, data_loading_time (ms): 0.374, tokens/sec: 11,386.468
+2026-10-04 05:21:45.638864 started calculating bleu
+2026-10-04 05:24:54.000459 finished calculating bleu - avg bleu: 18.95 - total_time: 188.36156272888184 - avg_eos_idx: 25.42
+2026-10-04 05:24:54.005823: [epoch 0]: tokens_trained_so_far: 140,258,426 avg_loss: 3.9464, non_smoothed_loss_fn: 2.969, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 2.763, bleu_calculations_val: 0.190, avg_vloss: 3.8077, avg_time (s): 0.317, epoch_time (s): 16,266.059
+2026-10-04 05:24:56.278632: [epoch 0]: history saved
+2026-10-04 05:24:56.279036: Epoch: 1
+2026-10-04 05:24:58.814669: [epoch 1] batch 0 loss_value: 3.3920, batch_time (s): 0.411, data_loading_time (ms): 2120.623, tokens/sec: 4,283.237
+2026-10-04 05:26:42.972975: [epoch 1] batch 400 loss_value: 3.2836, batch_time (s): 0.142, data_loading_time (ms): 0.528, tokens/sec: 9,918.560
+2026-10-04 05:28:25.297835: [epoch 1] batch 800 loss_value: 4.2598, batch_time (s): 0.267, data_loading_time (ms): 0.481, tokens/sec: 12,322.597
+2026-10-04 05:30:10.682425: [epoch 1] batch 1200 loss_value: 3.8219, batch_time (s): 0.178, data_loading_time (ms): 0.325, tokens/sec: 10,411.280
+2026-10-04 05:31:51.732155: [epoch 1] batch 1600 loss_value: 3.1103, batch_time (s): 0.167, data_loading_time (ms): 0.307, tokens/sec: 11,717.761
+2026-10-04 05:33:33.569627: [epoch 1] batch 2000 loss_value: 4.3515, batch_time (s): 0.378, data_loading_time (ms): 0.384, tokens/sec: 11,679.968
+2026-10-04 05:35:15.221267: [epoch 1] batch 2400 loss_value: 3.9371, batch_time (s): 0.209, data_loading_time (ms): 0.518, tokens/sec: 10,859.126
+2026-10-04 05:36:59.677151: [epoch 1] batch 2800 loss_value: 4.0537, batch_time (s): 0.201, data_loading_time (ms): 0.364, tokens/sec: 10,658.071
+2026-10-04 05:38:39.913441: [epoch 1] batch 3200 loss_value: 4.0628, batch_time (s): 0.225, data_loading_time (ms): 0.529, tokens/sec: 11,660.781
+2026-10-04 05:40:24.442570: [epoch 1] batch 3600 loss_value: 3.1066, batch_time (s): 0.245, data_loading_time (ms): 0.519, tokens/sec: 14,615.564
+2026-10-04 05:42:08.547169: [epoch 1] batch 4000 loss_value: 3.2196, batch_time (s): 0.153, data_loading_time (ms): 0.504, tokens/sec: 10,872.539
+2026-10-04 05:43:47.247427: [epoch 1] batch 4400 loss_value: 3.7899, batch_time (s): 0.212, data_loading_time (ms): 0.405, tokens/sec: 11,489.522
+2026-10-04 05:45:28.228877: [epoch 1] batch 4800 loss_value: 3.8959, batch_time (s): 0.258, data_loading_time (ms): 0.514, tokens/sec: 10,523.666
+2026-10-04 05:47:14.363235: [epoch 1] batch 5200 loss_value: 3.5377, batch_time (s): 0.153, data_loading_time (ms): 0.584, tokens/sec: 8,582.339
+2026-10-04 05:48:57.050233: [epoch 1] batch 5600 loss_value: 3.8989, batch_time (s): 0.230, data_loading_time (ms): 0.337, tokens/sec: 10,990.255
+2026-10-04 05:50:39.442070: [epoch 1] batch 6000 loss_value: 4.4713, batch_time (s): 0.383, data_loading_time (ms): 0.358, tokens/sec: 11,457.005
+2026-10-04 05:52:23.887518: [epoch 1] batch 6400 loss_value: 4.0306, batch_time (s): 0.296, data_loading_time (ms): 0.345, tokens/sec: 10,700.134
+2026-10-04 05:54:04.997202: [epoch 1] batch 6800 loss_value: 4.1146, batch_time (s): 0.375, data_loading_time (ms): 1.516, tokens/sec: 12,984.660
+2026-10-04 05:55:48.049722: [epoch 1] batch 7200 loss_value: 3.9514, batch_time (s): 0.351, data_loading_time (ms): 1.122, tokens/sec: 11,490.315
+2026-10-04 05:57:32.792078: [epoch 1] batch 7600 loss_value: 4.5098, batch_time (s): 0.327, data_loading_time (ms): 1.251, tokens/sec: 11,840.689
+2026-10-04 05:59:21.129263: [epoch 1] batch 8000 loss_value: 3.3275, batch_time (s): 0.175, data_loading_time (ms): 0.375, tokens/sec: 10,954.150
+2026-10-04 06:01:02.826482: [epoch 1] batch 8400 loss_value: 3.6398, batch_time (s): 0.189, data_loading_time (ms): 0.355, tokens/sec: 10,353.019
+2026-10-04 06:02:43.557573: [epoch 1] batch 8800 loss_value: 3.8768, batch_time (s): 0.214, data_loading_time (ms): 0.478, tokens/sec: 10,761.884
+2026-10-04 06:04:28.853822: [epoch 1] batch 9200 loss_value: 4.4870, batch_time (s): 0.674, data_loading_time (ms): 0.541, tokens/sec: 8,921.196
+2026-10-04 06:06:16.280051: [epoch 1] batch 9600 loss_value: 4.0626, batch_time (s): 0.173, data_loading_time (ms): 0.491, tokens/sec: 9,788.139
+2026-10-04 06:08:00.522300: [epoch 1] batch 10000 loss_value: 3.8382, batch_time (s): 0.204, data_loading_time (ms): 0.469, tokens/sec: 9,877.805
+2026-10-04 06:09:45.896686: [epoch 1] batch 10400 loss_value: 4.1347, batch_time (s): 0.354, data_loading_time (ms): 0.333, tokens/sec: 13,203.108
+2026-10-04 06:11:30.746799: [epoch 1] batch 10800 loss_value: 4.7014, batch_time (s): 0.585, data_loading_time (ms): 0.444, tokens/sec: 9,738.561
+2026-10-04 06:13:14.107088: [epoch 1] batch 11200 loss_value: 4.2006, batch_time (s): 0.289, data_loading_time (ms): 0.519, tokens/sec: 11,421.917
+2026-10-04 06:14:52.638483: [epoch 1] batch 11600 loss_value: 4.1788, batch_time (s): 0.185, data_loading_time (ms): 0.356, tokens/sec: 10,723.112
+2026-10-04 06:16:33.863783: [epoch 1] batch 12000 loss_value: 4.3926, batch_time (s): 0.426, data_loading_time (ms): 0.488, tokens/sec: 11,278.042
+2026-10-04 06:18:14.395413: [epoch 1] batch 12400 loss_value: 4.4388, batch_time (s): 0.294, data_loading_time (ms): 0.541, tokens/sec: 10,217.218
+2026-10-04 06:20:01.496155: [epoch 1] batch 12800 loss_value: 3.6551, batch_time (s): 0.147, data_loading_time (ms): 0.340, tokens/sec: 8,931.409
+2026-10-04 06:21:44.728155: [epoch 1] batch 13200 loss_value: 4.2822, batch_time (s): 0.266, data_loading_time (ms): 0.365, tokens/sec: 11,329.045
+2026-10-04 06:23:27.736411: [epoch 1] batch 13600 loss_value: 3.7881, batch_time (s): 0.326, data_loading_time (ms): 0.328, tokens/sec: 11,296.317
+2026-10-04 06:25:08.438348: [epoch 1] batch 14000 loss_value: 3.5216, batch_time (s): 0.253, data_loading_time (ms): 0.507, tokens/sec: 14,042.793
+2026-10-04 06:26:50.286799: [epoch 1] batch 14400 loss_value: 3.1786, batch_time (s): 0.134, data_loading_time (ms): 0.360, tokens/sec: 9,071.975
+2026-10-04 06:28:35.784490: [epoch 1] batch 14800 loss_value: 3.8277, batch_time (s): 0.214, data_loading_time (ms): 0.351, tokens/sec: 11,532.547
+2026-10-04 06:30:20.156077: [epoch 1] batch 15200 loss_value: 4.4413, batch_time (s): 0.191, data_loading_time (ms): 0.526, tokens/sec: 10,035.320
+2026-10-04 06:32:02.414910: [epoch 1] batch 15600 loss_value: 3.4742, batch_time (s): 0.159, data_loading_time (ms): 0.517, tokens/sec: 9,035.337
+2026-10-04 06:33:46.533940: [epoch 1] batch 16000 loss_value: 3.8223, batch_time (s): 0.169, data_loading_time (ms): 0.353, tokens/sec: 10,781.801
+2026-10-04 06:35:29.333556: [epoch 1] batch 16400 loss_value: 3.7542, batch_time (s): 0.208, data_loading_time (ms): 0.487, tokens/sec: 11,686.618
+2026-10-04 06:37:13.253190: [epoch 1] batch 16800 loss_value: 4.2289, batch_time (s): 0.220, data_loading_time (ms): 0.355, tokens/sec: 11,056.257
+2026-10-04 06:38:56.060769: [epoch 1] batch 17200 loss_value: 4.0115, batch_time (s): 0.220, data_loading_time (ms): 0.330, tokens/sec: 10,490.621
+2026-10-04 06:40:42.819909: [epoch 1] batch 17600 loss_value: 4.3606, batch_time (s): 0.266, data_loading_time (ms): 0.552, tokens/sec: 11,291.671
+2026-10-04 06:42:30.072515: [epoch 1] batch 18000 loss_value: 3.8408, batch_time (s): 0.250, data_loading_time (ms): 0.350, tokens/sec: 11,139.973
+2026-10-04 06:44:12.494861: [epoch 1] batch 18400 loss_value: 4.3438, batch_time (s): 0.568, data_loading_time (ms): 0.522, tokens/sec: 10,977.569
+2026-10-04 06:45:53.886421: [epoch 1] batch 18800 loss_value: 3.9867, batch_time (s): 0.338, data_loading_time (ms): 0.374, tokens/sec: 11,465.259
+2026-10-04 06:47:32.423343: [epoch 1] batch 19200 loss_value: 3.7058, batch_time (s): 0.180, data_loading_time (ms): 0.467, tokens/sec: 9,982.685
+2026-10-04 06:49:18.108242: [epoch 1] batch 19600 loss_value: 4.1958, batch_time (s): 0.333, data_loading_time (ms): 0.366, tokens/sec: 11,523.184
+2026-10-04 06:51:01.273488 Saving mid-epoch to: ./test/overnight_Oct_2/model_1_in_batch.pt
+2026-10-04 06:51:08.230356 Val loss calculation done
+2026-10-04 06:51:09.312079: [epoch 1] batch 20000 loss_value: 3.4587, batch_time (s): 0.206, data_loading_time (ms): 0.408, tokens/sec: 10,693.541
+2026-10-04 06:52:53.031412: [epoch 1] batch 20400 loss_value: 3.6341, batch_time (s): 0.272, data_loading_time (ms): 0.477, tokens/sec: 11,645.780
+2026-10-04 06:54:35.676642: [epoch 1] batch 20800 loss_value: 4.1144, batch_time (s): 0.368, data_loading_time (ms): 0.480, tokens/sec: 11,991.562
+2026-10-04 06:56:21.681777: [epoch 1] batch 21200 loss_value: 4.0981, batch_time (s): 0.210, data_loading_time (ms): 0.340, tokens/sec: 10,668.797
+2026-10-04 06:58:08.074030: [epoch 1] batch 21600 loss_value: 3.8378, batch_time (s): 0.265, data_loading_time (ms): 0.347, tokens/sec: 10,640.675
+2026-10-04 06:59:48.696518: [epoch 1] batch 22000 loss_value: 2.5478, batch_time (s): 0.105, data_loading_time (ms): 0.483, tokens/sec: 6,686.738
+2026-10-04 07:01:28.501643: [epoch 1] batch 22400 loss_value: 4.0639, batch_time (s): 0.308, data_loading_time (ms): 0.483, tokens/sec: 11,936.499
+2026-10-04 07:03:10.564772: [epoch 1] batch 22800 loss_value: 4.6568, batch_time (s): 1.023, data_loading_time (ms): 0.567, tokens/sec: 7,162.616
+2026-10-04 07:04:56.502866: [epoch 1] batch 23200 loss_value: 4.2671, batch_time (s): 0.194, data_loading_time (ms): 0.343, tokens/sec: 9,884.067
+2026-10-04 07:06:36.823212: [epoch 1] batch 23600 loss_value: 3.9056, batch_time (s): 0.205, data_loading_time (ms): 0.487, tokens/sec: 9,852.805
+2026-10-04 07:08:18.138376: [epoch 1] batch 24000 loss_value: 3.8761, batch_time (s): 0.256, data_loading_time (ms): 0.339, tokens/sec: 10,855.325
+2026-10-04 07:10:01.997889: [epoch 1] batch 24400 loss_value: 4.6457, batch_time (s): 0.965, data_loading_time (ms): 0.537, tokens/sec: 8,292.191
+2026-10-04 07:11:46.284772: [epoch 1] batch 24800 loss_value: 3.7204, batch_time (s): 0.216, data_loading_time (ms): 0.365, tokens/sec: 11,841.378
+2026-10-04 07:13:33.438458: [epoch 1] batch 25200 loss_value: 3.1935, batch_time (s): 0.174, data_loading_time (ms): 0.491, tokens/sec: 10,482.685
+2026-10-04 07:15:17.564915: [epoch 1] batch 25600 loss_value: 3.9091, batch_time (s): 0.297, data_loading_time (ms): 0.513, tokens/sec: 10,891.434
+2026-10-04 07:17:04.078079: [epoch 1] batch 26000 loss_value: 4.0802, batch_time (s): 0.216, data_loading_time (ms): 0.751, tokens/sec: 10,498.201
+2026-10-04 07:18:52.687565: [epoch 1] batch 26400 loss_value: 3.7450, batch_time (s): 0.181, data_loading_time (ms): 0.473, tokens/sec: 10,778.099
+2026-10-04 07:20:36.374740: [epoch 1] batch 26800 loss_value: 4.3547, batch_time (s): 0.346, data_loading_time (ms): 0.384, tokens/sec: 11,573.774
+2026-10-04 07:22:17.532715: [epoch 1] batch 27200 loss_value: 4.4718, batch_time (s): 0.206, data_loading_time (ms): 0.406, tokens/sec: 11,480.777
+2026-10-04 07:24:01.270678: [epoch 1] batch 27600 loss_value: 4.1704, batch_time (s): 0.242, data_loading_time (ms): 0.365, tokens/sec: 11,384.323
+2026-10-04 07:25:42.403833: [epoch 1] batch 28000 loss_value: 4.0713, batch_time (s): 0.254, data_loading_time (ms): 1.436, tokens/sec: 11,698.255
+2026-10-04 07:27:25.239075: [epoch 1] batch 28400 loss_value: 3.9874, batch_time (s): 0.196, data_loading_time (ms): 0.517, tokens/sec: 11,407.030
+2026-10-04 07:29:10.222290: [epoch 1] batch 28800 loss_value: 4.2233, batch_time (s): 0.290, data_loading_time (ms): 0.501, tokens/sec: 11,588.676
+2026-10-04 07:30:50.431638: [epoch 1] batch 29200 loss_value: 3.6304, batch_time (s): 0.264, data_loading_time (ms): 0.498, tokens/sec: 11,390.527
+2026-10-04 07:32:35.182375: [epoch 1] batch 29600 loss_value: 2.5831, batch_time (s): 0.115, data_loading_time (ms): 0.490, tokens/sec: 7,506.631
+2026-10-04 07:34:17.348568: [epoch 1] batch 30000 loss_value: 4.2357, batch_time (s): 0.262, data_loading_time (ms): 0.362, tokens/sec: 12,219.007
+2026-10-04 07:36:00.116644: [epoch 1] batch 30400 loss_value: 3.7540, batch_time (s): 0.168, data_loading_time (ms): 0.332, tokens/sec: 9,499.544
+2026-10-04 07:37:46.810943: [epoch 1] batch 30800 loss_value: 3.6558, batch_time (s): 0.181, data_loading_time (ms): 0.470, tokens/sec: 9,908.384
+2026-10-04 07:39:26.291166: [epoch 1] batch 31200 loss_value: 3.7957, batch_time (s): 0.222, data_loading_time (ms): 0.364, tokens/sec: 12,833.522
+2026-10-04 07:41:12.010987: [epoch 1] batch 31600 loss_value: 3.5448, batch_time (s): 0.148, data_loading_time (ms): 0.895, tokens/sec: 9,515.169
+2026-10-04 07:42:53.565602: [epoch 1] batch 32000 loss_value: 3.7623, batch_time (s): 0.163, data_loading_time (ms): 0.349, tokens/sec: 9,445.163
+2026-10-04 07:44:37.543759: [epoch 1] batch 32400 loss_value: 4.2175, batch_time (s): 0.305, data_loading_time (ms): 0.476, tokens/sec: 11,119.857
+2026-10-04 07:46:20.891506: [epoch 1] batch 32800 loss_value: 4.0628, batch_time (s): 0.268, data_loading_time (ms): 0.548, tokens/sec: 13,358.143
+2026-10-04 07:48:02.284677: [epoch 1] batch 33200 loss_value: 3.8320, batch_time (s): 0.177, data_loading_time (ms): 0.343, tokens/sec: 10,279.825
+2026-10-04 07:49:46.526445: [epoch 1] batch 33600 loss_value: 3.6597, batch_time (s): 0.186, data_loading_time (ms): 0.517, tokens/sec: 11,379.381
+2026-10-04 07:51:27.551001: [epoch 1] batch 34000 loss_value: 3.9654, batch_time (s): 0.187, data_loading_time (ms): 0.492, tokens/sec: 10,947.724
+2026-10-04 07:53:08.201465: [epoch 1] batch 34400 loss_value: 4.3245, batch_time (s): 0.216, data_loading_time (ms): 1.533, tokens/sec: 10,519.931
+2026-10-04 07:54:53.277391: [epoch 1] batch 34800 loss_value: 3.6409, batch_time (s): 0.160, data_loading_time (ms): 1.355, tokens/sec: 9,590.477
+2026-10-04 07:56:36.111346: [epoch 1] batch 35200 loss_value: 4.1805, batch_time (s): 0.254, data_loading_time (ms): 0.384, tokens/sec: 11,600.964
+2026-10-04 07:58:17.238593: [epoch 1] batch 35600 loss_value: 3.9770, batch_time (s): 0.250, data_loading_time (ms): 0.780, tokens/sec: 10,370.364
+2026-10-04 08:00:02.578346: [epoch 1] batch 36000 loss_value: 3.6163, batch_time (s): 0.157, data_loading_time (ms): 0.364, tokens/sec: 9,571.924
+2026-10-04 08:01:47.106414: [epoch 1] batch 36400 loss_value: 4.1106, batch_time (s): 0.308, data_loading_time (ms): 1.867, tokens/sec: 12,566.075
+2026-10-04 08:03:26.168896: [epoch 1] batch 36800 loss_value: 4.0817, batch_time (s): 0.232, data_loading_time (ms): 0.481, tokens/sec: 12,014.972
+2026-10-04 08:05:08.840773: [epoch 1] batch 37200 loss_value: 3.7358, batch_time (s): 0.195, data_loading_time (ms): 0.339, tokens/sec: 11,144.684
+2026-10-04 08:06:51.098863: [epoch 1] batch 37600 loss_value: 3.9060, batch_time (s): 0.255, data_loading_time (ms): 0.338, tokens/sec: 10,782.897
+2026-10-04 08:08:36.572581: [epoch 1] batch 38000 loss_value: 3.3644, batch_time (s): 0.174, data_loading_time (ms): 0.733, tokens/sec: 10,139.003
+2026-10-04 08:10:23.077645: [epoch 1] batch 38400 loss_value: 4.0664, batch_time (s): 0.309, data_loading_time (ms): 0.386, tokens/sec: 11,788.207
+2026-10-04 08:12:03.818869: [epoch 1] batch 38800 loss_value: 4.1695, batch_time (s): 0.319, data_loading_time (ms): 0.353, tokens/sec: 12,427.772
+2026-10-04 08:13:43.587884: [epoch 1] batch 39200 loss_value: 3.8724, batch_time (s): 0.189, data_loading_time (ms): 0.485, tokens/sec: 12,028.105
+2026-10-04 08:15:24.456940: [epoch 1] batch 39600 loss_value: 3.8788, batch_time (s): 0.250, data_loading_time (ms): 0.465, tokens/sec: 11,902.343
+2026-10-04 08:17:08.753806 Saving mid-epoch to: ./test/overnight_Oct_2/model_1_in_batch.pt
+2026-10-04 08:17:15.906736 Val loss calculation done
+2026-10-04 08:17:17.395653: [epoch 1] batch 40000 loss_value: 3.9979, batch_time (s): 0.310, data_loading_time (ms): 10.600, tokens/sec: 12,489.845
+2026-10-04 08:19:00.454983: [epoch 1] batch 40400 loss_value: 3.5403, batch_time (s): 0.186, data_loading_time (ms): 0.505, tokens/sec: 10,474.197
+2026-10-04 08:20:44.105894: [epoch 1] batch 40800 loss_value: 3.9634, batch_time (s): 0.256, data_loading_time (ms): 0.333, tokens/sec: 11,396.853
+2026-10-04 08:22:28.763982: [epoch 1] batch 41200 loss_value: 4.6240, batch_time (s): 0.751, data_loading_time (ms): 0.802, tokens/sec: 10,561.531
+2026-10-04 08:24:16.770133: [epoch 1] batch 41600 loss_value: 3.7978, batch_time (s): 0.226, data_loading_time (ms): 0.539, tokens/sec: 12,057.043
+2026-10-04 08:26:01.103943: [epoch 1] batch 42000 loss_value: 4.2467, batch_time (s): 0.336, data_loading_time (ms): 0.837, tokens/sec: 11,143.356
+2026-10-04 08:27:47.188421: [epoch 1] batch 42400 loss_value: 3.9856, batch_time (s): 0.266, data_loading_time (ms): 0.369, tokens/sec: 12,731.019
+2026-10-04 08:29:33.612245: [epoch 1] batch 42800 loss_value: 4.1023, batch_time (s): 0.272, data_loading_time (ms): 0.341, tokens/sec: 11,425.342
+2026-10-04 08:31:13.850228: [epoch 1] batch 43200 loss_value: 3.9984, batch_time (s): 0.246, data_loading_time (ms): 0.339, tokens/sec: 11,950.475
+2026-10-04 08:32:55.669556: [epoch 1] batch 43600 loss_value: 3.5366, batch_time (s): 0.199, data_loading_time (ms): 0.342, tokens/sec: 9,965.927
+2026-10-04 08:34:40.106574: [epoch 1] batch 44000 loss_value: 3.8543, batch_time (s): 0.252, data_loading_time (ms): 0.564, tokens/sec: 11,954.441
+2026-10-04 08:36:21.638278: [epoch 1] batch 44400 loss_value: 4.0516, batch_time (s): 0.258, data_loading_time (ms): 0.370, tokens/sec: 12,009.926
+2026-10-04 08:38:05.232989: [epoch 1] batch 44800 loss_value: 3.4891, batch_time (s): 0.249, data_loading_time (ms): 0.499, tokens/sec: 13,230.078
+2026-10-04 08:39:46.040925: [epoch 1] batch 45200 loss_value: 3.6989, batch_time (s): 0.200, data_loading_time (ms): 0.344, tokens/sec: 12,009.718
+2026-10-04 08:41:28.552832: [epoch 1] batch 45600 loss_value: 4.6057, batch_time (s): 0.942, data_loading_time (ms): 0.310, tokens/sec: 8,047.838
+2026-10-04 08:43:11.703629: [epoch 1] batch 46000 loss_value: 3.9883, batch_time (s): 0.330, data_loading_time (ms): 0.336, tokens/sec: 13,198.524
+2026-10-04 08:44:57.102648: [epoch 1] batch 46400 loss_value: 3.4849, batch_time (s): 0.171, data_loading_time (ms): 0.583, tokens/sec: 9,724.513
+2026-10-04 08:46:37.172721: [epoch 1] batch 46800 loss_value: 3.9517, batch_time (s): 0.293, data_loading_time (ms): 1.139, tokens/sec: 12,112.489
+2026-10-04 08:48:19.115410: [epoch 1] batch 47200 loss_value: 3.6903, batch_time (s): 0.175, data_loading_time (ms): 0.359, tokens/sec: 10,973.629
+2026-10-04 08:49:59.641777: [epoch 1] batch 47600 loss_value: 4.2123, batch_time (s): 0.371, data_loading_time (ms): 0.316, tokens/sec: 12,062.432
+2026-10-04 08:51:38.862434: [epoch 1] batch 48000 loss_value: 3.2355, batch_time (s): 0.124, data_loading_time (ms): 0.336, tokens/sec: 7,738.687
+2026-10-04 08:53:22.981161: [epoch 1] batch 48400 loss_value: 4.1846, batch_time (s): 0.318, data_loading_time (ms): 0.585, tokens/sec: 11,057.085
+2026-10-04 08:55:05.250016: [epoch 1] batch 48800 loss_value: 3.5420, batch_time (s): 0.269, data_loading_time (ms): 0.578, tokens/sec: 13,420.882
+2026-10-04 08:56:51.566001: [epoch 1] batch 49200 loss_value: 4.3485, batch_time (s): 1.061, data_loading_time (ms): 0.335, tokens/sec: 7,687.620
+2026-10-04 08:58:36.075349: [epoch 1] batch 49600 loss_value: 3.8431, batch_time (s): 0.225, data_loading_time (ms): 0.356, tokens/sec: 11,799.311
+2026-10-04 09:00:12.938806: [epoch 1] batch 50000 loss_value: 4.1595, batch_time (s): 0.365, data_loading_time (ms): 0.331, tokens/sec: 11,491.221
+2026-10-04 09:01:56.798899: [epoch 1] batch 50400 loss_value: 3.7038, batch_time (s): 0.189, data_loading_time (ms): 0.383, tokens/sec: 10,341.773
+2026-10-04 09:03:38.308073: [epoch 1] batch 50800 loss_value: 3.8256, batch_time (s): 0.255, data_loading_time (ms): 0.334, tokens/sec: 11,810.196
+2026-10-04 09:05:23.050970: [epoch 1] batch 51200 loss_value: 3.7287, batch_time (s): 0.156, data_loading_time (ms): 0.392, tokens/sec: 9,233.132
+2026-10-04 09:07:07.580717: [epoch 1] batch 51600 loss_value: 4.5716, batch_time (s): 0.358, data_loading_time (ms): 0.324, tokens/sec: 12,529.536
+2026-10-04 09:08:50.819474: [epoch 1] batch 52000 loss_value: 3.9886, batch_time (s): 0.223, data_loading_time (ms): 0.887, tokens/sec: 11,179.687
+2026-10-04 09:10:34.056859: [epoch 1] batch 52400 loss_value: 4.2755, batch_time (s): 0.191, data_loading_time (ms): 0.809, tokens/sec: 10,897.140
+2026-10-04 09:12:18.510943: [epoch 1] batch 52800 loss_value: 3.6728, batch_time (s): 0.208, data_loading_time (ms): 0.366, tokens/sec: 10,767.222
+2026-10-04 09:14:00.074309: [epoch 1] batch 53200 loss_value: 3.5653, batch_time (s): 0.236, data_loading_time (ms): 0.330, tokens/sec: 12,895.175
+2026-10-04 09:15:46.834125: [epoch 1] batch 53600 loss_value: 3.9967, batch_time (s): 0.286, data_loading_time (ms): 0.740, tokens/sec: 10,956.102
+2026-10-04 09:17:30.874837: [epoch 1] batch 54000 loss_value: 4.3214, batch_time (s): 0.318, data_loading_time (ms): 0.811, tokens/sec: 11,678.539
+2026-10-04 09:19:13.754865: [epoch 1] batch 54400 loss_value: 4.1540, batch_time (s): 0.213, data_loading_time (ms): 0.441, tokens/sec: 10,354.291
+2026-10-04 09:20:55.888264: [epoch 1] batch 54800 loss_value: 3.7225, batch_time (s): 0.177, data_loading_time (ms): 0.399, tokens/sec: 9,230.395
+2026-10-04 09:22:39.439031: [epoch 1] batch 55200 loss_value: 3.8036, batch_time (s): 0.197, data_loading_time (ms): 0.484, tokens/sec: 10,870.171
+2026-10-04 09:24:23.798546: [epoch 1] batch 55600 loss_value: 3.6224, batch_time (s): 0.173, data_loading_time (ms): 0.602, tokens/sec: 10,370.295
+2026-10-04 09:26:07.489607: [epoch 1] batch 56000 loss_value: 3.8414, batch_time (s): 0.216, data_loading_time (ms): 0.964, tokens/sec: 11,411.371
+2026-10-04 09:27:49.315176: [epoch 1] batch 56400 loss_value: 4.0087, batch_time (s): 0.175, data_loading_time (ms): 0.366, tokens/sec: 10,982.040
+2026-10-04 09:29:32.684819: [epoch 1] batch 56800 loss_value: 3.5663, batch_time (s): 0.186, data_loading_time (ms): 2.105, tokens/sec: 9,964.669
+2026-10-04 09:31:16.514736: [epoch 1] batch 57200 loss_value: 4.0010, batch_time (s): 0.251, data_loading_time (ms): 0.335, tokens/sec: 10,817.514
+2026-10-04 09:32:57.537353: [epoch 1] batch 57600 loss_value: 4.3403, batch_time (s): 0.369, data_loading_time (ms): 0.363, tokens/sec: 11,607.233
+2026-10-04 09:34:42.159614: [epoch 1] batch 58000 loss_value: 3.8788, batch_time (s): 0.162, data_loading_time (ms): 0.441, tokens/sec: 9,455.865
+2026-10-04 09:36:23.780836: [epoch 1] batch 58400 loss_value: 4.0432, batch_time (s): 0.246, data_loading_time (ms): 0.433, tokens/sec: 10,394.916
+2026-10-04 09:38:05.752030: [epoch 1] batch 58800 loss_value: 3.7617, batch_time (s): 0.212, data_loading_time (ms): 0.352, tokens/sec: 11,897.854
+2026-10-04 09:39:47.248060: [epoch 1] batch 59200 loss_value: 3.7206, batch_time (s): 0.296, data_loading_time (ms): 0.346, tokens/sec: 13,291.377
+2026-10-04 09:41:31.463320: [epoch 1] batch 59600 loss_value: 3.9328, batch_time (s): 0.261, data_loading_time (ms): 1.785, tokens/sec: 11,278.574
+2026-10-04 09:43:13.363394 Saving mid-epoch to: ./test/overnight_Oct_2/model_1_in_batch.pt
+2026-10-04 09:43:20.348457 Val loss calculation done
+2026-10-04 09:43:21.501276: [epoch 1] batch 60000 loss_value: 3.9430, batch_time (s): 0.307, data_loading_time (ms): 0.722, tokens/sec: 10,952.479
+2026-10-04 09:45:01.296134: [epoch 1] batch 60400 loss_value: 4.2344, batch_time (s): 0.265, data_loading_time (ms): 0.510, tokens/sec: 11,107.881
+2026-10-04 09:46:47.335770: [epoch 1] batch 60800 loss_value: 4.1548, batch_time (s): 0.374, data_loading_time (ms): 0.339, tokens/sec: 12,139.507
+2026-10-04 09:48:31.568998: [epoch 1] batch 61200 loss_value: 3.9696, batch_time (s): 0.221, data_loading_time (ms): 1.269, tokens/sec: 10,567.265
+2026-10-04 09:50:11.294018: [epoch 1] batch 61600 loss_value: 3.6695, batch_time (s): 0.209, data_loading_time (ms): 0.380, tokens/sec: 11,660.580
+2026-10-04 09:51:54.018228: [epoch 1] batch 62000 loss_value: 4.3050, batch_time (s): 0.355, data_loading_time (ms): 0.521, tokens/sec: 11,821.232
+2026-10-04 09:53:37.172099: [epoch 1] batch 62400 loss_value: 3.8406, batch_time (s): 0.255, data_loading_time (ms): 0.508, tokens/sec: 11,916.071
+2026-10-04 09:55:22.788675: [epoch 1] batch 62800 loss_value: 4.0101, batch_time (s): 0.254, data_loading_time (ms): 0.717, tokens/sec: 12,998.587
+2026-10-04 09:57:05.793878: [epoch 1] batch 63200 loss_value: 3.9063, batch_time (s): 0.273, data_loading_time (ms): 0.503, tokens/sec: 11,135.735
+2026-10-04 09:58:47.551423: [epoch 1] batch 63600 loss_value: 3.9617, batch_time (s): 0.181, data_loading_time (ms): 0.485, tokens/sec: 10,428.755
+2026-10-04 10:00:28.864203: [epoch 1] batch 64000 loss_value: 4.4067, batch_time (s): 0.407, data_loading_time (ms): 0.527, tokens/sec: 11,709.917
+2026-10-04 10:02:13.838476: [epoch 1] batch 64400 loss_value: 4.4090, batch_time (s): 0.549, data_loading_time (ms): 0.557, tokens/sec: 9,158.056
+2026-10-04 10:03:57.442599: [epoch 1] batch 64800 loss_value: 3.5154, batch_time (s): 0.171, data_loading_time (ms): 0.524, tokens/sec: 10,105.488
+2026-10-04 10:05:44.006713: [epoch 1] batch 65200 loss_value: 3.3602, batch_time (s): 0.130, data_loading_time (ms): 0.377, tokens/sec: 9,101.675
+2026-10-04 10:07:27.615112: [epoch 1] batch 65600 loss_value: 3.8491, batch_time (s): 0.235, data_loading_time (ms): 0.351, tokens/sec: 13,068.342
+2026-10-04 10:09:13.929479: [epoch 1] batch 66000 loss_value: 3.7232, batch_time (s): 0.323, data_loading_time (ms): 0.480, tokens/sec: 11,498.424
+2026-10-04 10:10:52.622599: [epoch 1] batch 66400 loss_value: 3.8667, batch_time (s): 0.233, data_loading_time (ms): 0.392, tokens/sec: 11,107.788
+2026-10-04 10:12:33.102858: [epoch 1] batch 66800 loss_value: 4.0839, batch_time (s): 0.244, data_loading_time (ms): 1.137, tokens/sec: 11,914.648
+2026-10-04 10:14:18.792540: [epoch 1] batch 67200 loss_value: 4.0227, batch_time (s): 0.257, data_loading_time (ms): 0.491, tokens/sec: 13,201.360
+2026-10-04 10:15:59.603614: [epoch 1] batch 67600 loss_value: 4.1159, batch_time (s): 0.351, data_loading_time (ms): 0.364, tokens/sec: 12,868.264
+2026-10-04 10:17:43.464509: [epoch 1] batch 68000 loss_value: 4.2149, batch_time (s): 0.272, data_loading_time (ms): 0.350, tokens/sec: 11,401.198
+2026-10-04 10:19:23.336953: [epoch 1] batch 68400 loss_value: 3.7900, batch_time (s): 0.233, data_loading_time (ms): 0.347, tokens/sec: 12,915.459
+2026-10-04 10:21:04.365378: [epoch 1] batch 68800 loss_value: 3.9137, batch_time (s): 0.200, data_loading_time (ms): 0.558, tokens/sec: 10,403.631
+2026-10-04 10:22:46.797592: [epoch 1] batch 69200 loss_value: 4.3446, batch_time (s): 0.278, data_loading_time (ms): 1.699, tokens/sec: 12,775.516
+2026-10-04 10:24:26.067099: [epoch 1] batch 69600 loss_value: 3.7327, batch_time (s): 0.208, data_loading_time (ms): 0.539, tokens/sec: 11,517.895
+2026-10-04 10:26:09.068589: [epoch 1] batch 70000 loss_value: 4.0640, batch_time (s): 0.248, data_loading_time (ms): 0.334, tokens/sec: 12,534.776
+2026-10-04 10:27:48.104000: [epoch 1] batch 70400 loss_value: 3.8348, batch_time (s): 0.255, data_loading_time (ms): 0.504, tokens/sec: 10,783.280
+2026-10-04 10:29:28.533389: [epoch 1] batch 70800 loss_value: 4.0260, batch_time (s): 0.267, data_loading_time (ms): 0.495, tokens/sec: 11,134.228
+2026-10-04 10:31:11.125762: [epoch 1] batch 71200 loss_value: 3.6716, batch_time (s): 0.237, data_loading_time (ms): 0.357, tokens/sec: 13,363.701
+2026-10-04 10:32:53.957926: [epoch 1] batch 71600 loss_value: 3.9373, batch_time (s): 0.211, data_loading_time (ms): 0.377, tokens/sec: 11,051.299
+2026-10-04 10:34:36.323392: [epoch 1] batch 72000 loss_value: 3.8980, batch_time (s): 0.158, data_loading_time (ms): 1.000, tokens/sec: 7,883.258
+2026-10-04 10:36:17.581951: [epoch 1] batch 72400 loss_value: 3.9153, batch_time (s): 0.309, data_loading_time (ms): 0.379, tokens/sec: 12,626.373
+2026-10-04 10:37:56.612390: [epoch 1] batch 72800 loss_value: 3.9884, batch_time (s): 0.208, data_loading_time (ms): 0.353, tokens/sec: 10,452.304
+2026-10-04 10:39:41.445940: [epoch 1] batch 73200 loss_value: 4.1985, batch_time (s): 0.293, data_loading_time (ms): 0.335, tokens/sec: 12,561.097
+2026-10-04 10:41:25.046920: [epoch 1] batch 73600 loss_value: 3.7939, batch_time (s): 0.269, data_loading_time (ms): 2.145, tokens/sec: 12,590.202
+2026-10-04 10:41:58.841665 keyboard interrupt detected after finishing batches: 73726
+
+2026-10-04 10:41:59.881115 History saved
+Traceback (most recent call last):
+  File "/Users/mohammadaminsedaghat/Desktop/attention/train.py", line 981, in <module>
+    avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mohammadaminsedaghat/Desktop/attention/train.py", line 741, in train_one_epoch
+    scaler.scale(loss_value).backward()
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/Users/mohammadaminsedaghat/Desktop/attention/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

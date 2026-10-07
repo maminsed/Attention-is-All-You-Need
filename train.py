@@ -28,7 +28,7 @@ scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
 LOAD_PRE_SAVED = True
 VERBOSE = True
-VERBOSE_FREQ = 400
+VERBOSE_FREQ = 1000
 SAVE_FREQ=20_000
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
@@ -44,6 +44,64 @@ if not path.exists(save_file_path_root):
 
 if not path.exists(f"{save_file_path_root}/best/"):
     os.mkdir(f"{save_file_path_root}/best/")
+
+
+"""
+We will run some tests on the IWSLT. We will set baseline and in each experiment only change one var. 
+At each Experiment, we take the best var for the previous experiment. 
+If it looks epoch = 10 is not enough for a model (it hasn't started converging, we will increase epochs)
+BLEU change 1 is just a seed change now. Pick winners by non_smoothed_val_loss 
+
+Baseline:
+- vocab_size: 7000
+- dataset: iwslt_curated
+- filtering_strategy: drop
+- epoch: 10
+- use_amp: True
+- POST_LN
+
+Initial values: 
+- num_enc_layers/num_dec_layers: 4
+- batch_size: 32, 
+- warmup_steps: 3000
+- heads: 8,
+- drop_rate: 0.1
+
+
+Experiment 1: 
+- everything initial
+
+Experiment 2: 
+- PRE_LN
+
+Experiment 3:
+phase 1:
+- Peak LR -> 0.5x
+phase 2:
+- Peak LR -> 2x
+
+Experiment 4: N:
+phase 1:
+- num_enc_layers/num_dec_layers: 3
+phase 2:
+- N: 2
+phase 3: 
+- N: 6
+
+Experiment 5: BS:
+We will make the peak_LR constant
+phase 1:
+- batch_size: 64
+phase 2: 
+- batch_size: 128 (if mac can handle)
+
+Experiment 6: WS:
+phase 1:
+- WS = 4000
+phase 2:
+- WS = 1000
+
+"""
 
 config = {
     # model params
@@ -62,7 +120,6 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    # MPS couldn't handle 128
     "batch_size": 32,
     "val_batch_size": 32,
     "epochs": 5,
@@ -197,7 +254,7 @@ def collate_fn(batch):
 
     return src, tgt
 
-def encode_ds(data_path:str,cache_path:str,nrows=None,num_threads=None):
+def encode_ds(sp_bpe,data_path:str,cache_path:str,nrows=None,num_threads=None):
     if not path.exists(cache_path) or not config["tokenization_cache"]:
         print(f"{datetime.now()} cache does not exist")
         df = pd.read_csv(data_path,nrows=nrows)
@@ -258,21 +315,23 @@ def encode_ds(data_path:str,cache_path:str,nrows=None,num_threads=None):
     )
 
 
-def load_data() -> tuple[DataLoader, DataLoader]:
+def load_data(sp_bpe) -> tuple[DataLoader, DataLoader]:
 
     print(f"{datetime.now()}: encoding train started")
     X_train,Y_train,X_train_offset,Y_train_offset,dropped_train = encode_ds(
+        sp_bpe,
         f"data/{config['data_source']}/train_df.csv",
         f"data/{config['data_source']}/train_{config["tokenizer_source"]}.parquet",
         nrows=1000 if config["benchmark_mode"] else None,
-        num_threads=config["tokenizer_num_threads"]
+        num_threads=config["tokenizer_num_threads"],
     )
 
     print(f"{datetime.now()}: encoding val started")
     X_val, Y_val,X_val_offset,Y_val_offset, dropped_val = encode_ds(
+        sp_bpe,
         f"data/{config['data_source']}/val_df.csv",
         f"data/{config['data_source']}/val_{config["tokenizer_source"]}.parquet",
-        num_threads=config["tokenizer_num_threads"]
+        num_threads=config["tokenizer_num_threads"],
     )
 
     print(f"{datetime.now()}: # train size: #Tokens: X: {len(X_train):,} Y: {len(Y_train):,} #Sentences: {len(X_train_offset)-1:,}, num_dropped: {dropped_train:,}")
@@ -280,7 +339,7 @@ def load_data() -> tuple[DataLoader, DataLoader]:
 
     global NUM_BATCHES
     NUM_BATCHES = math.ceil((len(X_train_offset)-1) / config["batch_size"])
-    print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}")
+    print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}. LR peak: {SQRT_INV_DM*config["warmup_steps"]**-0.5}")
     if NUM_BATCHES * config["epochs"] * 0.5 < config["warmup_steps"]:
         print(f"{datetime.now()}: WARNING: more than half of epochs are warmup steps. ")
 
@@ -777,7 +836,7 @@ def lr_update_fn(step):
     lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5)
     return lr
 
-def load_best_model():
+def load_best_model(latest=False):
     global config
     # ONLY USE IN EVALUATION
     assert path.exists(history_path)
@@ -806,10 +865,11 @@ def load_best_model():
 
     print(f"{datetime.now()}: loading best pre saved")
     model_best_path = f"{save_file_path_root}/best/model.pt"
-    if path.exists(model_best_path):
+    if path.exists(model_best_path) and not latest:
         print("best model path found.")
         model.load_state_dict(torch.load(model_best_path))
     else:
+        print(f"best model path not found. Loading from: {model_path}")
         model.load_state_dict(torch.load(model_path))
 
     model.to(config["device"], dtype=config["dtype"])
@@ -906,7 +966,8 @@ if __name__ == "__main__":
         
     sp_bpe = spm.SentencePieceProcessor()
     sp_bpe.load(f"tokenizers/{config["tokenizer_source"]}/bpe.model")
-    train_loader, val_loader, train_size = load_data()
+    assert sp_bpe.vocab_size() == config["vocab_size"]
+    train_loader, val_loader, train_size = load_data(sp_bpe)
 
     model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model()
 

@@ -125,6 +125,15 @@ Results:
 - Sort Val
 - Setup mid epoch save. 
 - validation in epoch. 
+- Trained until 86800
+
+Results:
+- Lowkey didn't perform as good as iwslt on both it's own val set and iwslt's val set. 
+    - That might be because IWSLT is out of dist and it's own dataset is way noiser/has more examples than IWSLT so not so much of a fair comparrision. 
+    - It has BLEU 18 on it's own and 19 on IWSLT, extremly lower than the 30 baseline. 
+- comparing with normal sentence comparision it doesn't seem to be doing as good either. 
+- It is important to note that the val loss seems to be increasing and one epoch still hasn't finished. 
+- It takes extremly long tho... 
 
 
 Next step:
