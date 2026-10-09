@@ -21,20 +21,20 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./test/overnight_Oct_2"
+save_file_path_root = "./test/overnight_Oct_9_exp_4_1"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 1000
+VERBOSE_FREQ = 800
 SAVE_FREQ=20_000
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-DATAS_SOURCE = "wmt14_curated" # wmt14 or iwslt17 or iwslt17_curated or wmt14_curated
+DATAS_SOURCE = "iwslt17_curated" # wmt14 or iwslt17 or iwslt17_curated or wmt14_curated
 
 
 NUM_BATCHES = None
@@ -105,24 +105,24 @@ phase 2:
 
 config = {
     # model params
-    "vocab_size": 37000,
+    "vocab_size": 7000,
     "d_model": 512,
     "d_v": 64,
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 6,  # number of encoder layers
-    "num_dec_layers": 6,  # number of encoder layers
+    "num_enc_layers": 3,  # number of encoder layers
+    "num_dec_layers": 3,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
-    "drop_pre_norm": 0.2,
-    "drop_post_emb": 0.2,
+    "drop_pre_norm": 0.1,
+    "drop_post_emb": 0.1,
 
     # Training params
     "benchmark_mode": False,
     "batch_size": 32,
     "val_batch_size": 32,
-    "epochs": 5,
+    "epochs": 25,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -145,7 +145,7 @@ config = {
     "filtering_strategy": "drop", # drop or cut. 
 
     # tokenization
-    "tokenizer_source": "wmt14",
+    "tokenizer_source": "iwslt17",
     "tokenizer_num_threads": 2,
     "tokenization_cache": True,
 

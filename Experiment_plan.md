@@ -135,6 +135,10 @@ Results:
 - It is important to note that the val loss seems to be increasing and one epoch still hasn't finished. 
 - It takes extremly long tho... 
 
+## Oct 6th:
+- Tranined up until 1.6 epochs. It genuenlly did not improve that much. 
+- BLEU 18 -> 20. which could very much be way smaller change due to BLEU overfitting. But the issue is that non smoothed loss was increasing still.
+
 
 Next step:
 - read the article on how to speed up and come up with ways. 
