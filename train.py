@@ -160,7 +160,7 @@ config = {
     "pin_memory": False,  # doesn't help much in mac and non_blocking weird.
 }
 assert config["h"] * config["d_v"] == config["d_model"]
-assert DEVICE == "mps"
+assert DEVICE == "cuda"
 assert config["filtering_strategy"] in ["drop","cut"]
 if not config["tokenization_cache"]:
     print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
