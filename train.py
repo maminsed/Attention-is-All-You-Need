@@ -5,7 +5,6 @@ from datetime import datetime
 import time
 from os import path
 import os
-import pickle
 
 import numpy as np
 import pandas as pd
@@ -21,7 +20,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./test/overnight_Oct_9_exp_4_1"
+save_file_path_root = "./test/overnight_Oct_16"
 history_path = f"{save_file_path_root}/history.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -71,8 +70,11 @@ Initial values:
 Experiment 1: 
 - everything initial
 
-Experiment 2: 
+Experiment 2:
+phase 1: 
 - PRE_LN
+phase 2:
+- PRE LN without warmup steps.
 
 Experiment 3:
 phase 1:
@@ -80,7 +82,17 @@ phase 1:
 phase 2:
 - Peak LR -> 2x
 
-Experiment 4: N:
+Experiment 4: BS:
+phase 1:
+- batch_size: 64
+phase 2: 
+- batch_size: 128 (if compute can handle it)
+phase 3: 
+- bacthc_size: 128 (if compute can handle it)
+-> Double peak LR (or 1.4x) because 128 has more stable gradients 
+     so it can use higher peak_lr to utlize information better
+
+Experiment 5: N:
 phase 1:
 - num_enc_layers/num_dec_layers: 3
 phase 2:
@@ -88,18 +100,12 @@ phase 2:
 phase 3: 
 - N: 6
 
-Experiment 5: BS:
-We will make the peak_LR constant
-phase 1:
-- batch_size: 64
-phase 2: 
-- batch_size: 128 (if mac can handle)
-
-Experiment 6: WS:
-phase 1:
-- WS = 4000
+Experiment 6: dropout:
+phase 1: 
+- dropout: 0.2
 phase 2:
-- WS = 1000
+- dropout: 0.2
+- word_dropout: 0.1
 
 """
 
@@ -111,12 +117,13 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 3,  # number of encoder layers
-    "num_dec_layers": 3,  # number of encoder layers
+    "num_enc_layers": 6,  # number of encoder layers
+    "num_dec_layers": 6,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.1,
     "drop_post_emb": 0.1,
+    "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
 
     # Training params
     "benchmark_mode": False,
@@ -131,6 +138,7 @@ config = {
     "optim_eps": 1e-9,
     ### Scheduler
     "warmup_steps": 3000, # lowering a bit since were training for less epochs
+    "peak_lr": -1, # either -1 or a number, which if it is a number we will calculate warmup steps based on that. 
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,
@@ -155,25 +163,10 @@ config = {
     "seed": 42,
     ## Multiproccessing
     "use_amp": True,
-    "autocast_dtype": torch.bfloat16 if DEVICE=="mps" else torch.float16,
+    "autocast_dtype": torch.bfloat16,
     "num_workers": 2, # will time. 
     "pin_memory": False,  # doesn't help much in mac and non_blocking weird.
 }
-assert config["h"] * config["d_v"] == config["d_model"]
-assert DEVICE == "cuda"
-assert config["filtering_strategy"] in ["drop","cut"]
-if not config["tokenization_cache"]:
-    print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
-
-sp_bpe = None
-batch_sampler = None
-
-random.seed(config["seed"])
-np.random.seed(config["seed"])
-torch.manual_seed(config["seed"])
-
-# generally useful param:
-SQRT_INV_DM = 1/math.sqrt(config["d_model"])
 
 # make all temp changes here to not mess up anything else and forget:
 if config["benchmark_mode"]:
@@ -183,6 +176,27 @@ if config["benchmark_mode"]:
     config["use_amp"] = False
     VERBOSE_FREQ=5
     VERBOSE=True
+
+# generally useful param:
+SQRT_INV_DM = 1/math.sqrt(config["d_model"])
+
+config["lr_multiplier"] = config["peak_lr"] / (SQRT_INV_DM/math.sqrt(config["warmup_steps"])) if config["peak_lr"] != -1 else 1
+
+
+assert config["h"] * config["d_v"] == config["d_model"]
+assert DEVICE == "cuda"
+assert config["filtering_strategy"] in ["drop","cut"]
+assert config["ln_strat"] in ["PRE_LN","POST_LN"]
+assert SAVE_FREQ % VERBOSE_FREQ == 0
+if not config["tokenization_cache"]:
+    print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
+
+sp_bpe = None
+batch_sampler = None
+
+random.seed(config["seed"])
+np.random.seed(config["seed"])
+torch.manual_seed(config["seed"])
 
 
 class AttnDataset(Dataset):
@@ -408,9 +422,15 @@ class SelfAttention(torch.nn.Module):
         B,S,dm = x.shape
         Sy = y.shape[1]
 
+        if self.config["ln_strat"] == "PRE_LN":
+            y_2 = self.LayerNorm(y)
+            x = self.LayerNorm(x)
+        else:
+            y_2 = y
+
         K = self.W_K(x) # CUDA-B,S,dk*H
         V = self.W_V(x) # CUDA-B,S,dv*H
-        Q = self.W_Q(y) # CUDA-B,Sy,dk*H
+        Q = self.W_Q(y_2) # CUDA-B,Sy,dk*H
 
         K = K.view((B,S ,self.config["h"],-1)).transpose(1,2) # CUDA-B,H,S,dk
         Q = Q.view((B,Sy,self.config["h"],-1)).transpose(1,2) # CUDA-B,H,Sy,dk
@@ -428,7 +448,9 @@ class SelfAttention(torch.nn.Module):
 
         y_2 = self.W_O(y_2)
         y_2 = self.Dropout(y_2)
-        y = self.LayerNorm(y+y_2)
+        y = y+y_2
+        if self.config["ln_strat"] == "POST_LN":
+            y = self.LayerNorm(y)
         return y # CUDA-B,Sy,dm
 
 
@@ -446,11 +468,15 @@ class MLP(torch.nn.Module):
 
     def forward(self, x):
         x_2 = x  # CUDA- B,S,dm
+        if self.config["ln_strat"] == "PRE_LN":
+            x = self.LayerNorm(x)
         x = self.layer1(x)  # CUDA-B,S,d_ff
         x = self.activation(x)  # CUDA- B,S,d_ff
         x = self.layer2(x)  # CUDA- B,S,dm
         x = self.Dropout(x)  # CUDA- B,S,dm
-        x = self.LayerNorm(x + x_2)  # CUDA - B,S,dm
+        x = x + x_2
+        if self.config["ln_strat"] == "POST_LN":
+            x = self.LayerNorm(x)  # CUDA - B,S,dm
         return x
 
 
@@ -485,6 +511,9 @@ class Transformer(torch.nn.Module):
         self.decoder_MLP = ModuleList(
             [MLP(self.config) for _ in range(self.config["num_dec_layers"])]
         )
+
+        ## Only for PRE LN
+        self.LayerNorm = torch.nn.LayerNorm(config["d_model"])
 
     def positional_encoding(self, seq_len, device=None, d_model=None, n=10000):
         d_model = self.config["d_model"] if d_model is None else d_model
@@ -543,6 +572,9 @@ class Transformer(torch.nn.Module):
             )  # CUDA- B,Sy,dm
             y = self.cross_attention[i](x, y, padding_mask_constant)  # CUDA- B,Sy,dm
             y = self.decoder_MLP[i](y)  # CUDA- B,Sy,dm
+
+        if self.config["ln_strat"] == "PRE_LN":
+            y = self.LayerNorm(y) # CUDA - B,Sy,dm
 
         # unembedding
         y = y @ self.embedding.weight.T  # CUDA - B,Sy,VS
@@ -630,11 +662,13 @@ def calculate_val_loss(bleu_calc:bool):
     model.eval()
     avg_vloss = torch.zeros((),device=DEVICE)
     avg_metrics = torch.zeros((len(metrics),),device=DEVICE)
+    total_tokens = torch.zeros((),device=DEVICE,dtype=torch.long)
     with torch.no_grad():
         for x, y in val_loader:
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
             y = y.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
-
+            cur_tokens=(y[:,1:]!=PAD_TOKEN).sum().detach()
+            
             with torch.autocast(
                 device_type=DEVICE, dtype=config["autocast_dtype"], enabled=config["use_amp"]
             ):
@@ -646,23 +680,24 @@ def calculate_val_loss(bleu_calc:bool):
 
                 loss_val = loss_fn(logits_val, y)
                 for i,m in enumerate(metrics):
-                    avg_metrics[i] += m(logits_val,y).detach()
+                    avg_metrics[i] += m(logits_val,y).detach()*cur_tokens
 
             
-            avg_vloss += loss_val.detach()
+            avg_vloss += loss_val.detach()*cur_tokens
+            total_tokens+=cur_tokens
         
-    avg_vloss /= len(val_loader)
-    avg_metrics /= len(val_loader)
+    avg_vloss /= total_tokens
+    avg_metrics /= total_tokens
 
     if bleu_calc:
         avg_metrics[-1] = calculate_bleu(val_loader,model,sp_bpe)
 
     return avg_vloss.item(), [m.item() for m in avg_metrics]
 
-def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*,save_weights=True,is_best=True,batches_done=0):
-    if model_path and optim_path and save_weights:
+def save_hist(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,batches_done=0):
+    if model_path and optimizer_path and save_weights:
         torch.save(model.state_dict(), model_path)
-        torch.save(optimizer.state_dict(), optim_path)
+        torch.save(optimizer.state_dict(), optimizer_path)
         torch.save(scheduler.state_dict(),scheduler_path)
 
         if is_best:
@@ -686,10 +721,11 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": str(best_val_loss) if best_val_loss == float("inf") else best_val_loss,
                 "epoch": epoch,
+                "tokens_so_far": tokens_so_far,
                 "last_completed_epoch": last_completed_epoch,
                 "model_path": model_path,
                 "history_path": history_path,
-                "optim_path": optim_path,
+                "optim_path": optimizer_path,
                 "scheduler_path": scheduler_path,
                 "in_epoch_batches": batches_done
             },
@@ -698,7 +734,7 @@ def save_hist(history_path,model_path=None,optim_path=None,scheduler_path=None,*
 
 
 
-def train_one_epoch(epoch):
+def train_one_epoch(epoch,tokens_so_far):
     print(f"{datetime.now()}: Epoch: {epoch}")
 
     total_loss = torch.zeros((),device=DEVICE)
@@ -721,6 +757,8 @@ def train_one_epoch(epoch):
             start_time = time.time()
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
             y = y.to(device=DEVICE, non_blocking=config["pin_memory"],dtype=torch.long)
+            tokens_so_far+=(x!=PAD_TOKEN).sum().detach()
+            tokens_so_far+=(y!=PAD_TOKEN).sum().detach()
             optimizer.zero_grad(set_to_none=True)  # default behaviour
             avg_metric = torch.zeros(((len(metrics),)),device=DEVICE)
 
@@ -743,7 +781,10 @@ def train_one_epoch(epoch):
             scheduler.step()
             scaler.update()
             if config["benchmark_mode"]:
-                torch.mps.synchronize()
+                if DEVICE == "mps":
+                    torch.mps.synchronize()
+                else:
+                    torch.cuda.synchronize()
             end_time = time.time()
 
             # loss.backward()
@@ -754,14 +795,14 @@ def train_one_epoch(epoch):
             delta = end_time - start_time
             total_time+=delta
 
-            if i % VERBOSE_FREQ == 0:
+            if (i+1) % VERBOSE_FREQ == 0:
                 ts = (x.shape[0]*x.shape[1]+y.shape[0]) / delta
                 history.append(
                     {
-                        "batch_loss": loss_value.item(),
-                        "batch_percentage": i / NUM_BATCHES,
-                        "batch_idx": i,
                         "epoch": epoch,
+                        "batch_idx": i,
+                        "tokens_so_far": tokens_so_far.item(),
+                        "batch_loss": loss_value.item(),
                         "batch_time": delta,
                         "data_loading_time": start_time - prev_end,
                         "tokens/sec": ts,
@@ -778,12 +819,8 @@ def train_one_epoch(epoch):
                 print(f"{datetime.now()} Saving mid-epoch to: {model_path}")
                 
                 avg_vloss, avg_val_metrics = calculate_val_loss(False)
-                history.append({
-                    "avg_vloss": avg_vloss, 
-                    "avg_loss": total_loss.item() / (i+1),
-                    "epoch": epoch,
-                    "batch_idx": i,
-                    "batch_percentage": i / NUM_BATCHES
+                history[-1].update({
+                    "avg_vloss": avg_vloss,
                 } | {
                     metrics[i].name:avg_metrics[i].item()/(i+1) for i in range(len(metrics))
                 } | {
@@ -793,10 +830,8 @@ def train_one_epoch(epoch):
                 print(f"{datetime.now()} Val loss calculation done")
                 
                 save_hist(
-                    history_path,
                     model_path,
-                    optimizer_path,
-                    scheduler_path,
+                    tokens_so_far=tokens_so_far.item(),
                     save_weights=True,
                     is_best=False,
                     batches_done=i+1
@@ -808,10 +843,8 @@ def train_one_epoch(epoch):
         print(e)
         model_path=f"{save_file_path_root}/model_{epoch}_keyboard_intrrupt.pt"
         save_hist(
-            history_path,
             model_path,
-            optimizer_path,
-            scheduler_path,
+            tokens_so_far=tokens_so_far.item(),
             save_weights=True,
             is_best=False,
             batches_done=i
@@ -833,7 +866,7 @@ def train_one_epoch(epoch):
 
 def lr_update_fn(step):
     step = max(step,1)
-    lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5)
+    lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5) * config["lr_multiplier"]
     return lr
 
 def load_best_model(latest=False):
@@ -880,7 +913,7 @@ def load_best_model(latest=False):
     return model,loss_fn,history
 
 
-def load_model():
+def load_model(tokens_so_far):
     model = Transformer(config).to(config["device"], dtype=config["dtype"])
     print("\n\n==============")
     num_parameters=sum(p.numel() for p in model.parameters())
@@ -941,6 +974,7 @@ def load_model():
             start_epoch = dic.get("last_completed_epoch",dic["epoch"])
             model_path = dic["model_path"]
             in_epoch_batches = dic.get("in_epoch_batches",0)
+            tokens_so_far+=dic.get("tokens_so_far",0)
         assert path.exists(model_path)
 
 
@@ -968,8 +1002,9 @@ if __name__ == "__main__":
     sp_bpe.load(f"tokenizers/{config["tokenizer_source"]}/bpe.model")
     assert sp_bpe.vocab_size() == config["vocab_size"]
     train_loader, val_loader, train_size = load_data(sp_bpe)
+    tokens_so_far=torch.zeros((),device=DEVICE,dtype=torch.long)
 
-    model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model()
+    model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(tokens_so_far)
 
     print(f"{datetime.now()}: training started!")
     scaler = torch.amp.GradScaler(DEVICE, enabled=config["use_amp"] and DEVICE != "mps")
@@ -978,7 +1013,7 @@ if __name__ == "__main__":
         if epoch > STOP_AFTER_EPOCH:
             break
         model.train(True)
-        avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch)
+        avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch,tokens_so_far)
         last_completed_epoch=epoch
         
         metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
@@ -987,20 +1022,23 @@ if __name__ == "__main__":
             f"{datetime.now()}: [epoch {epoch}]: tokens_trained_so_far: {train_size*(epoch+1):,} avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
         )
         history.append({
+            "epoch": epoch,
+            "tokens_so_far": tokens_so_far.item(),
             "avg_loss": avg_loss,
             "avg_vloss": avg_vloss, 
-            "epoch": epoch,
             "avg_time":avg_time,
             "epoch_time":epoch_time,
-            "cpu_alloc_memory": torch.mps.current_allocated_memory()/torch.mps.driver_allocated_memory(),
+            # "cpu_alloc_memory": torch.cuda.memory.memory_allocated()/torch.cuda.driver_allocated_memory(),
         } | {
             metrics[i].name:avg_metrics[i] for i in range(len(metrics))
         } | {
             metrics[i].name+"_val":avg_val_metrics[i] for i in range(len(metrics))
         }
         )
-
-        if avg_vloss >= last_epoch_vloss:
+        
+        non_smoothed_vloss = avg_val_metrics[0]
+        assert metrics[0].name == "non_smoothed_loss_fn"
+        if non_smoothed_vloss >= last_epoch_vloss:
             non_improve_cnt += 1
             print(
                 f"{datetime.now()}: [epoch {epoch}]: epoch did not improve!"
@@ -1014,21 +1052,19 @@ if __name__ == "__main__":
             )
             break
 
-        last_epoch_vloss = avg_vloss
+        last_epoch_vloss = non_smoothed_vloss
 
         is_best=False
-        model_path = f"{save_file_path_root}/model_{epoch}_{avg_vloss}.pt"
-        if avg_vloss < best_val_loss:
-            best_val_loss = avg_vloss
+        model_path = f"{save_file_path_root}/model_{epoch}_{non_smoothed_vloss}.pt"
+        if non_smoothed_vloss < best_val_loss:
+            best_val_loss = non_smoothed_vloss
             is_best=True
         else:
             print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
         
         save_hist(
-            history_path,
             model_path,
-            optimizer_path,
-            scheduler_path,
+            tokens_so_far=tokens_so_far.item(),
             save_weights=True,
             is_best=is_best
         )
