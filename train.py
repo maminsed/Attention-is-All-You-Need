@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./test/overnight_Oct_16"
+save_file_path_root = "./runs/overnight_Nov_3"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -119,18 +119,18 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 6,  # number of encoder layers
-    "num_dec_layers": 6,  # number of encoder layers
+    "num_enc_layers": 4,  # number of encoder layers
+    "num_dec_layers": 4,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.1,
     "drop_post_emb": 0.1,
-    "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
+    "ln_strat": "POST_LN", # PRE_LN vs POST_LN
 
     # Training params
     "benchmark_mode": False,
     "batch_size": 32,
-    "val_batch_size": 32,
+    "val_batch_size": 64,
     "epochs": 25,
     "early_stopping_limit": 5,
     ## Optimizer
