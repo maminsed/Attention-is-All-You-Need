@@ -2,6 +2,9 @@
 .vscode/
 __pycache__/
 test/**/*.pt
+runs/**/*.pt
+
+events.out.tfevents.*
 
 # data
 wmt14_*.csv

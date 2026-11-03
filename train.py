@@ -730,6 +730,7 @@ def save_model(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,
                 "last_epoch_vloss": str(last_epoch_vloss) if last_epoch_vloss == float("inf") else last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": str(best_val_loss) if best_val_loss == float("inf") else best_val_loss,
+                "best_epoch": best_epoch,
                 "epoch": epoch,
                 "tokens_so_far": tokens_so_far,
                 "last_completed_epoch": last_completed_epoch,
@@ -880,6 +881,7 @@ def load_best_model(latest=False):
         last_epoch_vloss = float(dic["last_epoch_vloss"])
         non_improve_cnt = dic["non_improve_cnt"]
         best_val_loss = float(dic["best_val_loss"])
+        best_epoch = dic.get("best_epoch",0)
         start_epoch = dic["epoch"]
         model_path = dic["model_path"]
         config = {k:(v if k not in ["device","autocast_dtype","dtype"] else config[k]) for k,v in dic["config"].items()}
@@ -909,7 +911,7 @@ def load_best_model(latest=False):
     model.to(config["device"], dtype=config["dtype"])
 
     print(
-        f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
+        f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}, best_epoch: {best_epoch}"
     )
     return model,loss_fn
 
@@ -960,6 +962,7 @@ def load_model(tokens_so_far):
     last_epoch_vloss = float("inf")
     non_improve_cnt = 0
     best_val_loss = float("inf")
+    best_epoch=0
     start_epoch = -1
     if LOAD_PRE_SAVED:
         print(f"{datetime.now()}: loading pre saved")
@@ -970,6 +973,7 @@ def load_model(tokens_so_far):
             last_epoch_vloss = float(dic["last_epoch_vloss"])
             non_improve_cnt = dic["non_improve_cnt"]
             best_val_loss = float(dic["best_val_loss"])
+            best_epoch = dic.get("best_epoch",0)
             start_epoch = dic.get("last_completed_epoch",dic["epoch"])
             model_path = dic["model_path"]
             in_epoch_batches = dic.get("in_epoch_batches",0)
@@ -989,7 +993,7 @@ def load_model(tokens_so_far):
         print(
             f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
         )
-    return model,optimizer,scheduler,loss_fn,metrics,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
+    return model,optimizer,scheduler,loss_fn,metrics,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch, best_epoch
 
 if __name__ == "__main__":
     print(f"{datetime.now()}: code started: ")
@@ -1005,7 +1009,7 @@ if __name__ == "__main__":
 
     writer = SummaryWriter(tensorboard_dir)
 
-    model, optimizer, scheduler, loss_fn, metrics, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(tokens_so_far)
+    model, optimizer, scheduler, loss_fn, metrics, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch, best_epoch = load_model(tokens_so_far)
 
     print(f"{datetime.now()}: training started!")
     scaler = torch.amp.GradScaler(DEVICE, enabled=config["use_amp"] and DEVICE != "mps")
@@ -1055,6 +1059,7 @@ if __name__ == "__main__":
             if non_smoothed_vloss < best_val_loss:
                 best_val_loss = non_smoothed_vloss
                 is_best=True
+                best_epoch=epoch
             else:
                 print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
             
