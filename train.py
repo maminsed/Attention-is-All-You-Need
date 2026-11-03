@@ -14,6 +14,7 @@ import torch
 from frozendict import frozendict
 from torch.nn import ModuleList
 from torch.nn.utils.rnn import pad_sequence
+from torch.utils.tensorboard import SummaryWriter
 from torchmetrics.text import BLEUScore,SacreBLEUScore
 import pyarrow as pa
 
@@ -21,9 +22,10 @@ import pyarrow as pa
 from torch.utils.data import DataLoader, Dataset
 
 save_file_path_root = "./test/overnight_Oct_16"
-history_path = f"{save_file_path_root}/history.json"
+config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
+tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
@@ -657,7 +659,7 @@ class noop():
     def __call__(self,logits,preds):
         return torch.zeros((),device=DEVICE)
 
-def calculate_val_loss(bleu_calc:bool):
+def calculate_val_loss(bleu_calc:bool,tokens_so_far):
     # val loss:
     model.eval()
     avg_vloss = torch.zeros((),device=DEVICE)
@@ -689,12 +691,21 @@ def calculate_val_loss(bleu_calc:bool):
     avg_vloss /= total_tokens
     avg_metrics /= total_tokens
 
+    avg_vloss = avg_vloss.item()
+    tsi=tokens_so_far.item()
+
+    writer.add_scalar("loss_val/avg_loss",avg_vloss,tsi)
+    avg_metrics = [m.item() for m in avg_metrics]
+    for k in range(len(avg_metrics)-1):
+        writer.add_scalar(f"loss_val/{metrics[k].name}",avg_metrics[k],tsi)
+
     if bleu_calc:
-        avg_metrics[-1] = calculate_bleu(val_loader,model,sp_bpe)
+        avg_metrics[-1] = calculate_bleu(val_loader,model,sp_bpe).item()
+        writer.add_scalar(f"loss_val/{metrics[-1].name}",avg_metrics[-1],tsi)
 
-    return avg_vloss.item(), [m.item() for m in avg_metrics]
+    return avg_vloss, avg_metrics
 
-def save_hist(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,batches_done=0):
+def save_model(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,batches_done=0):
     if model_path and optimizer_path and save_weights:
         torch.save(model.state_dict(), model_path)
         torch.save(optimizer.state_dict(), optimizer_path)
@@ -709,10 +720,9 @@ def save_hist(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,b
             torch.save(optimizer.state_dict(), optim_best_path)
             torch.save(scheduler.state_dict(), scheduler_best_path)
         
-    with open(history_path, "w") as f:
+    with open(config_path, "w") as f:
         json.dump(
             {
-                "history": history,
                 "config": {k:(v if (
                     not type(v).__module__.startswith("torch")
                     ) else str(v)) 
@@ -724,7 +734,6 @@ def save_hist(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,b
                 "tokens_so_far": tokens_so_far,
                 "last_completed_epoch": last_completed_epoch,
                 "model_path": model_path,
-                "history_path": history_path,
                 "optim_path": optimizer_path,
                 "scheduler_path": scheduler_path,
                 "in_epoch_batches": batches_done
@@ -795,22 +804,18 @@ def train_one_epoch(epoch,tokens_so_far):
             delta = end_time - start_time
             total_time+=delta
 
+            tsi=None
             if (i+1) % VERBOSE_FREQ == 0:
-                ts = (x.shape[0]*x.shape[1]+y.shape[0]) / delta
-                history.append(
-                    {
-                        "epoch": epoch,
-                        "batch_idx": i,
-                        "tokens_so_far": tokens_so_far.item(),
-                        "batch_loss": loss_value.item(),
-                        "batch_time": delta,
-                        "data_loading_time": start_time - prev_end,
-                        "tokens/sec": ts,
-                    }
-                )
+                tokens_per_second = (x.shape[0]*x.shape[1]+y.shape[0]) / delta
+                tsi = tokens_so_far.item()
+                writer.add_scalar("loss/batch_loss", loss_value.item(),tsi)
+                writer.add_scalar("performance/tokens_per_second", tokens_per_second,tsi)
+                writer.add_scalar("performance/batch_time",delta,tsi)
+                writer.add_scalar("performance/data_loading_time",start_time-prev_end,tsi)
+
                 if VERBOSE:
                     print(
-                        f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, data_loading_time (ms): {(start_time - prev_end)*1000:.3f}, tokens/sec: {ts:,.3f}"
+                        f"{datetime.now()}: [epoch {epoch}] batch {i} loss_value: {loss_value:.4f}, batch_time (s): {delta:,.3f}, data_loading_time (ms): {(start_time - prev_end)*1000:.3f}, tokens/sec: {tokens_per_second:,.3f}"
                     )
 
             del logits,loss_value
@@ -818,18 +823,14 @@ def train_one_epoch(epoch,tokens_so_far):
                 model_path=f"{save_file_path_root}/model_{epoch}_in_batch.pt"
                 print(f"{datetime.now()} Saving mid-epoch to: {model_path}")
                 
-                avg_vloss, avg_val_metrics = calculate_val_loss(False)
-                history[-1].update({
-                    "avg_vloss": avg_vloss,
-                } | {
-                    metrics[i].name:avg_metrics[i].item()/(i+1) for i in range(len(metrics))
-                } | {
-                    metrics[k].name+"_val":avg_val_metrics[k] for k in range(len(metrics))
-                })
+                avg_vloss, avg_val_metrics = calculate_val_loss(False,tokens_so_far)
+                for k in range(len(metrics)-1):
+                    writer.add_scalar(f"loss/{metrics[k].name}",avg_metrics[k].item()/(idx+1),tsi)
+                
                 model.train(True)
                 print(f"{datetime.now()} Val loss calculation done")
                 
-                save_hist(
+                save_model(
                     model_path,
                     tokens_so_far=tokens_so_far.item(),
                     save_weights=True,
@@ -842,19 +843,20 @@ def train_one_epoch(epoch,tokens_so_far):
         print(f"{datetime.now()} keyboard interrupt detected after finishing batches: {i}")
         print(e)
         model_path=f"{save_file_path_root}/model_{epoch}_keyboard_intrrupt.pt"
-        save_hist(
+        save_model(
             model_path,
             tokens_so_far=tokens_so_far.item(),
             save_weights=True,
             is_best=False,
             batches_done=i
         )
-        print(f"{datetime.now()} History saved")
+        print(f"{datetime.now()} Config saved")
+        writer.close()
         raise
 
     epoch_end = time.time()
     
-    avg_vloss, avg_val_metrics = calculate_val_loss(epoch%2==0)
+    avg_vloss, avg_val_metrics = calculate_val_loss(epoch%2==0,tokens_so_far)
     return (
         (total_loss / total_batches).item(), 
         [m.item() for m in (avg_metrics / total_batches)], 
@@ -872,10 +874,9 @@ def lr_update_fn(step):
 def load_best_model(latest=False):
     global config
     # ONLY USE IN EVALUATION
-    assert path.exists(history_path)
-    with open(history_path, "r") as f:
+    assert path.exists(config_path)
+    with open(config_path, "r") as f:
         dic = json.load(f)
-        history = dic["history"]
         last_epoch_vloss = float(dic["last_epoch_vloss"])
         non_improve_cnt = dic["non_improve_cnt"]
         best_val_loss = float(dic["best_val_loss"])
@@ -910,7 +911,7 @@ def load_best_model(latest=False):
     print(
         f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
     )
-    return model,loss_fn,history
+    return model,loss_fn
 
 
 def load_model(tokens_so_far):
@@ -956,18 +957,16 @@ def load_model(tokens_so_far):
 
     print(f"{datetime.now()}: metrics loaded")
 
-    history = []
     last_epoch_vloss = float("inf")
     non_improve_cnt = 0
     best_val_loss = float("inf")
     start_epoch = -1
     if LOAD_PRE_SAVED:
         print(f"{datetime.now()}: loading pre saved")
-        assert path.exists(history_path)
+        assert path.exists(config_path)
         assert path.exists(optimizer_path)
-        with open(history_path, "r") as f:
+        with open(config_path, "r") as f:
             dic = json.load(f)
-            history = dic["history"]
             last_epoch_vloss = float(dic["last_epoch_vloss"])
             non_improve_cnt = dic["non_improve_cnt"]
             best_val_loss = float(dic["best_val_loss"])
@@ -990,7 +989,7 @@ def load_model(tokens_so_far):
         print(
             f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}"
         )
-    return model,optimizer,scheduler,loss_fn,metrics,history,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
+    return model,optimizer,scheduler,loss_fn,metrics,last_epoch_vloss,non_improve_cnt,best_val_loss,start_epoch
 
 if __name__ == "__main__":
     print(f"{datetime.now()}: code started: ")
@@ -1004,69 +1003,68 @@ if __name__ == "__main__":
     train_loader, val_loader, train_size = load_data(sp_bpe)
     tokens_so_far=torch.zeros((),device=DEVICE,dtype=torch.long)
 
-    model, optimizer, scheduler, loss_fn, metrics, history, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(tokens_so_far)
+    writer = SummaryWriter(tensorboard_dir)
+
+    model, optimizer, scheduler, loss_fn, metrics, last_epoch_vloss, non_improve_cnt, best_val_loss, start_epoch = load_model(tokens_so_far)
 
     print(f"{datetime.now()}: training started!")
     scaler = torch.amp.GradScaler(DEVICE, enabled=config["use_amp"] and DEVICE != "mps")
     last_completed_epoch=start_epoch
-    for epoch in range(start_epoch+1, config["epochs"]):
-        if epoch > STOP_AFTER_EPOCH:
-            break
-        model.train(True)
-        avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch,tokens_so_far)
-        last_completed_epoch=epoch
-        
-        metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
-        val_metrics_text = ", ".join([f"{metrics[i].name}_val: {avg_val_metrics[i]:.3f}" for i in range(len(metrics))])
-        print(
-            f"{datetime.now()}: [epoch {epoch}]: tokens_trained_so_far: {train_size*(epoch+1):,} avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
-        )
-        history.append({
-            "epoch": epoch,
-            "tokens_so_far": tokens_so_far.item(),
-            "avg_loss": avg_loss,
-            "avg_vloss": avg_vloss, 
-            "avg_time":avg_time,
-            "epoch_time":epoch_time,
-            # "cpu_alloc_memory": torch.cuda.memory.memory_allocated()/torch.cuda.driver_allocated_memory(),
-        } | {
-            metrics[i].name:avg_metrics[i] for i in range(len(metrics))
-        } | {
-            metrics[i].name+"_val":avg_val_metrics[i] for i in range(len(metrics))
-        }
-        )
-        
-        non_smoothed_vloss = avg_val_metrics[0]
-        assert metrics[0].name == "non_smoothed_loss_fn"
-        if non_smoothed_vloss >= last_epoch_vloss:
-            non_improve_cnt += 1
+    try:
+        for epoch in range(start_epoch+1, config["epochs"]):
+            if epoch > STOP_AFTER_EPOCH:
+                break
+            model.train(True)
+            avg_loss, avg_metrics,avg_vloss,avg_val_metrics,avg_time,epoch_time = train_one_epoch(epoch,tokens_so_far)
+            last_completed_epoch=epoch
+            
+            metrics_text = ", ".join([f"{metrics[i].name}: {avg_metrics[i]:.3f}" for i in range(len(metrics))])
+            val_metrics_text = ", ".join([f"{metrics[i].name}_val: {avg_val_metrics[i]:.3f}" for i in range(len(metrics))])
             print(
-                f"{datetime.now()}: [epoch {epoch}]: epoch did not improve!"
+                f"{datetime.now()}: [epoch {epoch}]: tokens_trained_so_far: {train_size*(epoch+1):,} avg_loss: {avg_loss:.4f}, {metrics_text}, {val_metrics_text}, avg_vloss: {avg_vloss:.4f}, avg_time (s): {avg_time:.3f}, epoch_time (s): {epoch_time:,.3f}"
             )
-        else:
-            non_improve_cnt = 0
 
-        if non_improve_cnt > config["early_stopping_limit"]:
-            print(
-                f"{datetime.now()}: [epoch {epoch}]: early stopping triggered!"
+            tsi=tokens_so_far.item()
+            writer.add_scalar("info/epoch",epoch,tsi)
+            writer.add_scalar("loss/avg_loss",avg_loss,tsi)
+            writer.add_scalar("performance/epoch_avg_time",avg_time,tsi)
+            writer.add_scalar("performance/epoch_tot_time",epoch_time,tsi)
+            for k in range(len(metrics)-1):
+                writer.add_scalar(f"loss/{metrics[k].name}",avg_metrics[k],tsi)
+            
+            non_smoothed_vloss = avg_val_metrics[0]
+            assert metrics[0].name == "non_smoothed_loss_fn"
+            if non_smoothed_vloss >= last_epoch_vloss:
+                non_improve_cnt += 1
+                print(
+                    f"{datetime.now()}: [epoch {epoch}]: epoch did not improve!"
+                )
+            else:
+                non_improve_cnt = 0
+
+            if non_improve_cnt > config["early_stopping_limit"]:
+                print(
+                    f"{datetime.now()}: [epoch {epoch}]: early stopping triggered!"
+                )
+                break
+
+            last_epoch_vloss = non_smoothed_vloss
+
+            is_best=False
+            model_path = f"{save_file_path_root}/model_{epoch}_{non_smoothed_vloss}.pt"
+            if non_smoothed_vloss < best_val_loss:
+                best_val_loss = non_smoothed_vloss
+                is_best=True
+            else:
+                print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
+            
+            save_model(
+                model_path,
+                tokens_so_far=tokens_so_far.item(),
+                save_weights=True,
+                is_best=is_best
             )
-            break
-
-        last_epoch_vloss = non_smoothed_vloss
-
-        is_best=False
-        model_path = f"{save_file_path_root}/model_{epoch}_{non_smoothed_vloss}.pt"
-        if non_smoothed_vloss < best_val_loss:
-            best_val_loss = non_smoothed_vloss
-            is_best=True
-        else:
-            print(f"{datetime.now()}: [epoch {epoch}]: Still not better than max epoch.")
-        
-        save_hist(
-            model_path,
-            tokens_so_far=tokens_so_far.item(),
-            save_weights=True,
-            is_best=is_best
-        )
-        print(f"{datetime.now()}: [epoch {epoch}]: history saved")
-    print(f"{datetime.now()}: Done training! ")
+            print(f"{datetime.now()}: [epoch {epoch}]: Config saved")
+    finally:
+        print(f"{datetime.now()}: Done training! ")
+        writer.close()
