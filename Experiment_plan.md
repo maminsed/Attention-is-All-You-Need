@@ -26,6 +26,7 @@ Personal insights:
 - we have lower training loss however, after 13 it seems to be more prone to overfitting. 
 - It reached better val values faster and the difference between the BLEU values seem to be too small to be from actual difference. 
 - To be honest, I can't tell the difference between this one and exp 1 from the test sentences I run. 
-    - They both seem to do decent with multi-shot calls
+    - They both seem to do decent with multi-shot calls -> this only when not doing greedy decoding. after greedy decoding the sentence does not change
     - They both do worse for longer sentences (understandable)
-    - The translations almost have all the correct letters, it just doesn't make sense
+    - The translations almost have all the correct letters, it just doesn't make sense (sampeled decoding)
+    - with greedy decoding it's performing much better, however, it seems to be missing some filler words such as "already", etc. 
