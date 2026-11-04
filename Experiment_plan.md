@@ -4,7 +4,7 @@ Test sentences:
 
 
 ### Experiment 1: Initial config
-- location: runs/overnight_Nov_3/
+- location: runs/exp_1/
 - best epoch: 15
 - best BLEU: 0.314
 - best non_smoothed_val_loss: 1.65
@@ -16,7 +16,7 @@ Personal insights:
 
 
 ### Experiment 2 - Phase 1: PRE-LN
-- location: runs/overnight_Nov_3_exp_2/
+- location: runs/exp_2_phase_1/
 - best_epoch: 13
 - best BLEU: 0.310
 - best non_smoothed_val_loss: 1.65
@@ -30,3 +30,16 @@ Personal insights:
     - They both do worse for longer sentences (understandable)
     - The translations almost have all the correct letters, it just doesn't make sense (sampeled decoding)
     - with greedy decoding it's performing much better, however, it seems to be missing some filler words such as "already", etc. 
+
+
+### Experiment 2 - phase 2: PRE-lN + no warmup. 
+- location: runs/exp_2_phase_2/
+- best epoch: 25
+- best BLEU: 0.220
+- best non_smoothed_val_loss: 2.08
+
+
+Personal Insights:
+- It seems like that even though it's stable, it seems like that small warmup step was required for the network to achieve better final results, so epoch 1 result in this case was worst. 
+- Only tested with greedy decoding and the overall results seemed to be trying to say the same thing however the whole sentence itself does not mean the same thing, you should know what the original sentence was to understand what it's trying to say. 
+- Even with this low BLEU short sentences are having correct translations and it messes up with longer sentences. 

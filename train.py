@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/overnight_Nov_3_exp_2"
+save_file_path_root = "./runs/exp_2_phase_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -131,7 +131,7 @@ config = {
     "benchmark_mode": False,
     "batch_size": 32,
     "val_batch_size": 64,
-    "epochs": 25,
+    "epochs": 15,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -140,7 +140,8 @@ config = {
     "optim_eps": 1e-9,
     ### Scheduler
     "warmup_steps": 3000, # lowering a bit since were training for less epochs
-    "peak_lr": -1, # either -1 or a number, which if it is a number we will calculate warmup steps based on that. 
+    "peak_lr": -1, # either -1 or a number, which if it is a number we will calculate warmup steps based on that.
+    "warmup_strat": "constant", # "constant" or "rise" 
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,
@@ -183,12 +184,13 @@ if config["benchmark_mode"]:
 SQRT_INV_DM = 1/math.sqrt(config["d_model"])
 
 config["lr_multiplier"] = config["peak_lr"] / (SQRT_INV_DM/math.sqrt(config["warmup_steps"])) if config["peak_lr"] != -1 else 1
-
+config["peak_lr"] = SQRT_INV_DM*config["warmup_steps"]**-0.5 if config["peak_lr"] == -1 else config["peak_lr"]
 
 assert config["h"] * config["d_v"] == config["d_model"]
 assert DEVICE == "cuda"
 assert config["filtering_strategy"] in ["drop","cut"]
 assert config["ln_strat"] in ["PRE_LN","POST_LN"]
+assert config["warmup_strat"] in ["rise","constant"] 
 assert SAVE_FREQ % VERBOSE_FREQ == 0
 if not config["tokenization_cache"]:
     print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
@@ -355,7 +357,7 @@ def load_data(sp_bpe) -> tuple[DataLoader, DataLoader]:
 
     global NUM_BATCHES
     NUM_BATCHES = math.ceil((len(X_train_offset)-1) / config["batch_size"])
-    print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}. LR peak: {SQRT_INV_DM*config["warmup_steps"]**-0.5}")
+    print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}. LR peak: {config["peak_lr"]}")
     if NUM_BATCHES * config["epochs"] * 0.5 < config["warmup_steps"]:
         print(f"{datetime.now()}: WARNING: more than half of epochs are warmup steps. ")
 
@@ -813,6 +815,7 @@ def train_one_epoch(epoch,tokens_so_far):
                 writer.add_scalar("performance/tokens_per_second", tokens_per_second,tsi)
                 writer.add_scalar("performance/batch_time",delta,tsi)
                 writer.add_scalar("performance/data_loading_time",start_time-prev_end,tsi)
+                writer.add_scalar("info/learning_rate",scheduler.get_last_lr()[0],tsi)
 
                 if VERBOSE:
                     print(
@@ -869,7 +872,10 @@ def train_one_epoch(epoch,tokens_so_far):
 
 def lr_update_fn(step):
     step = max(step,1)
-    lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5) * config["lr_multiplier"]
+    if config["warmup_strat"] == "rise":
+        lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5) * config["lr_multiplier"]
+    else:
+        lr = min(SQRT_INV_DM*step**-0.5* config["lr_multiplier"],config["peak_lr"])
     return lr
 
 def load_best_model(latest=False):
