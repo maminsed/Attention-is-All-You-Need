@@ -7,8 +7,8 @@
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
-#SBATCH --output=logs/overnight_Nov_3-%j.out
-#SBATCH --error=logs/overnight_Nov_3-%j.err
+#SBATCH --output=logs/overnight_Nov_3_exp_2-%j.out
+#SBATCH --error=logs/overnight_Nov_3_exp_2-%j.err
 #SBATCH --mail-user=m4sedagh@uwaterloo.ca
 #SBATCH --mail-type=ALL
 

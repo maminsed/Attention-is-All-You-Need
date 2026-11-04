@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/overnight_Nov_3"
+save_file_path_root = "./runs/overnight_Nov_3_exp_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -125,7 +125,7 @@ config = {
     ## Regularization/activations
     "drop_pre_norm": 0.1,
     "drop_post_emb": 0.1,
-    "ln_strat": "POST_LN", # PRE_LN vs POST_LN
+    "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
 
     # Training params
     "benchmark_mode": False,
