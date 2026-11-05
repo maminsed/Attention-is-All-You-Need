@@ -69,3 +69,4 @@ Personal Insights:
 Personal Insights:
 - even worse validation behaviour than PRE-lN + no warmup. 
 
+*Feature Implemented* -> broke down forward into encode and decode for faster val/inference. 

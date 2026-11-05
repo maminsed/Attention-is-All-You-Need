@@ -536,11 +536,15 @@ class Transformer(torch.nn.Module):
         # y.shape = CUDA- B,Sy
         # returns: CUDA- B,Sy,VS
 
-        # masking constants:
-        d = y.shape[1]
-        lookahead_mask_constant = torch.triu(
-            torch.ones((d, d), device=y.device, requires_grad=False), 1
-        ).bool()  # CUDA - Sy,Sy
+        x,padding_mask_constant = self.encode(x) # CUDA-B,S,dm
+        y = self.decode(x,y,padding_mask_constant) # CUDA-B,Sy,VS
+
+        return y
+
+
+    def encode(self,x):
+        # x.shape = CUDA- B,S
+        # returns CUDA-B,S,dm and CUDA-B,1,1,S
 
         padding_mask_constant = x == self.pad_token  # CUDA- B,S
         padding_mask_constant.requires_grad = False
@@ -556,18 +560,32 @@ class Transformer(torch.nn.Module):
         x = x + pe  # CUDA- B,S,d_m
         x = self.dropout(x)
 
+        # for each layer
+        for i in range(self.config["num_enc_layers"]):
+            # encoder
+            x = self.encoder_attention[i](x, x, padding_mask_constant)  # CUDA- B,S,d_m
+            x = self.encoder_MLP[i](x)  # CUDA, B,S,dm
+
+        return x,padding_mask_constant
+
+
+    def decode(self,x,y,padding_mask_constant):
+        # x.shape = CUDA-B,S,dm
+        # y.shape = CUDA-B,Sy
+        # padding_mask_constant.shape = B,1,1,S
+
+        # masking constants:
+        d = y.shape[1]
+        lookahead_mask_constant = torch.triu(
+            torch.ones((d, d), device=y.device, requires_grad=False), 1
+        ).bool()  # CUDA - Sy,Sy
+
         # y embedding
         y = self.embedding(y)  # CUDA- B,Sy,dm
         y = y / SQRT_INV_DM  # CUDA- B,Sy,d_m
         pe = self.positional_encoding(y.shape[1], device=y.device)  # CUDA- Sy,d_m
         y = y + pe  # CUDA- B,Sy,d_m
         y = self.dropout(y)
-
-        # for each layer
-        for i in range(self.config["num_enc_layers"]):
-            # encoder
-            x = self.encoder_attention[i](x, x, padding_mask_constant)  # CUDA- B,S,d_m
-            x = self.encoder_MLP[i](x)  # CUDA, B,S,dm
 
         for i in range(self.config["num_dec_layers"]):
             # decoder
@@ -600,9 +618,9 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
             B = x.shape[0]
             final_trans = torch.full((B,CONTEXT_CAP), EOS_ID, dtype=torch.long,device=DEVICE) # (B,CP)
-            eos_idx = torch.full((B,1), -1,dtype=torch.long,device=DEVICE)
+            eos_idx = torch.full((B,), -1,dtype=torch.long,device=DEVICE)
 
-            cur_x = x
+            cur_x,cur_pmask = model.encode(x)
             cur_eng_trans = torch.full((B,1),BOS_ID,dtype=torch.long,device=DEVICE) # (B,Sy)
             cur_indecies = torch.arange(B,device=DEVICE)
             num_without_eos=B
@@ -610,7 +628,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
             cnt=0
             while cnt < CONTEXT_CAP-1 and cur_x.shape[0] > 0:
                 cnt+=1
-                output = model(cur_x,cur_eng_trans)
+                output = model.decode(cur_x,cur_eng_trans,cur_pmask)
                 output = torch.argmax(output[:,-1,:],dim=1,keepdim=True) # B,1
 
                 cur_eng_trans = torch.cat([cur_eng_trans,output],dim=1)
@@ -624,6 +642,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
 
                     keep = ~is_eos
                     cur_x = cur_x[keep]
+                    cur_pmask = cur_pmask[keep]
                     cur_eng_trans = cur_eng_trans[keep]
                     cur_indecies = cur_indecies[keep]
 
@@ -631,7 +650,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
                 final_trans[cur_indecies, :cnt+1] = cur_eng_trans
                 eos_idx[cur_indecies] = cnt
             
-            eos_idx_cpu = eos_idx.squeeze().detach().cpu().tolist()
+            eos_idx_cpu = eos_idx.detach().cpu().tolist()
             avg_eos_idx+=sum(eos_idx_cpu)
             total_sample+=B
 
@@ -643,7 +662,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
                 valid_counts = eos_idx_cpu[idx]+1
                 eng_decod.append(sp_bpe.decode_ids(final_trans_cpu[idx][:valid_counts]))
 
-            val = bleu_fn(eng_decod,orig_decod)
+            bleu_fn.update(eng_decod,orig_decod)
             if return_translations:
                 translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
     end_time = time.time()
