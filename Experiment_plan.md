@@ -11,7 +11,7 @@ Test sentences:
 
 Personal insights:
 - It seemed to be doing pretty well in short texts while performance detriorates as sentences increase in size.
-- definetly overfitting after best epoch. 
+- mild overfitting (I guess not too much rise)
 - performance seems extremly fast on CUDA. 
 
 
@@ -34,12 +34,26 @@ Personal insights:
 
 ### Experiment 2 - phase 2: PRE-lN + no warmup. 
 - location: runs/exp_2_phase_2/
-- best epoch: 25
+- best epoch: 24
 - best BLEU: 0.220
 - best non_smoothed_val_loss: 2.08
 
 
 Personal Insights:
-- It seems like that even though it's stable, it seems like that small warmup step was required for the network to achieve better final results, so epoch 1 result in this case was worst. 
+- It seems like that even though it's stable, it seems like that small warmup step was required for the network to achieve better final results, so epoch 2 val result in this case was worst. 
 - Only tested with greedy decoding and the overall results seemed to be trying to say the same thing however the whole sentence itself does not mean the same thing, you should know what the original sentence was to understand what it's trying to say. 
 - Even with this low BLEU short sentences are having correct translations and it messes up with longer sentences. 
+
+
+### Experiment 3 - phase 1: 0.5x 
+- location: runs/exp_3_phase_1/ (has a part 2)
+- best epoch: 11
+- best BLEU: 0.311
+- best non_smoothed_val_loss: 1.66
+
+
+Personal Insights:
+- Kinda same as Exp2-Phase1
+- at this point I feel like the change in the BLEU and non_smoothed_val_loss is too small for me to see anything. 
+- training loss did decrease faster tho while val loss lagged behind. 
+- Same manual evaluation as before. 

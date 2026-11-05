@@ -21,13 +21,13 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_2_phase_2"
+save_file_path_root = "./runs/exp_3_phase_1"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 800
 SAVE_FREQ=20_000
@@ -90,7 +90,7 @@ phase 1:
 phase 2: 
 - batch_size: 128 (if compute can handle it)
 phase 3: 
-- bacthc_size: 128 (if compute can handle it)
+- batch_size: 128 (if compute can handle it)
 -> Double peak LR (or 1.4x) because 128 has more stable gradients 
      so it can use higher peak_lr to utlize information better
 
@@ -131,7 +131,7 @@ config = {
     "benchmark_mode": False,
     "batch_size": 32,
     "val_batch_size": 64,
-    "epochs": 15,
+    "epochs": 25,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -140,8 +140,8 @@ config = {
     "optim_eps": 1e-9,
     ### Scheduler
     "warmup_steps": 3000, # lowering a bit since were training for less epochs
-    "peak_lr": -1, # either -1 or a number, which if it is a number we will calculate warmup steps based on that.
-    "warmup_strat": "constant", # "constant" or "rise" 
+    "peak_lr": 0.0008068715304598784 * 0.5, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
+    "warmup_strat": "rise", # "constant" or "rise" 
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,
