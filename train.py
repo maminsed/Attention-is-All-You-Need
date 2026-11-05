@@ -21,13 +21,13 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_3_phase_1"
+save_file_path_root = "./runs/exp_3_phase_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
 VERBOSE_FREQ = 800
 SAVE_FREQ=20_000
@@ -140,7 +140,7 @@ config = {
     "optim_eps": 1e-9,
     ### Scheduler
     "warmup_steps": 3000, # lowering a bit since were training for less epochs
-    "peak_lr": 0.0008068715304598784 * 0.5, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
+    "peak_lr": 0.0008068715304598784 * 2, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
     "warmup_strat": "rise", # "constant" or "rise" 
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only

@@ -57,3 +57,15 @@ Personal Insights:
 - at this point I feel like the change in the BLEU and non_smoothed_val_loss is too small for me to see anything. 
 - training loss did decrease faster tho while val loss lagged behind. 
 - Same manual evaluation as before. 
+
+
+### Experiment 3 - phase 2: 2x
+- location: runs/exp_3_phase_2/
+- best epoch: 24
+- best non_smoothed_val_loss: 2.90
+- best BLEU: 
+
+
+Personal Insights:
+- even worse validation behaviour than PRE-lN + no warmup. 
+
