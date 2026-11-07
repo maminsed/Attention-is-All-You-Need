@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_4_phase_3"
+save_file_path_root = "./runs/exp_4_phase_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -400,12 +400,13 @@ def activation_lookup(activation="relu"):
 
 
 class SelfAttention(torch.nn.Module):
-    def __init__(self, config, *, lookahead_mask=False, pad_mask=True):
+    def __init__(self, config, *, lookahead_mask:bool=False, pad_mask:bool=True,is_cross:bool=False):
         super().__init__()
 
         self.config = config
         self.lookahead_mask = lookahead_mask
         self.pad_mask = pad_mask
+        self.is_cross = is_cross
         self.d_k_sqrt = math.sqrt(self.config["d_k"])
 
         self.W_K = torch.nn.Linear(config["d_model"], config["d_k"]*config["h"], bias=False) # CUDA
@@ -418,33 +419,58 @@ class SelfAttention(torch.nn.Module):
         self.Dropout = torch.nn.Dropout(config["drop_pre_norm"])
         self.LayerNorm = torch.nn.LayerNorm(config["d_model"])
 
+        self.K_cache = torch.tensor((),device=DEVICE,dtype=config["dtype"])
+        self.V_cache = torch.tensor((),device=DEVICE,dtype=config["dtype"])
+
     def apply_mask(self, x, mask_constant):
         return x.where(~mask_constant, float("-inf"))
 
-    def forward(self, x, y, padding_mask_constant=None, lookahead_mask_constant=None):
-
+    def forward(self, x, y, padding_mask_constant=None, lookahead_mask_constant=None,*,kv_cache:bool=False):
         # x: B,S,d_m
         # y: B,Sy,d_m
         # (in cases of self attention, S=Sy)
-        B,S,dm = x.shape
+        # in case of kv_cache: Sy=1
+
+        B,_,dm = x.shape
         Sy = y.shape[1]
 
         if self.config["ln_strat"] == "PRE_LN":
             y_2 = self.LayerNorm(y)
-            x = self.LayerNorm(x)
+            if not self.is_cross: x=y_2
+            else: x = self.LayerNorm(x)
         else:
             y_2 = y
 
-        K = self.W_K(x) # CUDA-B,S,dk*H
-        V = self.W_V(x) # CUDA-B,S,dv*H
+
+        first_pass = self.K_cache.shape[0] == 0
+        if kv_cache and first_pass:
+            self.K_cache = self.W_K(x)
+            self.V_cache = self.W_V(x)
+
+
+        if not kv_cache:
+            K = self.W_K(x) # CUDA-B,S,dk*H
+            V = self.W_V(x) # CUDA-B,S,dv*H
+        else:
+            if not self.is_cross and not first_pass:
+                new_k = self.W_K(y_2) # CUDA-B,1,dk*H
+                new_v = self.W_V(y_2) # CUDA-B,1,dk*H
+                
+                self.K_cache = torch.cat([self.K_cache,new_k],dim=1)
+                self.V_cache = torch.cat([self.V_cache,new_v],dim=1)
+            # If cross: Sc = S and in case of self attention: Sc=Sy (so far)
+            K = self.K_cache # CUDA-B,Sc,dk*H
+            V = self.V_cache # CUDA-B,Sc,dv*H
         Q = self.W_Q(y_2) # CUDA-B,Sy,dk*H
 
-        K = K.view((B,S ,self.config["h"],-1)).transpose(1,2) # CUDA-B,H,S,dk
-        Q = Q.view((B,Sy,self.config["h"],-1)).transpose(1,2) # CUDA-B,H,Sy,dk
-        V = V.view((B,S ,self.config["h"],-1)).transpose(1,2) # CUDA-B,H,S,dv
+        # If it's kv_cache: CUDA-B,H,Sc,dk for K,V and CUDA-B,H,1,dk for Q
+        K = K.view((B,K.shape[1],self.config["h"],-1)).transpose(1,2) # CUDA-B,H,S,dk
+        Q = Q.view((B,Q.shape[1],self.config["h"],-1)).transpose(1,2) # CUDA-B,H,Sy,dk
+        V = V.view((B,V.shape[1],self.config["h"],-1)).transpose(1,2) # CUDA-B,H,S,dv
 
+        # If it's kv_cache: CUDA-B,H,1,Sc
         y_2 = Q @ K.transpose(2,3) / self.d_k_sqrt # CUDA-B,H,Sy,S
-        if self.lookahead_mask:
+        if self.lookahead_mask and not kv_cache:
             y_2 = self.apply_mask(y_2, lookahead_mask_constant) # ***
 
         if self.pad_mask:
@@ -458,8 +484,16 @@ class SelfAttention(torch.nn.Module):
         y = y+y_2
         if self.config["ln_strat"] == "POST_LN":
             y = self.LayerNorm(y)
+
         return y # CUDA-B,Sy,dm
 
+    def reset_cache(self):
+        self.K_cache = torch.tensor((),device=DEVICE,dtype=config["dtype"])
+        self.V_cache = torch.tensor((),device=DEVICE,dtype=config["dtype"])
+
+    def drop_sentences(self,keep):
+        self.K_cache = self.K_cache[keep]
+        self.V_cache = self.V_cache[keep]
 
 class MLP(torch.nn.Module):
     def __init__(self, config):
@@ -513,7 +547,7 @@ class Transformer(torch.nn.Module):
             ]
         )
         self.cross_attention = ModuleList(
-            [SelfAttention(self.config) for _ in range(self.config["num_dec_layers"])]
+            [SelfAttention(self.config,is_cross=True) for _ in range(self.config["num_dec_layers"])]
         )
         self.decoder_MLP = ModuleList(
             [MLP(self.config) for _ in range(self.config["num_dec_layers"])]
@@ -522,11 +556,14 @@ class Transformer(torch.nn.Module):
         ## Only for PRE LN
         self.LayerNorm = torch.nn.LayerNorm(config["d_model"])
 
-    def positional_encoding(self, seq_len, device=None, d_model=None, n=10000):
-        d_model = self.config["d_model"] if d_model is None else d_model
-        pe = torch.zeros(seq_len, d_model, device=device)  # CUDA- S,d_m
-        pos = torch.arange(seq_len, device=device).reshape(-1, 1)  # CUDA- S,1
-        freq = torch.arange(0, d_model, 2, device=device)  # CUDA, d_m/2
+        ## KV_Cache:
+        self.cache_idx=0
+
+    def positional_encoding(self, seq_len, n=10000,*,start=0):
+        d_model = self.config["d_model"]
+        pe = torch.zeros(seq_len, d_model, device=DEVICE)  # CUDA- S,d_m
+        pos = torch.arange(start,end=start+seq_len, device=DEVICE).reshape(-1, 1)  # CUDA- S,1
+        freq = torch.arange(0, d_model, 2, device=DEVICE)  # CUDA, d_m/2
         dim = n ** (freq / d_model)  # CUDA, d_m/2
 
         pe[:, 0::2] = torch.sin(pos / dim)
@@ -559,7 +596,7 @@ class Transformer(torch.nn.Module):
         x = self.embedding(x)  # CUDA- B,S,dm
         x = x / SQRT_INV_DM  # CUDA- B,S,d_m (INV_INV_SQRT: SQRT_DM)
         # positional encoding
-        pe = self.positional_encoding(x.shape[1], device=x.device)  # CUDA- S,d_m
+        pe = self.positional_encoding(x.shape[1])  # CUDA- S,d_m
         x = x + pe  # CUDA- B,S,d_m
         x = self.dropout(x)
 
@@ -572,30 +609,39 @@ class Transformer(torch.nn.Module):
         return x,padding_mask_constant
 
 
-    def decode(self,x,y,padding_mask_constant):
+    def decode(self,x,y,padding_mask_constant,*,kv_cache:bool=False):
         # x.shape = CUDA-B,S,dm
         # y.shape = CUDA-B,Sy
         # padding_mask_constant.shape = B,1,1,S
+        # if kv_cache: 
+        # y.shape = CUDA-B,1
 
         # masking constants:
         d = y.shape[1]
-        lookahead_mask_constant = torch.triu(
-            torch.ones((d, d), device=y.device, requires_grad=False), 1
-        ).bool()  # CUDA - Sy,Sy
+        if not kv_cache:
+            lookahead_mask_constant = torch.triu(
+                torch.ones((d, d), device=DEVICE, requires_grad=False), 1
+            ).bool()  # CUDA - Sy,Sy
+            start=0
+        else: 
+            lookahead_mask_constant = None
+            start=self.cache_idx
+            self.cache_idx+=1
+
 
         # y embedding
         y = self.embedding(y)  # CUDA- B,Sy,dm
         y = y / SQRT_INV_DM  # CUDA- B,Sy,d_m
-        pe = self.positional_encoding(y.shape[1], device=y.device)  # CUDA- Sy,d_m
+        pe = self.positional_encoding(y.shape[1],start=start)  # CUDA- Sy,d_m
         y = y + pe  # CUDA- B,Sy,d_m
         y = self.dropout(y)
 
         for i in range(self.config["num_dec_layers"]):
             # decoder
             y = self.decoder_attention[i](
-                y, y, lookahead_mask_constant=lookahead_mask_constant
+                y, y, lookahead_mask_constant=lookahead_mask_constant,kv_cache=kv_cache
             )  # CUDA- B,Sy,dm
-            y = self.cross_attention[i](x, y, padding_mask_constant)  # CUDA- B,Sy,dm
+            y = self.cross_attention[i](x, y, padding_mask_constant,kv_cache=kv_cache)  # CUDA- B,Sy,dm
             y = self.decoder_MLP[i](y)  # CUDA- B,Sy,dm
 
         if self.config["ln_strat"] == "PRE_LN":
@@ -605,6 +651,18 @@ class Transformer(torch.nn.Module):
         y = y @ self.embedding.weight.T  # CUDA - B,Sy,VS
         return y  # CUDA- B,Sy,VS
 
+    def reset_cache(self):
+        self.cache_idx=0
+        for s in self.decoder_attention:
+            s.reset_cache()
+        for c in self.cross_attention:
+            c.reset_cache()
+
+    def drop_sentences(self,keep):
+        for s in self.decoder_attention:
+            s.drop_sentences(keep)
+        for c in self.cross_attention:
+            c.drop_sentences(keep)
 
 def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translations:bool=False):
     start_time = time.time()
@@ -618,6 +676,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
     translations = []
     with torch.no_grad():
         for i,(x, y) in enumerate(loader):
+            model.reset_cache()
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"])
             B = x.shape[0]
             final_trans = torch.full((B,CONTEXT_CAP), EOS_ID, dtype=torch.long,device=DEVICE) # (B,CP)
@@ -625,18 +684,20 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
 
             cur_x,cur_pmask = model.encode(x)
             cur_eng_trans = torch.full((B,1),BOS_ID,dtype=torch.long,device=DEVICE) # (B,Sy)
+            cur_y = cur_eng_trans
             cur_indecies = torch.arange(B,device=DEVICE)
             num_without_eos=B
 
             cnt=0
             while cnt < CONTEXT_CAP-1 and cur_x.shape[0] > 0:
                 cnt+=1
-                output = model.decode(cur_x,cur_eng_trans,cur_pmask)
+                output = model.decode(cur_x,cur_y,cur_pmask,kv_cache=True)
                 output = torch.argmax(output[:,-1,:],dim=1,keepdim=True) # B,1
 
                 cur_eng_trans = torch.cat([cur_eng_trans,output],dim=1)
 
                 is_eos = (output.squeeze(1) == EOS_ID)
+                cur_y = output
                 if is_eos.any():
                     finished_indecies = cur_indecies[is_eos]
                     eos_idx[finished_indecies] = cnt
@@ -645,9 +706,11 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
 
                     keep = ~is_eos
                     cur_x = cur_x[keep]
+                    cur_y = cur_y[keep]
                     cur_pmask = cur_pmask[keep]
                     cur_eng_trans = cur_eng_trans[keep]
                     cur_indecies = cur_indecies[keep]
+                    model.drop_sentences(keep)
 
             if cur_x.shape[0] > 0:
                 final_trans[cur_indecies, :cnt+1] = cur_eng_trans
@@ -668,6 +731,7 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
             bleu_fn.update(eng_decod,orig_decod)
             if return_translations:
                 translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
+    model.reset_cache() # free up space for later. 
     end_time = time.time()
     avg_bleu = bleu_fn.compute()
     print(f"{datetime.now()} finished calculating bleu - avg bleu: {avg_bleu*100:.2f} - total_time: {end_time - start_time} - avg_eos_idx: {avg_eos_idx/total_sample:.2f}")
