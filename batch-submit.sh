@@ -7,8 +7,8 @@
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
-#SBATCH --output=logs/exp_4_phase_2.out
-#SBATCH --error=logs/exp_4_phase_2.err
+#SBATCH --output=logs/exp_4_phase_3.out
+#SBATCH --error=logs/exp_4_phase_3.err
 #SBATCH --mail-user=m4sedagh@uwaterloo.ca
 #SBATCH --mail-type=ALL
 

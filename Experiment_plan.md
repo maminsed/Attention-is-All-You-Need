@@ -1,12 +1,9 @@
-
-Test sentences:
-
-
+Best BLEU is not BLEU at best epoch, it's best BLEU in general. 
 
 ### Experiment 1: Initial config
 - location: runs/exp_1/
 - best epoch: 15
-- best BLEU: 0.314
+- best BLEU: 0.313
 - best non_smoothed_val_loss: 1.65
 
 Personal insights:
@@ -68,5 +65,31 @@ Personal Insights:
 
 Personal Insights:
 - even worse validation behaviour than PRE-lN + no warmup. 
+- it did not overfit but it takes extremly long to train and batch loss has higher instability
 
 *Feature Implemented* -> broke down forward into encode and decode for faster val/inference. 
+
+### Experiment 4 - phase 1: 64 batch_size
+- location: runs/exp_4_phase_1/
+- best_epoch: 13
+- best non_smoothed_val_loss: 1.64
+- best BLEU: 0.313
+
+
+Perosnal Insight:
+- better performance than initial config and exp2_phase1, but with way less epoch total time
+- manual testing showed it still has the same problems, which makes me think its also remotly the issue of data. 
+
+
+
+### Experiment 4 - phase 2: 128 batch_size
+- location: runs/exp_4_phase_2/
+- best_epoch: 11
+- best non_smoothed_val_loss: 1.632
+- best BLEU: 0.315
+
+
+Personal Insight:
+- even better performance than exp4 phase 1 with less total epoch time
+- manual testing still shows the same thing tho. 
+- it seems to have higher early batch_loss and non smoothed val loss at first which is why Im thinking a higher peak_lr could be helpful. 

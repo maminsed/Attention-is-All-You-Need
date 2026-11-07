@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_4_phase_2"
+save_file_path_root = "./runs/exp_4_phase_3"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -89,7 +89,10 @@ phase 1:
 - batch_size: 64
 phase 2: 
 - batch_size: 128 (if compute can handle it)
-phase 3: 
+phase 3:
+- batch_size: 128
+- same peak_lr but lower warmup steps to be 1/4 of the original wamrup steps so number of updates seen is kinda comparable
+phase 4: 
 - batch_size: 128 (if compute can handle it)
 -> Double peak LR (or 1.4x) because 128 has more stable gradients 
      so it can use higher peak_lr to utlize information better
@@ -139,8 +142,8 @@ config = {
     "optim_betas": [0.9, 0.98],
     "optim_eps": 1e-9,
     ### Scheduler
-    "warmup_steps": 3000, # lowering a bit since were training for less epochs
-    "peak_lr": -1, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
+    "warmup_steps": 750, # lowering a bit since were training for less epochs
+    "peak_lr": 0.0008068715304598784, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
     "warmup_strat": "rise", # "constant" or "rise" 
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
@@ -723,6 +726,7 @@ def calculate_val_loss(bleu_calc:bool,tokens_so_far):
     if bleu_calc:
         avg_metrics[-1] = calculate_bleu(val_loader,model,sp_bpe).item()
         writer.add_scalar(f"loss_val/{metrics[-1].name}",avg_metrics[-1],tsi)
+        global best_bleu
         best_bleu = max(best_bleu,avg_metrics[-1])
 
     return avg_vloss, avg_metrics
