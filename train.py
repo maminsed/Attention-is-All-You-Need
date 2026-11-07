@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_4_phase_1"
+save_file_path_root = "./runs/exp_4_phase_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -29,7 +29,7 @@ tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 800
+VERBOSE_FREQ = 200
 SAVE_FREQ=20_000
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
@@ -129,7 +129,7 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 64,
+    "batch_size": 128,
     "val_batch_size": 64,
     "epochs": 25,
     "early_stopping_limit": 5,
