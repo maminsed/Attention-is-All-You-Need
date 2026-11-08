@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_4_phase_2"
+save_file_path_root = "./runs/exp_4_phase_4"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -92,10 +92,11 @@ phase 2:
 phase 3:
 - batch_size: 128
 - same peak_lr but lower warmup steps to be 1/4 of the original wamrup steps so number of updates seen is kinda comparable
-phase 4: 
-- batch_size: 128 (if compute can handle it)
--> Double peak LR (or 1.4x) because 128 has more stable gradients 
-     so it can use higher peak_lr to utlize information better
+phase 4:
+- batch_size: 128
+- same peak_lr as p2,3
+- 1/4 warmup steps
+- slow_decay tau: 3000
 
 Experiment 5: N:
 phase 1:
@@ -144,7 +145,8 @@ config = {
     ### Scheduler
     "warmup_steps": 750, # lowering a bit since were training for less epochs
     "peak_lr": 0.0008068715304598784, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
-    "warmup_strat": "rise", # "constant" or "rise" 
+    "warmup_strat": "slow_decay", # "constant" or "rise" or "slow_decay"
+    "tau": 3000, # -1 or number (when slow_decay)
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,
@@ -193,7 +195,8 @@ assert config["h"] * config["d_v"] == config["d_model"]
 assert DEVICE == "cuda"
 assert config["filtering_strategy"] in ["drop","cut"]
 assert config["ln_strat"] in ["PRE_LN","POST_LN"]
-assert config["warmup_strat"] in ["rise","constant"] 
+assert config["warmup_strat"] in ["rise","constant","slow_decay"]
+assert config["warmup_strat"] != "slow_decay" or config["tau"] > 0
 assert SAVE_FREQ % VERBOSE_FREQ == 0
 if not config["tokenization_cache"]:
     print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
@@ -963,8 +966,10 @@ def lr_update_fn(step):
     step = max(step,1)
     if config["warmup_strat"] == "rise":
         lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5) * config["lr_multiplier"]
-    else:
+    elif config["warmup_strat"] == "constant":
         lr = min(SQRT_INV_DM*step**-0.5* config["lr_multiplier"],config["peak_lr"])
+    elif config["warmup_strat"] == "slow_decay":
+        lr = config["peak_lr"]*min((1+(step-config["warmup_steps"])/config["tau"])**-0.5,step/config["warmup_steps"])
     return lr
 
 def load_best_model(latest=False):

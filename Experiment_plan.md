@@ -109,3 +109,15 @@ Personal Insights:
 
 
 *Feature Implemented* -> kv_cache
+
+### Experiment 4 - phase 4: 128 batch_size, same warmup as phase 3, slower decay
+- best_epoch: 23
+- best non_smoothed_val_loss: 1.6487
+- best BLEU: 0.3113
+
+
+Personal Insights:
+- It's performing better early loss compared to exp4-p2 and better late stage score compared to exp4-p3. 
+- However, it still cannnot match the exp4-p2 performance. 
+- I would say it's performing similar to exp2-p1's perfomance. 
+- I believe this lack of performance is because of too little optimizer steps, which is why for the final phase of this experiment group, I will do bs=32, and a slower decay
