@@ -93,3 +93,19 @@ Personal Insight:
 - even better performance than exp4 phase 1 with less total epoch time
 - manual testing still shows the same thing tho. 
 - it seems to have higher early batch_loss and non smoothed val loss at first which is why Im thinking a higher peak_lr could be helpful. 
+
+
+### Experiment 4 - phase 3: 128 batch_size, but same warmup (tokens seens) and peak_lr
+- location: runs/exp_4_phase_3/
+- best_epoch: 9
+- non_smoothed_val_loss: 1.686
+- best BLEU: 0.305
+
+Personal Insights: 
+- while it has better early training behaviour than exp_4_phase_2, it has worse end training behaviour than it and overfits earlier. 
+- Moreover, it also performs worse than exp2_p1
+- This points to the fact that maybe the improvement in exp4_p2 was because we had higher learning rate later in training
+- these all point to exp4_p4 which would studies a learning rate that decays slower
+
+
+*Feature Implemented* -> kv_cache
