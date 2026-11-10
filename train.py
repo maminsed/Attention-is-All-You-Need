@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_4_phase_5"
+save_file_path_root = "./runs/exp_5_phase_1"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -29,7 +29,7 @@ tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 800
+VERBOSE_FREQ = 200
 SAVE_FREQ=20_000
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
@@ -128,8 +128,8 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 4,  # number of encoder layers
-    "num_dec_layers": 4,  # number of encoder layers
+    "num_enc_layers": 3,  # number of encoder layers
+    "num_dec_layers": 3,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.1,
@@ -138,7 +138,7 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 32,
+    "batch_size": 128,
     "val_batch_size": 64,
     "epochs": 25,
     "early_stopping_limit": 5,
@@ -150,8 +150,8 @@ config = {
     ### Scheduler
     "warmup_steps": 3_000, # lowering a bit since were training for less epochs
     "peak_lr": 0.0008068715304598784, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
-    "warmup_strat": "slow_decay", # "constant" or "rise" or "slow_decay"
-    "tau": 5000, # -1 or number (when slow_decay)
+    "warmup_strat": "rise", # "constant" or "rise" or "slow_decay"
+    "tau": -1, # -1 or number (when slow_decay)
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,

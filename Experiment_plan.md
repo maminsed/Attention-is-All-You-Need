@@ -132,3 +132,12 @@ Personal Insights:
 - Im assuming maybe thats because batch size 32 has higher noise and thats the reason high lr is not neccessarily a good thing, while bs 128 reduces that noise a lot so it can use higher lr. 
 - I guess the whole experiment 4 also showed that early performance and late performance does not always go hand in hand. 
 
+
+### Experiment 5 - phase 1: (exp4-phase2 cont.) num layers: 3
+- best epoch: 11
+- best non_smoothed_val_loss: 1.669
+- best BLEU: 0.3099
+
+Personal Insights:
+- Worse performance than benchmark, kinda similar performance to exp2-p1 (even worse)
+- Im guessing scaling laws...
