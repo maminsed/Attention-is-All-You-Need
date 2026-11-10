@@ -1,0 +1,159 @@
+2026-11-10 16:38:48.825494: code started: 
+2026-11-10 16:38:48.825633: DEVICE: cuda
+2026-11-10 16:38:48.829862: encoding train started
+2026-11-10 16:38:48.831359 cache found
+2026-11-10 16:38:49.007557: encoding val started
+2026-11-10 16:38:49.008374 cache found
+2026-11-10 16:38:49.014253: # train size: #Tokens: X: 5,793,549 Y: 5,652,819 #Sentences: 204,029, num_dropped: 0
+2026-11-10 16:38:49.014356: # val size: #Tokens: X: 27,871 Y: 26,699 #Sentences: 873, num_dropped: 0
+2026-11-10 16:38:49.014379: batches/epoch: 1,594. LR peak: 0.0008068715304598784
+/u701/m4sedagh/Attention-is-All-You-Need/train.py:219: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:213.)
+  self.X = torch.from_numpy(X)
+
+
+==============
+num_parameters: 47,686,656 - num_non_embedding_params: 44,102,656
+2026-11-10 16:38:49.626320: optimizer loaded
+2026-11-10 16:38:49.627396: scheduler loaded
+2026-11-10 16:38:49.627479: loss_fn loaded
+2026-11-10 16:38:49.627516: metrics loaded
+2026-11-10 16:38:49.627526: loading pre saved
+2026-11-10 16:38:50.193963: Starting from pre saved with: start_epoch: 24, best_val_loss: 1.5059, last_epoch_vloss: 1.51, non_improve_cnt: 0.00, best_bleu: 0.331
+2026-11-10 16:38:50.194088: training started!
+2026-11-10 16:38:50.194756: Epoch: 25
+2026-11-10 16:39:04.628036: [epoch 25] batch 199 loss_value: 2.4162, batch_time (s): 0.064, data_loading_time (ms): 3.616, tokens/sec: 204,896.461
+2026-11-10 16:39:17.918177: [epoch 25] batch 399 loss_value: 2.0441, batch_time (s): 0.057, data_loading_time (ms): 2.077, tokens/sec: 120,929.482
+2026-11-10 16:39:31.416783: [epoch 25] batch 599 loss_value: 2.3503, batch_time (s): 0.063, data_loading_time (ms): 2.527, tokens/sec: 140,945.313
+2026-11-10 16:39:44.777308: [epoch 25] batch 799 loss_value: 2.1803, batch_time (s): 0.058, data_loading_time (ms): 3.463, tokens/sec: 136,610.057
+2026-11-10 16:39:57.984788: [epoch 25] batch 999 loss_value: 1.6358, batch_time (s): 0.057, data_loading_time (ms): 3.062, tokens/sec: 65,004.620
+2026-11-10 16:40:10.800313: [epoch 25] batch 1199 loss_value: 1.7138, batch_time (s): 0.056, data_loading_time (ms): 2.108, tokens/sec: 59,778.523
+2026-11-10 16:40:23.535365: [epoch 25] batch 1399 loss_value: 2.0381, batch_time (s): 0.061, data_loading_time (ms): 2.903, tokens/sec: 90,368.156
+2026-11-10 16:40:36.654053 started calculating bleu
+2026-11-10 16:40:42.049495 finished calculating bleu - avg bleu: 32.42 - total_time: 5.394867181777954 - avg_eos_idx: 27.65
+2026-11-10 16:40:42.050194: [epoch 25]: tokens_trained_so_far: 150,632,274 avg_loss: 2.1489, non_smoothed_loss_fn: 1.084, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.508, bleu_calculations_val: 0.324, avg_vloss: 2.5838, avg_time (s): 0.063, epoch_time (s): 106.173
+2026-11-10 16:40:42.050315: [epoch 25]: epoch did not improve!
+2026-11-10 16:40:42.050327: [epoch 25]: Still not better than max epoch.
+2026-11-10 16:40:43.376122: [epoch 25]: Config saved
+2026-11-10 16:40:43.378008: Epoch: 26
+2026-11-10 16:40:56.623978: [epoch 26] batch 199 loss_value: 2.1631, batch_time (s): 0.066, data_loading_time (ms): 2.729, tokens/sec: 119,914.103
+2026-11-10 16:41:09.340842: [epoch 26] batch 399 loss_value: 1.6245, batch_time (s): 0.056, data_loading_time (ms): 3.012, tokens/sec: 66,538.696
+2026-11-10 16:41:22.210911: [epoch 26] batch 599 loss_value: 1.8975, batch_time (s): 0.069, data_loading_time (ms): 2.615, tokens/sec: 72,556.157
+2026-11-10 16:41:35.411241: [epoch 26] batch 799 loss_value: 2.2977, batch_time (s): 0.058, data_loading_time (ms): 2.649, tokens/sec: 166,734.239
+2026-11-10 16:41:48.731397: [epoch 26] batch 999 loss_value: 2.8486, batch_time (s): 0.079, data_loading_time (ms): 3.225, tokens/sec: 344,229.862
+2026-11-10 16:42:01.818491: [epoch 26] batch 1199 loss_value: 1.9597, batch_time (s): 0.069, data_loading_time (ms): 3.060, tokens/sec: 80,294.701
+2026-11-10 16:42:15.105086: [epoch 26] batch 1399 loss_value: 2.1099, batch_time (s): 0.059, data_loading_time (ms): 2.383, tokens/sec: 105,006.291
+2026-11-10 16:42:27.576527 started calculating bleu
+2026-11-10 16:42:32.043263 finished calculating bleu - avg bleu: 33.20 - total_time: 4.466518402099609 - avg_eos_idx: 28.32
+2026-11-10 16:42:32.043688: [epoch 26]: tokens_trained_so_far: 156,425,823 avg_loss: 2.1371, non_smoothed_loss_fn: 1.070, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.510, bleu_calculations_val: 0.332, avg_vloss: 2.5832, avg_time (s): 0.061, epoch_time (s): 103.931
+2026-11-10 16:42:32.044002: [epoch 26]: epoch did not improve!
+2026-11-10 16:42:32.044014: [epoch 26]: Still not better than max epoch.
+2026-11-10 16:42:33.410661: [epoch 26]: Config saved
+2026-11-10 16:42:33.411835: Epoch: 27
+2026-11-10 16:42:46.444350: [epoch 27] batch 199 loss_value: 1.9860, batch_time (s): 0.062, data_loading_time (ms): 2.536, tokens/sec: 98,892.123
+2026-11-10 16:42:59.274906: [epoch 27] batch 399 loss_value: 1.8217, batch_time (s): 0.061, data_loading_time (ms): 2.655, tokens/sec: 87,624.122
+2026-11-10 16:43:13.620393: [epoch 27] batch 599 loss_value: 1.8259, batch_time (s): 0.060, data_loading_time (ms): 3.048, tokens/sec: 70,582.372
+2026-11-10 16:43:26.517256: [epoch 27] batch 799 loss_value: 1.6595, batch_time (s): 0.059, data_loading_time (ms): 2.085, tokens/sec: 54,180.787
+2026-11-10 16:43:39.526936: [epoch 27] batch 999 loss_value: 2.7241, batch_time (s): 0.062, data_loading_time (ms): 3.280, tokens/sec: 323,596.154
+2026-11-10 16:43:52.282675: [epoch 27] batch 1199 loss_value: 2.3985, batch_time (s): 0.059, data_loading_time (ms): 2.028, tokens/sec: 214,145.297
+2026-11-10 16:44:04.495538: [epoch 27] batch 1399 loss_value: 2.5511, batch_time (s): 0.064, data_loading_time (ms): 1.992, tokens/sec: 282,194.451
+2026-11-10 16:44:17.173772 started calculating bleu
+2026-11-10 16:44:20.113573 finished calculating bleu - avg bleu: 32.70 - total_time: 2.939610481262207 - avg_eos_idx: 28.03
+2026-11-10 16:44:20.114164: [epoch 27]: tokens_trained_so_far: 162,219,372 avg_loss: 2.1258, non_smoothed_loss_fn: 1.057, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.510, bleu_calculations_val: 0.327, avg_vloss: 2.5819, avg_time (s): 0.061, epoch_time (s): 103.490
+2026-11-10 16:44:20.114267: [epoch 27]: Still not better than max epoch.
+2026-11-10 16:44:21.444974: [epoch 27]: Config saved
+2026-11-10 16:44:21.446882: Epoch: 28
+2026-11-10 16:44:35.422393: [epoch 28] batch 199 loss_value: 2.0315, batch_time (s): 0.070, data_loading_time (ms): 3.742, tokens/sec: 102,838.631
+2026-11-10 16:44:48.904371: [epoch 28] batch 399 loss_value: 1.8843, batch_time (s): 0.058, data_loading_time (ms): 2.671, tokens/sec: 111,964.279
+2026-11-10 16:45:02.367325: [epoch 28] batch 599 loss_value: 2.1557, batch_time (s): 0.050, data_loading_time (ms): 2.655, tokens/sec: 160,390.688
+2026-11-10 16:45:14.767638: [epoch 28] batch 799 loss_value: 1.6947, batch_time (s): 0.060, data_loading_time (ms): 2.654, tokens/sec: 78,749.410
+2026-11-10 16:45:27.371815: [epoch 28] batch 999 loss_value: 2.9125, batch_time (s): 0.065, data_loading_time (ms): 2.523, tokens/sec: 499,865.089
+2026-11-10 16:45:40.411779: [epoch 28] batch 1199 loss_value: 1.7168, batch_time (s): 0.061, data_loading_time (ms): 2.087, tokens/sec: 56,566.317
+2026-11-10 16:45:53.567630: [epoch 28] batch 1399 loss_value: 2.2077, batch_time (s): 0.059, data_loading_time (ms): 2.655, tokens/sec: 134,953.442
+2026-11-10 16:46:06.267768 started calculating bleu
+2026-11-10 16:46:10.504943 finished calculating bleu - avg bleu: 32.50 - total_time: 4.2369842529296875 - avg_eos_idx: 27.95
+2026-11-10 16:46:10.505310: [epoch 28]: tokens_trained_so_far: 168,012,921 avg_loss: 2.1154, non_smoothed_loss_fn: 1.045, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.514, bleu_calculations_val: 0.325, avg_vloss: 2.5836, avg_time (s): 0.062, epoch_time (s): 104.554
+2026-11-10 16:46:10.505611: [epoch 28]: epoch did not improve!
+2026-11-10 16:46:10.505632: [epoch 28]: Still not better than max epoch.
+2026-11-10 16:46:11.870470: [epoch 28]: Config saved
+2026-11-10 16:46:11.872305: Epoch: 29
+2026-11-10 16:46:24.927274: [epoch 29] batch 199 loss_value: 2.2847, batch_time (s): 0.057, data_loading_time (ms): 2.622, tokens/sec: 194,034.411
+2026-11-10 16:46:37.916115: [epoch 29] batch 399 loss_value: 2.3036, batch_time (s): 0.060, data_loading_time (ms): 3.002, tokens/sec: 186,045.222
+2026-11-10 16:46:51.117529: [epoch 29] batch 599 loss_value: 1.9090, batch_time (s): 0.072, data_loading_time (ms): 3.242, tokens/sec: 78,190.864
+2026-11-10 16:47:04.997813: [epoch 29] batch 799 loss_value: 1.5436, batch_time (s): 0.058, data_loading_time (ms): 3.688, tokens/sec: 46,208.565
+2026-11-10 16:47:18.903882: [epoch 29] batch 999 loss_value: 1.9427, batch_time (s): 0.071, data_loading_time (ms): 3.830, tokens/sec: 75,749.491
+2026-11-10 16:47:32.443790: [epoch 29] batch 1199 loss_value: 2.1913, batch_time (s): 0.064, data_loading_time (ms): 3.106, tokens/sec: 131,820.002
+2026-11-10 16:47:46.279585: [epoch 29] batch 1399 loss_value: 2.3179, batch_time (s): 0.061, data_loading_time (ms): 3.261, tokens/sec: 162,788.712
+2026-11-10 16:47:59.208913 started calculating bleu
+2026-11-10 16:48:04.018462 finished calculating bleu - avg bleu: 32.92 - total_time: 4.809354543685913 - avg_eos_idx: 27.79
+2026-11-10 16:48:04.018873: [epoch 29]: tokens_trained_so_far: 173,806,470 avg_loss: 2.1053, non_smoothed_loss_fn: 1.033, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.508, bleu_calculations_val: 0.329, avg_vloss: 2.5817, avg_time (s): 0.063, epoch_time (s): 107.069
+2026-11-10 16:48:04.019187: [epoch 29]: Still not better than max epoch.
+2026-11-10 16:48:05.373878: [epoch 29]: Config saved
+2026-11-10 16:48:05.374688: Epoch: 30
+2026-11-10 16:48:18.481761: [epoch 30] batch 199 loss_value: 2.4682, batch_time (s): 0.063, data_loading_time (ms): 2.078, tokens/sec: 222,910.573
+2026-11-10 16:48:31.389420: [epoch 30] batch 399 loss_value: 2.7889, batch_time (s): 0.061, data_loading_time (ms): 3.505, tokens/sec: 411,371.333
+2026-11-10 16:48:44.318512: [epoch 30] batch 599 loss_value: 2.5376, batch_time (s): 0.064, data_loading_time (ms): 3.080, tokens/sec: 240,927.553
+2026-11-10 16:48:56.762978: [epoch 30] batch 799 loss_value: 2.3630, batch_time (s): 0.053, data_loading_time (ms): 2.184, tokens/sec: 195,281.017
+2026-11-10 16:49:10.205276: [epoch 30] batch 999 loss_value: 2.0264, batch_time (s): 0.067, data_loading_time (ms): 4.749, tokens/sec: 118,707.705
+2026-11-10 16:49:23.547288: [epoch 30] batch 1199 loss_value: 2.4418, batch_time (s): 0.064, data_loading_time (ms): 2.732, tokens/sec: 199,716.874
+2026-11-10 16:49:37.482738: [epoch 30] batch 1399 loss_value: 2.3504, batch_time (s): 0.063, data_loading_time (ms): 4.185, tokens/sec: 178,116.208
+2026-11-10 16:49:51.747009 started calculating bleu
+2026-11-10 16:49:54.895373 finished calculating bleu - avg bleu: 32.80 - total_time: 3.1481523513793945 - avg_eos_idx: 28.23
+2026-11-10 16:49:54.896027: [epoch 30]: tokens_trained_so_far: 179,600,019 avg_loss: 2.0963, non_smoothed_loss_fn: 1.023, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.510, bleu_calculations_val: 0.328, avg_vloss: 2.5838, avg_time (s): 0.063, epoch_time (s): 106.098
+2026-11-10 16:49:54.896137: [epoch 30]: epoch did not improve!
+2026-11-10 16:49:54.896149: [epoch 30]: Still not better than max epoch.
+2026-11-10 16:49:56.245644: [epoch 30]: Config saved
+2026-11-10 16:49:56.247489: Epoch: 31
+2026-11-10 16:50:09.389713: [epoch 31] batch 199 loss_value: 1.6205, batch_time (s): 0.057, data_loading_time (ms): 2.626, tokens/sec: 62,464.723
+2026-11-10 16:50:22.921550: [epoch 31] batch 399 loss_value: 1.9622, batch_time (s): 0.066, data_loading_time (ms): 2.767, tokens/sec: 87,927.701
+2026-11-10 16:50:36.607371: [epoch 31] batch 599 loss_value: 1.9705, batch_time (s): 0.067, data_loading_time (ms): 3.313, tokens/sec: 98,806.517
+2026-11-10 16:50:50.391821: [epoch 31] batch 799 loss_value: 2.5492, batch_time (s): 0.062, data_loading_time (ms): 2.769, tokens/sec: 282,377.863
+2026-11-10 16:51:04.430714: [epoch 31] batch 999 loss_value: 2.5729, batch_time (s): 0.078, data_loading_time (ms): 4.495, tokens/sec: 207,167.989
+2026-11-10 16:51:18.366939: [epoch 31] batch 1199 loss_value: 2.3239, batch_time (s): 0.060, data_loading_time (ms): 3.191, tokens/sec: 186,827.061
+2026-11-10 16:51:32.067430: [epoch 31] batch 1399 loss_value: 2.5240, batch_time (s): 0.068, data_loading_time (ms): 4.612, tokens/sec: 225,824.294
+2026-11-10 16:51:45.303536 started calculating bleu
+2026-11-10 16:51:48.896219 finished calculating bleu - avg bleu: 32.61 - total_time: 3.59249210357666 - avg_eos_idx: 28.04
+2026-11-10 16:51:48.896611: [epoch 31]: tokens_trained_so_far: 185,393,568 avg_loss: 2.0865, non_smoothed_loss_fn: 1.011, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.515, bleu_calculations_val: 0.326, avg_vloss: 2.5860, avg_time (s): 0.064, epoch_time (s): 108.779
+2026-11-10 16:51:48.896699: [epoch 31]: epoch did not improve!
+2026-11-10 16:51:48.896711: [epoch 31]: Still not better than max epoch.
+2026-11-10 16:51:50.221627: [epoch 31]: Config saved
+2026-11-10 16:51:50.223393: Epoch: 32
+2026-11-10 16:52:03.243133: [epoch 32] batch 199 loss_value: 2.0495, batch_time (s): 0.063, data_loading_time (ms): 4.102, tokens/sec: 123,826.455
+2026-11-10 16:52:16.666721: [epoch 32] batch 399 loss_value: 1.8554, batch_time (s): 0.057, data_loading_time (ms): 3.639, tokens/sec: 98,746.024
+2026-11-10 16:52:30.195829: [epoch 32] batch 599 loss_value: 2.3022, batch_time (s): 0.059, data_loading_time (ms): 2.183, tokens/sec: 181,630.982
+2026-11-10 16:52:43.374477: [epoch 32] batch 799 loss_value: 2.5223, batch_time (s): 0.059, data_loading_time (ms): 2.794, tokens/sec: 286,892.571
+2026-11-10 16:52:56.603341: [epoch 32] batch 999 loss_value: 2.0730, batch_time (s): 0.059, data_loading_time (ms): 2.205, tokens/sec: 124,254.481
+2026-11-10 16:53:09.864188: [epoch 32] batch 1199 loss_value: 2.2577, batch_time (s): 0.063, data_loading_time (ms): 3.128, tokens/sec: 141,670.614
+2026-11-10 16:53:22.837812: [epoch 32] batch 1399 loss_value: 2.0447, batch_time (s): 0.064, data_loading_time (ms): 2.949, tokens/sec: 108,111.342
+2026-11-10 16:53:35.521629 started calculating bleu
+2026-11-10 16:53:41.362529 finished calculating bleu - avg bleu: 32.63 - total_time: 5.8406171798706055 - avg_eos_idx: 27.85
+2026-11-10 16:53:41.363410: [epoch 32]: tokens_trained_so_far: 191,187,117 avg_loss: 2.0779, non_smoothed_loss_fn: 1.001, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.520, bleu_calculations_val: 0.326, avg_vloss: 2.5924, avg_time (s): 0.062, epoch_time (s): 105.027
+2026-11-10 16:53:41.363543: [epoch 32]: epoch did not improve!
+2026-11-10 16:53:41.363555: [epoch 32]: Still not better than max epoch.
+2026-11-10 16:53:42.716203: [epoch 32]: Config saved
+2026-11-10 16:53:42.717204: Epoch: 33
+2026-11-10 16:53:56.645261: [epoch 33] batch 199 loss_value: 1.7040, batch_time (s): 0.073, data_loading_time (ms): 4.243, tokens/sec: 61,554.857
+2026-11-10 16:54:10.817735: [epoch 33] batch 399 loss_value: 2.5444, batch_time (s): 0.070, data_loading_time (ms): 2.865, tokens/sec: 230,260.621
+2026-11-10 16:54:23.940012: [epoch 33] batch 599 loss_value: 1.5049, batch_time (s): 0.057, data_loading_time (ms): 2.598, tokens/sec: 44,961.992
+2026-11-10 16:54:36.918828: [epoch 33] batch 799 loss_value: 1.7710, batch_time (s): 0.057, data_loading_time (ms): 2.556, tokens/sec: 91,544.564
+2026-11-10 16:54:49.794801: [epoch 33] batch 999 loss_value: 2.6572, batch_time (s): 0.066, data_loading_time (ms): 2.584, tokens/sec: 286,711.369
+2026-11-10 16:55:02.669811: [epoch 33] batch 1199 loss_value: 1.8779, batch_time (s): 0.056, data_loading_time (ms): 2.771, tokens/sec: 102,461.930
+2026-11-10 16:55:15.895443: [epoch 33] batch 1399 loss_value: 1.9927, batch_time (s): 0.064, data_loading_time (ms): 2.697, tokens/sec: 112,560.403
+2026-11-10 16:55:28.681979 started calculating bleu
+2026-11-10 16:55:31.965728 finished calculating bleu - avg bleu: 32.84 - total_time: 3.2835443019866943 - avg_eos_idx: 27.95
+2026-11-10 16:55:31.966085: [epoch 33]: tokens_trained_so_far: 196,980,666 avg_loss: 2.0693, non_smoothed_loss_fn: 0.991, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.516, bleu_calculations_val: 0.328, avg_vloss: 2.5899, avg_time (s): 0.062, epoch_time (s): 105.700
+2026-11-10 16:55:31.966184: [epoch 33]: Still not better than max epoch.
+2026-11-10 16:55:33.369074: [epoch 33]: Config saved
+2026-11-10 16:55:33.370934: Epoch: 34
+2026-11-10 16:55:46.781736: [epoch 34] batch 199 loss_value: 2.5374, batch_time (s): 0.061, data_loading_time (ms): 3.128, tokens/sec: 271,047.941
+2026-11-10 16:56:01.288155: [epoch 34] batch 399 loss_value: 2.1146, batch_time (s): 0.076, data_loading_time (ms): 4.942, tokens/sec: 105,031.969
+2026-11-10 16:56:14.854691: [epoch 34] batch 599 loss_value: 2.1372, batch_time (s): 0.060, data_loading_time (ms): 4.351, tokens/sec: 139,813.494
+2026-11-10 16:56:28.861257: [epoch 34] batch 799 loss_value: 2.0194, batch_time (s): 0.084, data_loading_time (ms): 3.511, tokens/sec: 80,674.328
+2026-11-10 16:56:43.162656: [epoch 34] batch 999 loss_value: 1.6270, batch_time (s): 0.066, data_loading_time (ms): 3.612, tokens/sec: 62,102.572
+2026-11-10 16:56:57.600800: [epoch 34] batch 1199 loss_value: 2.3160, batch_time (s): 0.063, data_loading_time (ms): 4.232, tokens/sec: 172,946.569
+2026-11-10 16:57:12.125539: [epoch 34] batch 1399 loss_value: 2.2804, batch_time (s): 0.061, data_loading_time (ms): 3.911, tokens/sec: 166,329.932
+2026-11-10 16:57:24.112891 started calculating bleu
+2026-11-10 16:57:27.647244 finished calculating bleu - avg bleu: 32.99 - total_time: 3.5341553688049316 - avg_eos_idx: 28.19
+2026-11-10 16:57:27.647663: [epoch 34]: tokens_trained_so_far: 202,774,215 avg_loss: 2.0611, non_smoothed_loss_fn: 0.982, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.515, bleu_calculations_val: 0.330, avg_vloss: 2.5876, avg_time (s): 0.065, epoch_time (s): 110.508
+2026-11-10 16:57:27.647754: [epoch 34]: Still not better than max epoch.
+2026-11-10 16:57:28.793540: [epoch 34]: Config saved
+2026-11-10 16:57:28.793629: Done training! 

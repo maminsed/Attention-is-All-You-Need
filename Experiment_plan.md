@@ -150,6 +150,17 @@ Personal Insights:
 
 Personal Insights: 
 - Achieves better performance in lower epochs, but also as a result it's more suseptible to overfitting, so the rate of increase in val loss is much faster when it's overfitting. 
-- Best so far. 
+- Best so far. winner of this experiment. 
 - Again scaling laws coming in effect, however, this is making the 20x train data harder. 
 - 29M params -> 44M params, almost double while tokens stay at 5M tokens, 1/9
+
+
+### Experiment 6 - phase 1: dropout -> 0.3
+- best epoch: 24 (/34)
+- best non_smoothed_val_loss: 1.505
+- best BLEU: 0.3320
+
+Personal Insight:
+- we saw in exp5-p2 that it has very high potential but it overfits early, so I think higher dropout was a really good choice because it allowed the model to not overfit and train for longer, hence a higher epoch. 
+- It did have lower train performance as expected and worse early training performnace. which are all expected.
+- Im assuming these are a lot would change with the scaling laws so I will be careful with wmt_14

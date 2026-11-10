@@ -21,17 +21,17 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_5_phase_2"
+save_file_path_root = "./runs/exp_6_phase_1"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 200
 SAVE_FREQ=20_000
-STOP_AFTER_EPOCH=30
+STOP_AFTER_EPOCH=40
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
@@ -111,7 +111,7 @@ phase 3:
 
 Experiment 6: dropout:
 phase 1: 
-- dropout: 0.2
+- dropout: 0.3
 phase 2:
 - dropout: 0.2
 - word_dropout: 0.1
@@ -130,15 +130,15 @@ config = {
     "num_dec_layers": 6,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
-    "drop_pre_norm": 0.1,
-    "drop_post_emb": 0.1,
+    "drop_pre_norm": 0.3,
+    "drop_post_emb": 0.3,
     "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
 
     # Training params
     "benchmark_mode": False,
     "batch_size": 128,
     "val_batch_size": 64,
-    "epochs": 25,
+    "epochs": 35,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
