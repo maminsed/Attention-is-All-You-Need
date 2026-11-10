@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_5_phase_1"
+save_file_path_root = "./runs/exp_5_phase_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -106,8 +106,6 @@ phase 5:
 Experiment 5: N:
 phase 1:
 - num_enc_layers/num_dec_layers: 3
-phase 2:
-- N: 2
 phase 3: 
 - N: 6
 
@@ -128,8 +126,8 @@ config = {
     "d_k": 64,
     "d_ff": 2048,  # MLPs hidden layers activation,
     "h": 8,  # number of heads per attention layer, h * d_k = d_model
-    "num_enc_layers": 3,  # number of encoder layers
-    "num_dec_layers": 3,  # number of encoder layers
+    "num_enc_layers": 6,  # number of encoder layers
+    "num_dec_layers": 6,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
     "drop_pre_norm": 0.1,

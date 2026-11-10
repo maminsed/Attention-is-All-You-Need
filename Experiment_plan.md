@@ -141,3 +141,15 @@ Personal Insights:
 Personal Insights:
 - Worse performance than benchmark, kinda similar performance to exp2-p1 (even worse)
 - Im guessing scaling laws...
+
+
+### Experiment 5 - phase 2: num layers: 6
+- best epoch: 9
+- best non_smoothed_val_loss: 1.604
+- best BLEU: 0.3197
+
+Personal Insights: 
+- Achieves better performance in lower epochs, but also as a result it's more suseptible to overfitting, so the rate of increase in val loss is much faster when it's overfitting. 
+- Best so far. 
+- Again scaling laws coming in effect, however, this is making the 20x train data harder. 
+- 29M params -> 44M params, almost double while tokens stay at 5M tokens, 1/9
