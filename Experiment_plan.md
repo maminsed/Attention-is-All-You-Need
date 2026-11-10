@@ -111,7 +111,7 @@ Personal Insights:
 *Feature Implemented* -> kv_cache
 
 ### Experiment 4 - phase 4: 128 batch_size, same warmup as phase 3, slower decay
-- best_epoch: 23
+- best_epoch: 11
 - best non_smoothed_val_loss: 1.6487
 - best BLEU: 0.3113
 
@@ -121,3 +121,14 @@ Personal Insights:
 - However, it still cannnot match the exp4-p2 performance. 
 - I would say it's performing similar to exp2-p1's perfomance. 
 - I believe this lack of performance is because of too little optimizer steps, which is why for the final phase of this experiment group, I will do bs=32, and a slower decay
+
+### Experiment 4 - phaes 5: 32 batch_size, slower_decay, tau: 5k
+- best epoch: 13
+- best non_smoothed_val_loss: 1.659
+- best BLEU: 0.308
+
+Personal Insights:
+- It seems like this is performing worse than p4 and p2 and exp2-p1, Im guessing this doesn't support that in batch size 32 higher lr neccessarily helps. 
+- Im assuming maybe thats because batch size 32 has higher noise and thats the reason high lr is not neccessarily a good thing, while bs 128 reduces that noise a lot so it can use higher lr. 
+- I guess the whole experiment 4 also showed that early performance and late performance does not always go hand in hand. 
+

@@ -21,7 +21,7 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_4_phase_4"
+save_file_path_root = "./runs/exp_4_phase_5"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -29,7 +29,7 @@ tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%
 
 LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 200
+VERBOSE_FREQ = 800
 SAVE_FREQ=20_000
 STOP_AFTER_EPOCH=30
 PAD_TOKEN = 3
@@ -97,6 +97,11 @@ phase 4:
 - same peak_lr as p2,3
 - 1/4 warmup steps
 - slow_decay tau: 3000
+phase 5:
+- batch_size: 32
+- same peak_lr
+- 3k warmup steps
+- slow_decay tau: 5k
 
 Experiment 5: N:
 phase 1:
@@ -133,7 +138,7 @@ config = {
 
     # Training params
     "benchmark_mode": False,
-    "batch_size": 128,
+    "batch_size": 32,
     "val_batch_size": 64,
     "epochs": 25,
     "early_stopping_limit": 5,
@@ -143,10 +148,10 @@ config = {
     "optim_betas": [0.9, 0.98],
     "optim_eps": 1e-9,
     ### Scheduler
-    "warmup_steps": 750, # lowering a bit since were training for less epochs
+    "warmup_steps": 3_000, # lowering a bit since were training for less epochs
     "peak_lr": 0.0008068715304598784, # either -1 or a number, which if it is a number we will calculate lr_multiplier baesd on that. 
     "warmup_strat": "slow_decay", # "constant" or "rise" or "slow_decay"
-    "tau": 3000, # -1 or number (when slow_decay)
+    "tau": 5000, # -1 or number (when slow_decay)
     ## Loss
     "loss": "CrossEntropyLoss",  # informational only
     "label_smoothing": 0.1,
@@ -952,7 +957,7 @@ def train_one_epoch(epoch,tokens_so_far):
 
     epoch_end = time.time()
     
-    avg_vloss, avg_val_metrics = calculate_val_loss(epoch%2==0,tokens_so_far)
+    avg_vloss, avg_val_metrics = calculate_val_loss(True,tokens_so_far)
     return (
         (total_loss / total_batches).item(), 
         [m.item() for m in (avg_metrics / total_batches)], 
@@ -964,12 +969,13 @@ def train_one_epoch(epoch,tokens_so_far):
 
 def lr_update_fn(step):
     step = max(step,1)
+    warmup_steps = config["warmup_steps"]
     if config["warmup_strat"] == "rise":
-        lr = SQRT_INV_DM*min(step**-0.5,step*config["warmup_steps"]**-1.5) * config["lr_multiplier"]
+        lr = config["peak_lr"]*min(step/warmup_steps,(warmup_steps/step)**0.5)
     elif config["warmup_strat"] == "constant":
-        lr = min(SQRT_INV_DM*step**-0.5* config["lr_multiplier"],config["peak_lr"])
+        lr = config["peak_lr"]*min((warmup_steps/step)**0.5,1)
     elif config["warmup_strat"] == "slow_decay":
-        lr = config["peak_lr"]*min((1+(step-config["warmup_steps"])/config["tau"])**-0.5,step/config["warmup_steps"])
+        lr = config["peak_lr"]*min((1+(step-warmup_steps)/config["tau"])**-0.5,step/config["warmup_steps"])
     return lr
 
 def load_best_model(latest=False):
