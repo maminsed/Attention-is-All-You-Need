@@ -21,17 +21,17 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_6_phase_2"
+save_file_path_root = "./runs/exp_6_phase_3"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 200
 SAVE_FREQ=20_000
-STOP_AFTER_EPOCH=40
+STOP_AFTER_EPOCH=100
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
@@ -137,14 +137,14 @@ config = {
     "drop_pre_norm": 0.3,
     "drop_post_emb": 0.3,
     "source_word_dropout": 0.1,
-    "target_word_dropout": 0.0,
+    "target_word_dropout": 0.1,
     "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
 
     # Training params
     "benchmark_mode": False,
     "batch_size": 128,
     "val_batch_size": 64,
-    "epochs": 35,
+    "epochs": 45,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -197,7 +197,7 @@ if config["benchmark_mode"]:
 # generally useful param:
 SQRT_INV_DM = 1/math.sqrt(config["d_model"])
 
-config["lr_multiplier"] = config["peak_lr"] / (SQRT_INV_DM/math.sqrt(config["warmup_steps"])) if config["peak_lr"] != -1 else 1
+
 config["peak_lr"] = SQRT_INV_DM*config["warmup_steps"]**-0.5 if config["peak_lr"] == -1 else config["peak_lr"]
 
 assert config["h"] * config["d_v"] == config["d_model"]

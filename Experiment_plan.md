@@ -1,5 +1,78 @@
 Best BLEU is not BLEU at best epoch, it's best BLEU in general. 
 
+### General Idea
+We will run some tests on the IWSLT. We will set baseline and in each experiment only change one var. 
+At each Experiment, we take the best var for the previous experiment. 
+If it looks epoch = 10 is not enough for a model (it hasn't started converging, we will increase epochs)
+BLEU change 1 is just a seed change now. Pick winners by non_smoothed_val_loss 
+
+Baseline:
+- vocab_size: 7000
+- dataset: iwslt_curated
+- filtering_strategy: drop
+- epoch: 10
+- use_amp: True
+- POST_LN
+
+Initial values: 
+- num_enc_layers/num_dec_layers: 4
+- batch_size: 32, 
+- warmup_steps: 3000
+- heads: 8,
+- drop_rate: 0.1
+
+
+Experiment 1: 
+- everything initial
+
+Experiment 2:
+phase 1: 
+- PRE_LN
+phase 2:
+- PRE LN without warmup steps.
+
+Experiment 3:
+phase 1:
+- Peak LR -> 0.5x
+phase 2:
+- Peak LR -> 2x
+
+Experiment 4: BS:
+phase 1:
+- batch_size: 64
+phase 2: 
+- batch_size: 128 (if compute can handle it)
+phase 3:
+- batch_size: 128
+- same peak_lr but lower warmup steps to be 1/4 of the original wamrup steps so number of updates seen is kinda comparable
+phase 4:
+- batch_size: 128
+- same peak_lr as p2,3
+- 1/4 warmup steps
+- slow_decay tau: 3000
+phase 5:
+- batch_size: 32
+- same peak_lr
+- 3k warmup steps
+- slow_decay tau: 5k
+
+Experiment 5: N:
+phase 1:
+- num_enc_layers/num_dec_layers: 3
+phase 3: 
+- N: 6
+
+Experiment 6: dropout:
+phase 1: 
+- dropout: 0.3
+phase 2:
+- dropout: 0.3
+- source_word_dropout: 0.1
+phase 3:
+- dropout: 0.3
+- source_word_dropout: 0.1
+- target_word_dropout: 0.1
+
 ### Experiment 1: Initial config
 - location: runs/exp_1/
 - best epoch: 15
@@ -174,3 +247,19 @@ Personal Insight:
 Personal Insights:
 - Again higher performance, allowed for less overfitting, however, it kicked in kinda late in training (epoch 21) and up until that point it was worse than exp6-p1. 
 - It did have lower BLEU tho which is interesting. Im assuming BLEU wouldn't see improvement unless the top word increased while loss would see improvement if not top decreased which is what dropout might be teaching...?
+
+
+### Experiment 6 - phase 3: target word dropout -> 0.1
+- best epoch: 38 (/40)
+- best non_smoothed_val_loss: 1.4673
+- best BLEU: 0.3390
+
+Personal Insights:
+- best performance so far. However, it didn't pass previous best until epoch 25. 
+- I believe the longer sequences have improved a lot, but it's missing a lot of the stuff like everyone, even, etc. (not exactly main parts of sentence but needed for sentence to make sense) - sometimes it uses synonyms but Im greedy decoding. 
+- Entire experiments are done so most of what I learned:
+    - early loss behaviour does not determine end loss behaviour
+    - the larger the network the better performance (at least up to 40M layers) However its extremly more prone to overfitting. 
+    - When your data is sparse, dropout is your best friend. 
+    - Batch size is a complicated thing, longer batch sizes give better performance when you combine them with higher lr (from what I've seen) because the gradients are more stable. 
+    - PRE_LN performs better, but it's not as stable that it does not need a warmup. 
