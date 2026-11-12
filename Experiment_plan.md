@@ -164,3 +164,13 @@ Personal Insight:
 - we saw in exp5-p2 that it has very high potential but it overfits early, so I think higher dropout was a really good choice because it allowed the model to not overfit and train for longer, hence a higher epoch. 
 - It did have lower train performance as expected and worse early training performnace. which are all expected.
 - Im assuming these are a lot would change with the scaling laws so I will be careful with wmt_14
+
+
+### Experiment 6 - phase 2: source word dropout -> 0.1
+- best epoch: 30 (/34)
+- best non_smoothed_val_loss: 1.491
+- best BLEU: 0.3304
+
+Personal Insights:
+- Again higher performance, allowed for less overfitting, however, it kicked in kinda late in training (epoch 21) and up until that point it was worse than exp6-p1. 
+- It did have lower BLEU tho which is interesting. Im assuming BLEU wouldn't see improvement unless the top word increased while loss would see improvement if not top decreased which is what dropout might be teaching...?

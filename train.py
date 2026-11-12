@@ -21,13 +21,13 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_6_phase_1"
+save_file_path_root = "./runs/exp_6_phase_2"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
 VERBOSE_FREQ = 200
 SAVE_FREQ=20_000
@@ -113,8 +113,12 @@ Experiment 6: dropout:
 phase 1: 
 - dropout: 0.3
 phase 2:
-- dropout: 0.2
-- word_dropout: 0.1
+- dropout: 0.3
+- source_word_dropout: 0.1
+phase 3:
+- dropout: 0.3
+- source_word_dropout: 0.1
+- target_word_dropout: 0.1
 
 """
 
@@ -132,6 +136,8 @@ config = {
     ## Regularization/activations
     "drop_pre_norm": 0.3,
     "drop_post_emb": 0.3,
+    "source_word_dropout": 0.1,
+    "target_word_dropout": 0.0,
     "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
 
     # Training params
@@ -536,6 +542,8 @@ class Transformer(torch.nn.Module):
         self.embedding = torch.nn.Embedding(self.config["vocab_size"], self.config["d_model"])
         torch.nn.init.uniform_(self.embedding.weight,-SQRT_INV_DM,SQRT_INV_DM)
         self.dropout = torch.nn.Dropout(self.config["drop_post_emb"])
+        self.source_word_dropout = torch.nn.Dropout1d(self.config.get("source_word_dropout",0.0))
+        self.target_word_dropout = torch.nn.Dropout1d(self.config.get("target_word_dropout",0.0))
 
         # encoder
         self.encoder_attention = ModuleList(
@@ -598,6 +606,7 @@ class Transformer(torch.nn.Module):
             (x.shape[0], 1, 1, x.shape[1])
         )  # CUDA- B,1,1,S
 
+
         # x embedding
         x = self.embedding(x)  # CUDA- B,S,dm
         x = x / SQRT_INV_DM  # CUDA- B,S,d_m (INV_INV_SQRT: SQRT_DM)
@@ -605,6 +614,7 @@ class Transformer(torch.nn.Module):
         pe = self.positional_encoding(x.shape[1])  # CUDA- S,d_m
         x = x + pe  # CUDA- B,S,d_m
         x = self.dropout(x)
+        x = self.source_word_dropout(x)
 
         # for each layer
         for i in range(self.config["num_enc_layers"]):
@@ -641,6 +651,7 @@ class Transformer(torch.nn.Module):
         pe = self.positional_encoding(y.shape[1],start=start)  # CUDA- Sy,d_m
         y = y + pe  # CUDA- B,Sy,d_m
         y = self.dropout(y)
+        y = self.target_word_dropout(y)
 
         for i in range(self.config["num_dec_layers"]):
             # decoder
@@ -736,7 +747,12 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
 
             bleu_fn.update(eng_decod,orig_decod)
             if return_translations:
-                translations+=[{"orig":orig_decod[idx][0], "trans": eng_decod[idx]} for idx in range(B)]
+                translations+=[{
+                    "orig":orig_decod[idx][0], 
+                    "trans": eng_decod[idx],
+                    "dutch": sp_bpe.decode_ids(x[idx].tolist()),
+                    "len": (y[idx] != PAD_TOKEN).sum().item(),
+                } for idx in range(B)]
     model.reset_cache() # free up space for later. 
     end_time = time.time()
     avg_bleu = bleu_fn.compute()
