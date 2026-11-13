@@ -21,21 +21,22 @@ import pyarrow as pa
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
 
-save_file_path_root = "./runs/exp_6_phase_3"
+save_file_path_root = "./runs/wmt14/run_1/"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
-VERBOSE_FREQ = 200
-SAVE_FREQ=20_000
+VERBOSE_FREQ = 2_000
+SAVE_FREQ=6_000
+BLEU_FREQ=12_000
 STOP_AFTER_EPOCH=100
 PAD_TOKEN = 3
 CONTEXT_CAP = 128
 DEVICE = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-DATAS_SOURCE = "iwslt17_curated" # wmt14 or iwslt17 or iwslt17_curated or wmt14_curated
+DATAS_SOURCE = "wmt14_curated" # wmt14 or iwslt17 or iwslt17_curated or wmt14_curated
 
 
 NUM_BATCHES = None
@@ -47,84 +48,9 @@ if not path.exists(f"{save_file_path_root}/best/"):
     os.mkdir(f"{save_file_path_root}/best/")
 
 
-"""
-We will run some tests on the IWSLT. We will set baseline and in each experiment only change one var. 
-At each Experiment, we take the best var for the previous experiment. 
-If it looks epoch = 10 is not enough for a model (it hasn't started converging, we will increase epochs)
-BLEU change 1 is just a seed change now. Pick winners by non_smoothed_val_loss 
-
-Baseline:
-- vocab_size: 7000
-- dataset: iwslt_curated
-- filtering_strategy: drop
-- epoch: 10
-- use_amp: True
-- POST_LN
-
-Initial values: 
-- num_enc_layers/num_dec_layers: 4
-- batch_size: 32, 
-- warmup_steps: 3000
-- heads: 8,
-- drop_rate: 0.1
-
-
-Experiment 1: 
-- everything initial
-
-Experiment 2:
-phase 1: 
-- PRE_LN
-phase 2:
-- PRE LN without warmup steps.
-
-Experiment 3:
-phase 1:
-- Peak LR -> 0.5x
-phase 2:
-- Peak LR -> 2x
-
-Experiment 4: BS:
-phase 1:
-- batch_size: 64
-phase 2: 
-- batch_size: 128 (if compute can handle it)
-phase 3:
-- batch_size: 128
-- same peak_lr but lower warmup steps to be 1/4 of the original wamrup steps so number of updates seen is kinda comparable
-phase 4:
-- batch_size: 128
-- same peak_lr as p2,3
-- 1/4 warmup steps
-- slow_decay tau: 3000
-phase 5:
-- batch_size: 32
-- same peak_lr
-- 3k warmup steps
-- slow_decay tau: 5k
-
-Experiment 5: N:
-phase 1:
-- num_enc_layers/num_dec_layers: 3
-phase 3: 
-- N: 6
-
-Experiment 6: dropout:
-phase 1: 
-- dropout: 0.3
-phase 2:
-- dropout: 0.3
-- source_word_dropout: 0.1
-phase 3:
-- dropout: 0.3
-- source_word_dropout: 0.1
-- target_word_dropout: 0.1
-
-"""
-
 config = {
     # model params
-    "vocab_size": 7000,
+    "vocab_size": 37000,
     "d_model": 512,
     "d_v": 64,
     "d_k": 64,
@@ -134,17 +60,17 @@ config = {
     "num_dec_layers": 6,  # number of encoder layers
     "MLP_activation": "relu",
     ## Regularization/activations
-    "drop_pre_norm": 0.3,
-    "drop_post_emb": 0.3,
-    "source_word_dropout": 0.1,
-    "target_word_dropout": 0.1,
+    "drop_pre_norm": 0.1,
+    "drop_post_emb": 0.1,
+    "source_word_dropout": 0.0,
+    "target_word_dropout": 0.0,
     "ln_strat": "PRE_LN", # PRE_LN vs POST_LN
 
     # Training params
     "benchmark_mode": False,
     "batch_size": 128,
     "val_batch_size": 64,
-    "epochs": 45,
+    "epochs": 15,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -170,7 +96,7 @@ config = {
     "filtering_strategy": "drop", # drop or cut. 
 
     # tokenization
-    "tokenizer_source": "iwslt17",
+    "tokenizer_source": "wmt14",
     "tokenizer_num_threads": 2,
     "tokenization_cache": True,
 
@@ -207,6 +133,7 @@ assert config["ln_strat"] in ["PRE_LN","POST_LN"]
 assert config["warmup_strat"] in ["rise","constant","slow_decay"]
 assert config["warmup_strat"] != "slow_decay" or config["tau"] > 0
 assert SAVE_FREQ % VERBOSE_FREQ == 0
+assert BLEU_FREQ % SAVE_FREQ == 0
 if not config["tokenization_cache"]:
     print("WARNING: TOKENIZATION CACHE IS DISABELED!!! ")
 
@@ -900,9 +827,13 @@ def train_one_epoch(epoch,tokens_so_far):
                         avg_metric[j]+=m(logits,y)
 
             scaler.scale(loss_value).backward()
+
+            scale_before=scaler.get_scale()
             scaler.step(optimizer)
-            scheduler.step()
             scaler.update()
+
+            if scaler.get_scale() >= scale_before:
+                scheduler.step()
             if config["benchmark_mode"]:
                 if DEVICE == "mps":
                     torch.mps.synchronize()
@@ -938,7 +869,7 @@ def train_one_epoch(epoch,tokens_so_far):
                 model_path=f"{save_file_path_root}/model_{epoch}_in_batch.pt"
                 print(f"{datetime.now()} Saving mid-epoch to: {model_path}")
                 
-                avg_vloss, avg_val_metrics = calculate_val_loss(False,tokens_so_far)
+                avg_vloss, avg_val_metrics = calculate_val_loss(BLEU_FREQ%SAVE_FREQ==0,tokens_so_far)
                 for k in range(len(metrics)-1):
                     writer.add_scalar(f"loss/{metrics[k].name}",avg_metrics[k].item()/(idx+1),tsi)
                 

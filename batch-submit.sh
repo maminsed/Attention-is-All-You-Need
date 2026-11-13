@@ -3,12 +3,12 @@
 #SBATCH --job-name=transformer-train
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --time=08:00:00
+#SBATCH --time=12:00:00
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
-#SBATCH --output=logs/exp_6_phase_3_pt2.out
-#SBATCH --error=logs/exp_6_phase_3_pt2.out
+#SBATCH --output=logs/wmt14/run_1.out
+#SBATCH --error=logs/wmt14/run_1.out
 #SBATCH --mail-user=m4sedagh@uwaterloo.ca
 #SBATCH --mail-type=ALL
 

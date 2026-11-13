@@ -1,0 +1,640 @@
+2026-11-12 03:26:41.552449: code started: 
+2026-11-12 03:26:41.552528: DEVICE: cuda
+2026-11-12 03:26:41.568453: encoding train started
+2026-11-12 03:26:41.570126 cache found
+2026-11-12 03:26:44.076516: encoding val started
+2026-11-12 03:26:44.077492 cache found
+2026-11-12 03:26:44.084910: # train size: #Tokens: X: 133,916,104 Y: 130,874,622 #Sentences: 4,246,755, num_dropped: 0
+2026-11-12 03:26:44.085006: # val size: #Tokens: X: 85,235 Y: 80,593 #Sentences: 2,997, num_dropped: 0
+2026-11-12 03:26:44.085029: batches/epoch: 33,178. LR peak: 0.0008068715304598784
+/u701/m4sedagh/Attention-is-All-You-Need/train.py:152: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:213.)
+  self.X = torch.from_numpy(X)
+
+
+==============
+num_parameters: 63,046,656 - num_non_embedding_params: 44,102,656
+2026-11-12 03:26:44.922976: optimizer loaded
+2026-11-12 03:26:44.923091: scheduler loaded
+2026-11-12 03:26:44.923173: loss_fn loaded
+2026-11-12 03:26:44.923211: metrics loaded
+2026-11-12 03:26:44.923226: training started!
+2026-11-12 03:26:44.923891: Epoch: 0
+2026-11-12 03:29:04.157146: [epoch 0] batch 1999 loss_value: 5.2538, batch_time (s): 0.062, data_loading_time (ms): 3.164, tokens/sec: 201,425.506
+2026-11-12 03:31:19.184152: [epoch 0] batch 3999 loss_value: 4.2150, batch_time (s): 0.060, data_loading_time (ms): 2.653, tokens/sec: 269,886.632
+2026-11-12 03:33:30.765614: [epoch 0] batch 5999 loss_value: 3.2621, batch_time (s): 0.066, data_loading_time (ms): 4.536, tokens/sec: 68,107.120
+2026-11-12 03:33:30.766599 Saving mid-epoch to: ./runs/wmt14/run_1//model_0_in_batch.pt
+2026-11-12 03:33:31.736256 started calculating bleu
+2026-11-12 03:33:45.053181 finished calculating bleu - avg bleu: 18.80 - total_time: 13.315948963165283 - avg_eos_idx: 25.29
+2026-11-12 03:33:45.054644 Val loss calculation done
+2026-11-12 03:36:00.424201: [epoch 0] batch 7999 loss_value: 3.6016, batch_time (s): 0.049, data_loading_time (ms): 1.989, tokens/sec: 152,973.882
+2026-11-12 03:38:14.264917: [epoch 0] batch 9999 loss_value: 3.3149, batch_time (s): 0.067, data_loading_time (ms): 2.635, tokens/sec: 81,931.571
+2026-11-12 03:40:32.691544: [epoch 0] batch 11999 loss_value: 3.6463, batch_time (s): 0.069, data_loading_time (ms): 2.434, tokens/sec: 143,174.998
+2026-11-12 03:40:32.692433 Saving mid-epoch to: ./runs/wmt14/run_1//model_0_in_batch.pt
+2026-11-12 03:40:33.641946 started calculating bleu
+2026-11-12 03:40:43.948607 finished calculating bleu - avg bleu: 22.99 - total_time: 10.306416988372803 - avg_eos_idx: 25.60
+2026-11-12 03:40:43.949540 Val loss calculation done
+2026-11-12 03:42:58.504832: [epoch 0] batch 13999 loss_value: 3.5480, batch_time (s): 0.061, data_loading_time (ms): 2.403, tokens/sec: 129,338.838
+2026-11-12 03:45:15.036663: [epoch 0] batch 15999 loss_value: 3.6742, batch_time (s): 0.069, data_loading_time (ms): 4.335, tokens/sec: 193,376.539
+2026-11-12 03:47:30.537904: [epoch 0] batch 17999 loss_value: 3.2265, batch_time (s): 0.059, data_loading_time (ms): 2.026, tokens/sec: 114,975.587
+2026-11-12 03:47:30.538722 Saving mid-epoch to: ./runs/wmt14/run_1//model_0_in_batch.pt
+2026-11-12 03:47:31.471978 started calculating bleu
+2026-11-12 03:47:40.906038 finished calculating bleu - avg bleu: 24.40 - total_time: 9.43386197090149 - avg_eos_idx: 25.11
+2026-11-12 03:47:40.906770 Val loss calculation done
+2026-11-12 03:49:56.767804: [epoch 0] batch 19999 loss_value: 3.6041, batch_time (s): 0.062, data_loading_time (ms): 3.929, tokens/sec: 262,756.427
+2026-11-12 03:52:11.510495: [epoch 0] batch 21999 loss_value: 3.1340, batch_time (s): 0.073, data_loading_time (ms): 4.108, tokens/sec: 91,359.555
+2026-11-12 03:54:27.197874: [epoch 0] batch 23999 loss_value: 3.4497, batch_time (s): 0.062, data_loading_time (ms): 2.561, tokens/sec: 237,799.627
+2026-11-12 03:54:27.198793 Saving mid-epoch to: ./runs/wmt14/run_1//model_0_in_batch.pt
+2026-11-12 03:54:28.130887 started calculating bleu
+2026-11-12 03:54:38.034406 finished calculating bleu - avg bleu: 25.21 - total_time: 9.903311014175415 - avg_eos_idx: 25.60
+2026-11-12 03:54:38.035442 Val loss calculation done
+2026-11-12 03:56:54.786305: [epoch 0] batch 25999 loss_value: 3.2679, batch_time (s): 0.062, data_loading_time (ms): 2.643, tokens/sec: 128,809.794
+2026-11-12 03:59:10.047907: [epoch 0] batch 27999 loss_value: 3.3761, batch_time (s): 0.060, data_loading_time (ms): 2.092, tokens/sec: 293,640.678
+2026-11-12 04:01:23.840464: [epoch 0] batch 29999 loss_value: 3.1658, batch_time (s): 0.058, data_loading_time (ms): 2.551, tokens/sec: 128,432.190
+2026-11-12 04:01:23.841341 Saving mid-epoch to: ./runs/wmt14/run_1//model_0_in_batch.pt
+2026-11-12 04:01:24.761697 started calculating bleu
+2026-11-12 04:01:33.919326 finished calculating bleu - avg bleu: 25.76 - total_time: 9.15744161605835 - avg_eos_idx: 25.32
+2026-11-12 04:01:33.920042 Val loss calculation done
+2026-11-12 04:03:54.621623: [epoch 0] batch 31999 loss_value: 3.2684, batch_time (s): 0.065, data_loading_time (ms): 2.606, tokens/sec: 134,047.704
+2026-11-12 04:05:17.555765 started calculating bleu
+2026-11-12 04:05:28.457051 finished calculating bleu - avg bleu: 25.93 - total_time: 10.901108264923096 - avg_eos_idx: 25.43
+2026-11-12 04:05:28.457748: [epoch 0]: tokens_trained_so_far: 133,916,104 avg_loss: 3.6559, non_smoothed_loss_fn: 2.620, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 2.049, bleu_calculations_val: 0.259, avg_vloss: 3.1732, avg_time (s): 0.064, epoch_time (s): 2,311.697
+2026-11-12 04:05:32.603319: [epoch 0]: Config saved
+2026-11-12 04:05:32.605212: Epoch: 1
+2026-11-12 04:07:50.344682: [epoch 1] batch 1999 loss_value: 3.1900, batch_time (s): 0.065, data_loading_time (ms): 4.696, tokens/sec: 134,591.814
+2026-11-12 04:10:06.827057: [epoch 1] batch 3999 loss_value: 3.3437, batch_time (s): 0.059, data_loading_time (ms): 3.096, tokens/sec: 193,890.877
+2026-11-12 04:12:23.371593: [epoch 1] batch 5999 loss_value: 3.3562, batch_time (s): 0.063, data_loading_time (ms): 3.407, tokens/sec: 216,005.639
+2026-11-12 04:12:23.372503 Saving mid-epoch to: ./runs/wmt14/run_1//model_1_in_batch.pt
+2026-11-12 04:12:24.337111 started calculating bleu
+2026-11-12 04:12:33.860051 finished calculating bleu - avg bleu: 26.29 - total_time: 9.522767066955566 - avg_eos_idx: 25.61
+2026-11-12 04:12:33.860754 Val loss calculation done
+2026-11-12 04:14:55.318965: [epoch 1] batch 7999 loss_value: 3.4478, batch_time (s): 0.061, data_loading_time (ms): 2.237, tokens/sec: 256,254.015
+2026-11-12 04:17:12.433771: [epoch 1] batch 9999 loss_value: 3.0351, batch_time (s): 0.063, data_loading_time (ms): 3.218, tokens/sec: 110,063.816
+2026-11-12 04:19:30.068015: [epoch 1] batch 11999 loss_value: 3.1446, batch_time (s): 0.060, data_loading_time (ms): 3.729, tokens/sec: 234,218.122
+2026-11-12 04:19:30.069012 Saving mid-epoch to: ./runs/wmt14/run_1//model_1_in_batch.pt
+2026-11-12 04:19:30.870755 started calculating bleu
+2026-11-12 04:19:40.874093 finished calculating bleu - avg bleu: 26.88 - total_time: 10.003163814544678 - avg_eos_idx: 25.51
+2026-11-12 04:19:40.874865 Val loss calculation done
+2026-11-12 04:21:59.968506: [epoch 1] batch 13999 loss_value: 3.1524, batch_time (s): 0.059, data_loading_time (ms): 3.159, tokens/sec: 196,035.780
+2026-11-12 04:24:17.074413: [epoch 1] batch 15999 loss_value: 3.4172, batch_time (s): 0.068, data_loading_time (ms): 4.071, tokens/sec: 204,729.038
+2026-11-12 04:26:33.434275: [epoch 1] batch 17999 loss_value: 3.0165, batch_time (s): 0.059, data_loading_time (ms): 3.726, tokens/sec: 148,343.039
+2026-11-12 04:26:33.435163 Saving mid-epoch to: ./runs/wmt14/run_1//model_1_in_batch.pt
+2026-11-12 04:26:34.261975 started calculating bleu
+2026-11-12 04:26:44.060514 finished calculating bleu - avg bleu: 26.99 - total_time: 9.79832911491394 - avg_eos_idx: 25.31
+2026-11-12 04:26:44.061266 Val loss calculation done
+2026-11-12 04:29:02.514228: [epoch 1] batch 19999 loss_value: 3.0042, batch_time (s): 0.061, data_loading_time (ms): 2.552, tokens/sec: 98,854.211
+2026-11-12 04:31:17.544572: [epoch 1] batch 21999 loss_value: 2.9128, batch_time (s): 0.070, data_loading_time (ms): 2.440, tokens/sec: 80,517.553
+2026-11-12 04:33:35.507478: [epoch 1] batch 23999 loss_value: 3.0173, batch_time (s): 0.059, data_loading_time (ms): 4.704, tokens/sec: 84,085.176
+2026-11-12 04:33:35.508516 Saving mid-epoch to: ./runs/wmt14/run_1//model_1_in_batch.pt
+2026-11-12 04:33:36.455343 started calculating bleu
+2026-11-12 04:33:48.479972 finished calculating bleu - avg bleu: 26.87 - total_time: 12.024438619613647 - avg_eos_idx: 25.67
+2026-11-12 04:33:48.480835 Val loss calculation done
+2026-11-12 04:36:07.158928: [epoch 1] batch 25999 loss_value: 3.4174, batch_time (s): 0.061, data_loading_time (ms): 2.717, tokens/sec: 283,819.525
+2026-11-12 04:38:28.118151: [epoch 1] batch 27999 loss_value: 3.0437, batch_time (s): 0.074, data_loading_time (ms): 3.768, tokens/sec: 101,569.242
+2026-11-12 04:40:44.663778: [epoch 1] batch 29999 loss_value: 3.1163, batch_time (s): 0.059, data_loading_time (ms): 2.297, tokens/sec: 114,209.056
+2026-11-12 04:40:44.664815 Saving mid-epoch to: ./runs/wmt14/run_1//model_1_in_batch.pt
+2026-11-12 04:40:45.615153 started calculating bleu
+2026-11-12 04:40:55.758680 finished calculating bleu - avg bleu: 27.47 - total_time: 10.143322944641113 - avg_eos_idx: 25.42
+2026-11-12 04:40:55.759456 Val loss calculation done
+2026-11-12 04:43:17.194376: [epoch 1] batch 31999 loss_value: 3.2775, batch_time (s): 0.062, data_loading_time (ms): 2.725, tokens/sec: 166,318.819
+2026-11-12 04:44:38.986315 started calculating bleu
+2026-11-12 04:44:48.553549 finished calculating bleu - avg bleu: 27.41 - total_time: 9.567044973373413 - avg_eos_idx: 25.39
+2026-11-12 04:44:48.554017: [epoch 1]: tokens_trained_so_far: 267,832,208 avg_loss: 3.1611, non_smoothed_loss_fn: 2.064, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.923, bleu_calculations_val: 0.274, avg_vloss: 3.0618, avg_time (s): 0.065, epoch_time (s): 2,345.426
+2026-11-12 04:44:52.867227: [epoch 1]: Config saved
+2026-11-12 04:44:52.868715: Epoch: 2
+2026-11-12 04:47:14.064341: [epoch 2] batch 1999 loss_value: 3.3113, batch_time (s): 0.062, data_loading_time (ms): 2.625, tokens/sec: 249,966.832
+2026-11-12 04:49:32.480116: [epoch 2] batch 3999 loss_value: 3.0351, batch_time (s): 0.061, data_loading_time (ms): 3.087, tokens/sec: 94,040.860
+2026-11-12 04:51:51.192024: [epoch 2] batch 5999 loss_value: 3.3107, batch_time (s): 0.063, data_loading_time (ms): 3.041, tokens/sec: 188,266.372
+2026-11-12 04:51:51.192900 Saving mid-epoch to: ./runs/wmt14/run_1//model_2_in_batch.pt
+2026-11-12 04:51:52.111372 started calculating bleu
+2026-11-12 04:52:02.856598 finished calculating bleu - avg bleu: 27.36 - total_time: 10.745019435882568 - avg_eos_idx: 25.04
+2026-11-12 04:52:02.857327 Val loss calculation done
+2026-11-12 04:54:21.858770: [epoch 2] batch 7999 loss_value: 2.8931, batch_time (s): 0.075, data_loading_time (ms): 3.153, tokens/sec: 69,948.385
+2026-11-12 04:56:38.587190: [epoch 2] batch 9999 loss_value: 3.4901, batch_time (s): 0.061, data_loading_time (ms): 4.313, tokens/sec: 351,856.731
+2026-11-12 04:58:55.232749: [epoch 2] batch 11999 loss_value: 3.2730, batch_time (s): 0.059, data_loading_time (ms): 3.219, tokens/sec: 210,764.268
+2026-11-12 04:58:55.233693 Saving mid-epoch to: ./runs/wmt14/run_1//model_2_in_batch.pt
+2026-11-12 04:58:56.146778 started calculating bleu
+2026-11-12 04:59:06.964113 finished calculating bleu - avg bleu: 27.18 - total_time: 10.817161083221436 - avg_eos_idx: 25.56
+2026-11-12 04:59:06.964831 Val loss calculation done
+2026-11-12 05:01:23.673649: [epoch 2] batch 13999 loss_value: 3.1450, batch_time (s): 0.062, data_loading_time (ms): 2.712, tokens/sec: 168,916.725
+2026-11-12 05:03:37.732165: [epoch 2] batch 15999 loss_value: 3.1465, batch_time (s): 0.062, data_loading_time (ms): 4.271, tokens/sec: 213,429.660
+2026-11-12 05:05:53.486363: [epoch 2] batch 17999 loss_value: 3.1574, batch_time (s): 0.066, data_loading_time (ms): 3.214, tokens/sec: 244,946.618
+2026-11-12 05:05:53.487396 Saving mid-epoch to: ./runs/wmt14/run_1//model_2_in_batch.pt
+2026-11-12 05:05:54.402755 started calculating bleu
+2026-11-12 05:06:04.278191 finished calculating bleu - avg bleu: 27.33 - total_time: 9.875229358673096 - avg_eos_idx: 25.33
+2026-11-12 05:06:04.278937 Val loss calculation done
+2026-11-12 05:08:19.513887: [epoch 2] batch 19999 loss_value: 3.0757, batch_time (s): 0.065, data_loading_time (ms): 2.961, tokens/sec: 138,782.175
+2026-11-12 05:10:36.319583: [epoch 2] batch 21999 loss_value: 3.1608, batch_time (s): 0.060, data_loading_time (ms): 3.182, tokens/sec: 175,625.792
+2026-11-12 05:12:51.462351: [epoch 2] batch 23999 loss_value: 3.2931, batch_time (s): 0.061, data_loading_time (ms): 3.724, tokens/sec: 256,706.897
+2026-11-12 05:12:51.463638 Saving mid-epoch to: ./runs/wmt14/run_1//model_2_in_batch.pt
+2026-11-12 05:12:52.399726 started calculating bleu
+2026-11-12 05:13:01.278117 finished calculating bleu - avg bleu: 27.90 - total_time: 8.878188133239746 - avg_eos_idx: 25.05
+2026-11-12 05:13:01.278857 Val loss calculation done
+2026-11-12 05:15:19.235492: [epoch 2] batch 25999 loss_value: 3.2642, batch_time (s): 0.070, data_loading_time (ms): 2.768, tokens/sec: 147,181.674
+2026-11-12 05:17:36.391524: [epoch 2] batch 27999 loss_value: 2.8495, batch_time (s): 0.059, data_loading_time (ms): 2.745, tokens/sec: 99,578.887
+2026-11-12 05:19:54.587674: [epoch 2] batch 29999 loss_value: 2.7522, batch_time (s): 0.060, data_loading_time (ms): 3.007, tokens/sec: 83,298.054
+2026-11-12 05:19:54.588603 Saving mid-epoch to: ./runs/wmt14/run_1//model_2_in_batch.pt
+2026-11-12 05:19:55.535083 started calculating bleu
+2026-11-12 05:20:06.221756 finished calculating bleu - avg bleu: 27.99 - total_time: 10.686482667922974 - avg_eos_idx: 25.42
+2026-11-12 05:20:06.222470 Val loss calculation done
+2026-11-12 05:22:26.768606: [epoch 2] batch 31999 loss_value: 2.8929, batch_time (s): 0.059, data_loading_time (ms): 3.570, tokens/sec: 98,420.939
+2026-11-12 05:23:49.523837 started calculating bleu
+2026-11-12 05:24:00.677806 finished calculating bleu - avg bleu: 28.15 - total_time: 11.153795003890991 - avg_eos_idx: 25.38
+2026-11-12 05:24:00.678441: [epoch 2]: tokens_trained_so_far: 401,748,312 avg_loss: 3.0872, non_smoothed_loss_fn: 1.982, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.867, bleu_calculations_val: 0.281, avg_vloss: 3.0105, avg_time (s): 0.064, epoch_time (s): 2,335.722
+2026-11-12 05:24:04.849061: [epoch 2]: Config saved
+2026-11-12 05:24:04.850909: Epoch: 3
+2026-11-12 05:26:24.811473: [epoch 3] batch 1999 loss_value: 2.9528, batch_time (s): 0.067, data_loading_time (ms): 2.719, tokens/sec: 99,400.008
+2026-11-12 05:28:41.458274: [epoch 3] batch 3999 loss_value: 2.9380, batch_time (s): 0.071, data_loading_time (ms): 2.210, tokens/sec: 113,889.378
+2026-11-12 05:31:01.401311: [epoch 3] batch 5999 loss_value: 2.9819, batch_time (s): 0.079, data_loading_time (ms): 3.629, tokens/sec: 116,854.666
+2026-11-12 05:31:01.402687 Saving mid-epoch to: ./runs/wmt14/run_1//model_3_in_batch.pt
+2026-11-12 05:31:02.347708 started calculating bleu
+2026-11-12 05:31:12.406179 finished calculating bleu - avg bleu: 28.19 - total_time: 10.058282136917114 - avg_eos_idx: 25.37
+2026-11-12 05:31:12.406904 Val loss calculation done
+2026-11-12 05:33:33.671246: [epoch 3] batch 7999 loss_value: 2.8884, batch_time (s): 0.065, data_loading_time (ms): 3.874, tokens/sec: 112,962.872
+2026-11-12 05:35:51.541953: [epoch 3] batch 9999 loss_value: 3.4178, batch_time (s): 0.066, data_loading_time (ms): 4.361, tokens/sec: 257,625.825
+2026-11-12 05:38:10.856949: [epoch 3] batch 11999 loss_value: 3.1750, batch_time (s): 0.066, data_loading_time (ms): 3.438, tokens/sec: 171,311.544
+2026-11-12 05:38:10.857930 Saving mid-epoch to: ./runs/wmt14/run_1//model_3_in_batch.pt
+2026-11-12 05:38:11.795297 started calculating bleu
+2026-11-12 05:38:21.288273 finished calculating bleu - avg bleu: 28.25 - total_time: 9.492786645889282 - avg_eos_idx: 25.30
+2026-11-12 05:38:21.289007 Val loss calculation done
+2026-11-12 05:40:38.928947: [epoch 3] batch 13999 loss_value: 2.8938, batch_time (s): 0.061, data_loading_time (ms): 2.722, tokens/sec: 144,933.910
+2026-11-12 05:42:52.034408: [epoch 3] batch 15999 loss_value: 3.3371, batch_time (s): 0.063, data_loading_time (ms): 2.446, tokens/sec: 237,330.908
+2026-11-12 05:45:08.713313: [epoch 3] batch 17999 loss_value: 2.7797, batch_time (s): 0.062, data_loading_time (ms): 2.254, tokens/sec: 92,939.268
+2026-11-12 05:45:08.714615 Saving mid-epoch to: ./runs/wmt14/run_1//model_3_in_batch.pt
+2026-11-12 05:45:09.675660 started calculating bleu
+2026-11-12 05:45:19.879076 finished calculating bleu - avg bleu: 27.82 - total_time: 10.203229665756226 - avg_eos_idx: 25.59
+2026-11-12 05:45:19.879799 Val loss calculation done
+2026-11-12 05:47:37.863854: [epoch 3] batch 19999 loss_value: 2.5793, batch_time (s): 0.044, data_loading_time (ms): 2.734, tokens/sec: 96,302.856
+2026-11-12 05:49:53.625363: [epoch 3] batch 21999 loss_value: 2.6129, batch_time (s): 0.060, data_loading_time (ms): 2.384, tokens/sec: 64,484.867
+2026-11-12 05:52:08.145092: [epoch 3] batch 23999 loss_value: 3.3628, batch_time (s): 0.074, data_loading_time (ms): 6.829, tokens/sec: 132,643.236
+2026-11-12 05:52:08.146122 Saving mid-epoch to: ./runs/wmt14/run_1//model_3_in_batch.pt
+2026-11-12 05:52:09.134660 started calculating bleu
+2026-11-12 05:52:18.846704 finished calculating bleu - avg bleu: 28.30 - total_time: 9.711853981018066 - avg_eos_idx: 25.41
+2026-11-12 05:52:18.847425 Val loss calculation done
+2026-11-12 05:54:34.814135: [epoch 3] batch 25999 loss_value: 2.9141, batch_time (s): 0.060, data_loading_time (ms): 3.312, tokens/sec: 103,783.690
+2026-11-12 05:56:50.953822: [epoch 3] batch 27999 loss_value: 2.7010, batch_time (s): 0.063, data_loading_time (ms): 3.379, tokens/sec: 73,288.788
+2026-11-12 05:59:08.043952: [epoch 3] batch 29999 loss_value: 3.3327, batch_time (s): 0.065, data_loading_time (ms): 4.314, tokens/sec: 229,443.746
+2026-11-12 05:59:08.045042 Saving mid-epoch to: ./runs/wmt14/run_1//model_3_in_batch.pt
+2026-11-12 05:59:08.974736 started calculating bleu
+2026-11-12 05:59:18.743900 finished calculating bleu - avg bleu: 28.32 - total_time: 9.76899003982544 - avg_eos_idx: 25.39
+2026-11-12 05:59:18.744623 Val loss calculation done
+2026-11-12 06:01:39.133791: [epoch 3] batch 31999 loss_value: 2.6954, batch_time (s): 0.066, data_loading_time (ms): 3.003, tokens/sec: 77,295.715
+2026-11-12 06:03:01.541369 started calculating bleu
+2026-11-12 06:03:10.911927 finished calculating bleu - avg bleu: 28.31 - total_time: 9.370365858078003 - avg_eos_idx: 25.47
+2026-11-12 06:03:10.912350: [epoch 3]: tokens_trained_so_far: 535,664,416 avg_loss: 3.0479, non_smoothed_loss_fn: 1.939, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.831, bleu_calculations_val: 0.283, avg_vloss: 2.9754, avg_time (s): 0.065, epoch_time (s): 2,335.730
+2026-11-12 06:03:15.228674: [epoch 3]: Config saved
+2026-11-12 06:03:15.230546: Epoch: 4
+2026-11-12 06:05:35.249697: [epoch 4] batch 1999 loss_value: 3.2615, batch_time (s): 0.061, data_loading_time (ms): 2.211, tokens/sec: 238,659.538
+2026-11-12 06:07:53.985805: [epoch 4] batch 3999 loss_value: 3.0051, batch_time (s): 0.060, data_loading_time (ms): 4.281, tokens/sec: 127,936.575
+2026-11-12 06:10:09.081341: [epoch 4] batch 5999 loss_value: 2.6265, batch_time (s): 0.061, data_loading_time (ms): 3.160, tokens/sec: 67,546.863
+2026-11-12 06:10:09.082254 Saving mid-epoch to: ./runs/wmt14/run_1//model_4_in_batch.pt
+2026-11-12 06:10:10.025577 started calculating bleu
+2026-11-12 06:10:19.862000 finished calculating bleu - avg bleu: 28.52 - total_time: 9.83614993095398 - avg_eos_idx: 25.52
+2026-11-12 06:10:19.863215 Val loss calculation done
+2026-11-12 06:12:39.038854: [epoch 4] batch 7999 loss_value: 2.7969, batch_time (s): 0.062, data_loading_time (ms): 4.578, tokens/sec: 139,940.363
+2026-11-12 06:14:56.553201: [epoch 4] batch 9999 loss_value: 3.0930, batch_time (s): 0.062, data_loading_time (ms): 2.731, tokens/sec: 167,594.996
+2026-11-12 06:17:10.283225: [epoch 4] batch 11999 loss_value: 3.0411, batch_time (s): 0.059, data_loading_time (ms): 3.712, tokens/sec: 189,223.621
+2026-11-12 06:17:10.284418 Saving mid-epoch to: ./runs/wmt14/run_1//model_4_in_batch.pt
+2026-11-12 06:17:11.198255 started calculating bleu
+2026-11-12 06:17:21.911860 finished calculating bleu - avg bleu: 28.43 - total_time: 10.713396787643433 - avg_eos_idx: 25.38
+2026-11-12 06:17:21.912623 Val loss calculation done
+2026-11-12 06:19:37.705335: [epoch 4] batch 13999 loss_value: 3.1807, batch_time (s): 0.060, data_loading_time (ms): 3.587, tokens/sec: 149,035.001
+2026-11-12 06:21:52.071853: [epoch 4] batch 15999 loss_value: 3.2657, batch_time (s): 0.064, data_loading_time (ms): 2.988, tokens/sec: 152,963.165
+2026-11-12 06:24:10.301294: [epoch 4] batch 17999 loss_value: 2.9723, batch_time (s): 0.063, data_loading_time (ms): 4.380, tokens/sec: 184,294.691
+2026-11-12 06:24:10.302305 Saving mid-epoch to: ./runs/wmt14/run_1//model_4_in_batch.pt
+2026-11-12 06:24:11.218523 started calculating bleu
+2026-11-12 06:24:20.510203 finished calculating bleu - avg bleu: 28.29 - total_time: 9.291504144668579 - avg_eos_idx: 25.62
+2026-11-12 06:24:20.510923 Val loss calculation done
+2026-11-12 06:26:40.429412: [epoch 4] batch 19999 loss_value: 2.6923, batch_time (s): 0.060, data_loading_time (ms): 3.402, tokens/sec: 102,209.210
+2026-11-12 06:28:56.861852: [epoch 4] batch 21999 loss_value: 2.7307, batch_time (s): 0.062, data_loading_time (ms): 2.873, tokens/sec: 95,195.015
+2026-11-12 06:31:13.325548: [epoch 4] batch 23999 loss_value: 2.9883, batch_time (s): 0.060, data_loading_time (ms): 2.962, tokens/sec: 168,014.745
+2026-11-12 06:31:13.326545 Saving mid-epoch to: ./runs/wmt14/run_1//model_4_in_batch.pt
+2026-11-12 06:31:14.243643 started calculating bleu
+2026-11-12 06:31:24.554249 finished calculating bleu - avg bleu: 28.43 - total_time: 10.310235977172852 - avg_eos_idx: 25.38
+2026-11-12 06:31:24.555641 Val loss calculation done
+2026-11-12 06:33:41.922047: [epoch 4] batch 25999 loss_value: 3.2903, batch_time (s): 0.070, data_loading_time (ms): 4.252, tokens/sec: 206,066.348
+2026-11-12 06:36:01.783045: [epoch 4] batch 27999 loss_value: 3.0703, batch_time (s): 0.060, data_loading_time (ms): 3.189, tokens/sec: 125,499.252
+2026-11-12 06:38:21.538246: [epoch 4] batch 29999 loss_value: 2.9756, batch_time (s): 0.063, data_loading_time (ms): 3.681, tokens/sec: 155,662.220
+2026-11-12 06:38:21.539541 Saving mid-epoch to: ./runs/wmt14/run_1//model_4_in_batch.pt
+2026-11-12 06:38:22.470025 started calculating bleu
+2026-11-12 06:38:33.607746 finished calculating bleu - avg bleu: 28.31 - total_time: 11.13752818107605 - avg_eos_idx: 25.52
+2026-11-12 06:38:33.608446 Val loss calculation done
+2026-11-12 06:40:51.668635: [epoch 4] batch 31999 loss_value: 3.0586, batch_time (s): 0.063, data_loading_time (ms): 2.537, tokens/sec: 226,970.739
+2026-11-12 06:42:11.879347 started calculating bleu
+2026-11-12 06:42:21.946019 finished calculating bleu - avg bleu: 28.30 - total_time: 10.06650185585022 - avg_eos_idx: 25.59
+2026-11-12 06:42:21.946635: [epoch 4]: tokens_trained_so_far: 669,580,520 avg_loss: 3.0221, non_smoothed_loss_fn: 1.910, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.812, bleu_calculations_val: 0.283, avg_vloss: 2.9566, avg_time (s): 0.064, epoch_time (s): 2,335.740
+2026-11-12 06:42:26.215071: [epoch 4]: Config saved
+2026-11-12 06:42:26.216972: Epoch: 5
+2026-11-12 06:44:44.396131: [epoch 5] batch 1999 loss_value: 3.0231, batch_time (s): 0.065, data_loading_time (ms): 2.982, tokens/sec: 162,303.090
+2026-11-12 06:46:59.202237: [epoch 5] batch 3999 loss_value: 2.6810, batch_time (s): 0.057, data_loading_time (ms): 3.051, tokens/sec: 109,097.477
+2026-11-12 06:49:16.777276: [epoch 5] batch 5999 loss_value: 2.9361, batch_time (s): 0.059, data_loading_time (ms): 2.648, tokens/sec: 155,140.716
+2026-11-12 06:49:16.778516 Saving mid-epoch to: ./runs/wmt14/run_1//model_5_in_batch.pt
+2026-11-12 06:49:17.710243 started calculating bleu
+2026-11-12 06:49:27.210896 finished calculating bleu - avg bleu: 28.63 - total_time: 9.500469207763672 - avg_eos_idx: 25.13
+2026-11-12 06:49:27.211592 Val loss calculation done
+2026-11-12 06:51:48.443103: [epoch 5] batch 7999 loss_value: 2.9065, batch_time (s): 0.062, data_loading_time (ms): 3.215, tokens/sec: 122,900.628
+2026-11-12 06:54:03.219299: [epoch 5] batch 9999 loss_value: 3.0301, batch_time (s): 0.054, data_loading_time (ms): 2.046, tokens/sec: 206,580.139
+2026-11-12 06:56:18.305541: [epoch 5] batch 11999 loss_value: 3.1442, batch_time (s): 0.071, data_loading_time (ms): 2.798, tokens/sec: 289,574.386
+2026-11-12 06:56:18.306550 Saving mid-epoch to: ./runs/wmt14/run_1//model_5_in_batch.pt
+2026-11-12 06:56:19.234757 started calculating bleu
+2026-11-12 06:56:28.730379 finished calculating bleu - avg bleu: 28.12 - total_time: 9.49544072151184 - avg_eos_idx: 25.44
+2026-11-12 06:56:28.731136 Val loss calculation done
+2026-11-12 06:58:47.923966: [epoch 5] batch 13999 loss_value: 2.8920, batch_time (s): 0.069, data_loading_time (ms): 2.806, tokens/sec: 155,550.884
+2026-11-12 07:01:04.445538: [epoch 5] batch 15999 loss_value: 2.6311, batch_time (s): 0.058, data_loading_time (ms): 4.637, tokens/sec: 79,946.693
+2026-11-12 07:03:20.777114: [epoch 5] batch 17999 loss_value: 3.2556, batch_time (s): 0.061, data_loading_time (ms): 2.712, tokens/sec: 198,996.241
+2026-11-12 07:03:20.778111 Saving mid-epoch to: ./runs/wmt14/run_1//model_5_in_batch.pt
+2026-11-12 07:03:21.742120 started calculating bleu
+2026-11-12 07:03:31.431646 finished calculating bleu - avg bleu: 28.44 - total_time: 9.689312934875488 - avg_eos_idx: 25.30
+2026-11-12 07:03:31.432398 Val loss calculation done
+2026-11-12 07:05:51.373062: [epoch 5] batch 19999 loss_value: 2.9096, batch_time (s): 0.060, data_loading_time (ms): 3.746, tokens/sec: 118,906.875
+2026-11-12 07:08:10.306100: [epoch 5] batch 21999 loss_value: 2.8086, batch_time (s): 0.061, data_loading_time (ms): 3.094, tokens/sec: 128,061.837
+2026-11-12 07:10:27.317275: [epoch 5] batch 23999 loss_value: 2.4906, batch_time (s): 0.060, data_loading_time (ms): 2.833, tokens/sec: 70,755.167
+2026-11-12 07:10:27.318503 Saving mid-epoch to: ./runs/wmt14/run_1//model_5_in_batch.pt
+2026-11-12 07:10:28.273129 started calculating bleu
+2026-11-12 07:10:37.364203 finished calculating bleu - avg bleu: 28.37 - total_time: 9.090869665145874 - avg_eos_idx: 25.21
+2026-11-12 07:10:37.365180 Val loss calculation done
+2026-11-12 07:12:57.328730: [epoch 5] batch 25999 loss_value: 2.9127, batch_time (s): 0.071, data_loading_time (ms): 3.473, tokens/sec: 110,649.779
+2026-11-12 07:15:19.342705: [epoch 5] batch 27999 loss_value: 2.8865, batch_time (s): 0.062, data_loading_time (ms): 3.598, tokens/sec: 101,477.706
+2026-11-12 07:17:36.077126: [epoch 5] batch 29999 loss_value: 2.7471, batch_time (s): 0.063, data_loading_time (ms): 3.813, tokens/sec: 77,694.186
+2026-11-12 07:17:36.078023 Saving mid-epoch to: ./runs/wmt14/run_1//model_5_in_batch.pt
+2026-11-12 07:17:37.007878 started calculating bleu
+2026-11-12 07:17:46.551123 finished calculating bleu - avg bleu: 28.62 - total_time: 9.543052673339844 - avg_eos_idx: 25.48
+2026-11-12 07:17:46.551937 Val loss calculation done
+2026-11-12 07:20:06.243142: [epoch 5] batch 31999 loss_value: 3.0699, batch_time (s): 0.070, data_loading_time (ms): 2.798, tokens/sec: 178,966.710
+2026-11-12 07:21:28.952096 started calculating bleu
+2026-11-12 07:21:39.051722 finished calculating bleu - avg bleu: 28.73 - total_time: 10.09941816329956 - avg_eos_idx: 25.30
+2026-11-12 07:21:39.052136: [epoch 5]: tokens_trained_so_far: 803,496,624 avg_loss: 3.0042, non_smoothed_loss_fn: 1.891, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.803, bleu_calculations_val: 0.287, avg_vloss: 2.9474, avg_time (s): 0.065, epoch_time (s): 2,341.794
+2026-11-12 07:21:42.829886: [epoch 5]: Config saved
+2026-11-12 07:21:42.831041: Epoch: 6
+2026-11-12 07:24:03.395688: [epoch 6] batch 1999 loss_value: 2.7952, batch_time (s): 0.060, data_loading_time (ms): 2.528, tokens/sec: 175,834.323
+2026-11-12 07:26:21.507949: [epoch 6] batch 3999 loss_value: 2.9682, batch_time (s): 0.060, data_loading_time (ms): 3.062, tokens/sec: 267,284.647
+2026-11-12 07:28:40.050236: [epoch 6] batch 5999 loss_value: 3.0756, batch_time (s): 0.070, data_loading_time (ms): 3.286, tokens/sec: 142,643.769
+2026-11-12 07:28:40.051380 Saving mid-epoch to: ./runs/wmt14/run_1//model_6_in_batch.pt
+2026-11-12 07:28:40.986820 started calculating bleu
+2026-11-12 07:28:51.422607 finished calculating bleu - avg bleu: 28.33 - total_time: 10.43558144569397 - avg_eos_idx: 25.28
+2026-11-12 07:28:51.423336 Val loss calculation done
+2026-11-12 07:31:10.260905: [epoch 6] batch 7999 loss_value: 3.4179, batch_time (s): 0.067, data_loading_time (ms): 2.921, tokens/sec: 300,722.949
+2026-11-12 07:33:29.141066: [epoch 6] batch 9999 loss_value: 2.6354, batch_time (s): 0.078, data_loading_time (ms): 3.237, tokens/sec: 83,933.395
+2026-11-12 07:35:50.813706: [epoch 6] batch 11999 loss_value: 3.0728, batch_time (s): 0.067, data_loading_time (ms): 4.197, tokens/sec: 188,373.088
+2026-11-12 07:35:50.814648 Saving mid-epoch to: ./runs/wmt14/run_1//model_6_in_batch.pt
+2026-11-12 07:35:51.768580 started calculating bleu
+2026-11-12 07:36:02.232963 finished calculating bleu - avg bleu: 28.29 - total_time: 10.464180946350098 - avg_eos_idx: 25.36
+2026-11-12 07:36:02.233674 Val loss calculation done
+2026-11-12 07:38:22.510072: [epoch 6] batch 13999 loss_value: 3.0697, batch_time (s): 0.063, data_loading_time (ms): 3.197, tokens/sec: 190,219.733
+2026-11-12 07:40:39.353907: [epoch 6] batch 15999 loss_value: 2.7249, batch_time (s): 0.059, data_loading_time (ms): 3.800, tokens/sec: 99,515.889
+2026-11-12 07:42:56.486952: [epoch 6] batch 17999 loss_value: 3.1107, batch_time (s): 0.064, data_loading_time (ms): 3.111, tokens/sec: 184,037.335
+2026-11-12 07:42:56.487942 Saving mid-epoch to: ./runs/wmt14/run_1//model_6_in_batch.pt
+2026-11-12 07:42:57.437326 started calculating bleu
+2026-11-12 07:43:07.350076 finished calculating bleu - avg bleu: 28.52 - total_time: 9.912517547607422 - avg_eos_idx: 25.25
+2026-11-12 07:43:07.351087 Val loss calculation done
+2026-11-12 07:45:25.748657: [epoch 6] batch 19999 loss_value: 3.2360, batch_time (s): 0.063, data_loading_time (ms): 2.966, tokens/sec: 293,821.423
+2026-11-12 07:47:42.924646: [epoch 6] batch 21999 loss_value: 2.9041, batch_time (s): 0.060, data_loading_time (ms): 2.794, tokens/sec: 90,206.942
+2026-11-12 07:50:00.257015: [epoch 6] batch 23999 loss_value: 3.1279, batch_time (s): 0.065, data_loading_time (ms): 3.541, tokens/sec: 153,352.930
+2026-11-12 07:50:00.257892 Saving mid-epoch to: ./runs/wmt14/run_1//model_6_in_batch.pt
+2026-11-12 07:50:01.199295 started calculating bleu
+2026-11-12 07:50:11.562146 finished calculating bleu - avg bleu: 28.60 - total_time: 10.362675428390503 - avg_eos_idx: 25.65
+2026-11-12 07:50:11.562879 Val loss calculation done
+2026-11-12 07:52:30.421077: [epoch 6] batch 25999 loss_value: 3.2653, batch_time (s): 0.063, data_loading_time (ms): 3.791, tokens/sec: 246,431.748
+2026-11-12 07:54:46.259175: [epoch 6] batch 27999 loss_value: 3.0047, batch_time (s): 0.049, data_loading_time (ms): 2.804, tokens/sec: 204,692.204
+2026-11-12 07:57:01.657852: [epoch 6] batch 29999 loss_value: 3.2953, batch_time (s): 0.075, data_loading_time (ms): 5.501, tokens/sec: 228,319.397
+2026-11-12 07:57:01.658784 Saving mid-epoch to: ./runs/wmt14/run_1//model_6_in_batch.pt
+2026-11-12 07:57:02.592631 started calculating bleu
+2026-11-12 07:57:13.618244 finished calculating bleu - avg bleu: 28.66 - total_time: 11.025432348251343 - avg_eos_idx: 25.34
+2026-11-12 07:57:13.619021 Val loss calculation done
+2026-11-12 07:59:31.950431: [epoch 6] batch 31999 loss_value: 2.9398, batch_time (s): 0.063, data_loading_time (ms): 3.057, tokens/sec: 153,367.150
+2026-11-12 08:00:50.902642 started calculating bleu
+2026-11-12 08:01:02.099748 finished calculating bleu - avg bleu: 28.78 - total_time: 11.196912288665771 - avg_eos_idx: 25.40
+2026-11-12 08:01:02.100165: [epoch 6]: tokens_trained_so_far: 937,412,728 avg_loss: 2.9921, non_smoothed_loss_fn: 1.878, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.789, bleu_calculations_val: 0.288, avg_vloss: 2.9375, avg_time (s): 0.065, epoch_time (s): 2,347.125
+2026-11-12 08:01:05.817905: [epoch 6]: Config saved
+2026-11-12 08:01:05.819780: Epoch: 7
+2026-11-12 08:03:28.159530: [epoch 7] batch 1999 loss_value: 2.8142, batch_time (s): 0.059, data_loading_time (ms): 2.942, tokens/sec: 159,548.189
+2026-11-12 08:05:46.148770: [epoch 7] batch 3999 loss_value: 2.8740, batch_time (s): 0.061, data_loading_time (ms): 2.254, tokens/sec: 127,125.283
+2026-11-12 08:08:00.598905: [epoch 7] batch 5999 loss_value: 2.7579, batch_time (s): 0.075, data_loading_time (ms): 2.883, tokens/sec: 97,736.662
+2026-11-12 08:08:00.599927 Saving mid-epoch to: ./runs/wmt14/run_1//model_7_in_batch.pt
+2026-11-12 08:08:01.542685 started calculating bleu
+2026-11-12 08:08:11.484003 finished calculating bleu - avg bleu: 28.54 - total_time: 9.941107749938965 - avg_eos_idx: 25.16
+2026-11-12 08:08:11.484774 Val loss calculation done
+2026-11-12 08:10:35.178459: [epoch 7] batch 7999 loss_value: 2.9821, batch_time (s): 0.061, data_loading_time (ms): 3.736, tokens/sec: 179,590.410
+2026-11-12 08:12:55.983686: [epoch 7] batch 9999 loss_value: 2.9366, batch_time (s): 0.062, data_loading_time (ms): 3.835, tokens/sec: 140,638.496
+2026-11-12 08:15:13.799758: [epoch 7] batch 11999 loss_value: 3.1788, batch_time (s): 0.063, data_loading_time (ms): 3.606, tokens/sec: 290,406.525
+2026-11-12 08:15:13.800805 Saving mid-epoch to: ./runs/wmt14/run_1//model_7_in_batch.pt
+2026-11-12 08:15:14.747326 started calculating bleu
+2026-11-12 08:15:24.793341 finished calculating bleu - avg bleu: 28.89 - total_time: 10.04582142829895 - avg_eos_idx: 25.45
+2026-11-12 08:15:24.794155 Val loss calculation done
+2026-11-12 08:17:48.685259: [epoch 7] batch 13999 loss_value: 2.7729, batch_time (s): 0.074, data_loading_time (ms): 3.165, tokens/sec: 72,671.710
+2026-11-12 08:20:04.712822: [epoch 7] batch 15999 loss_value: 2.6709, batch_time (s): 0.068, data_loading_time (ms): 3.027, tokens/sec: 64,408.445
+2026-11-12 08:22:21.395246: [epoch 7] batch 17999 loss_value: 2.7385, batch_time (s): 0.062, data_loading_time (ms): 3.137, tokens/sec: 83,079.302
+2026-11-12 08:22:21.396116 Saving mid-epoch to: ./runs/wmt14/run_1//model_7_in_batch.pt
+2026-11-12 08:22:22.321005 started calculating bleu
+2026-11-12 08:22:33.157693 finished calculating bleu - avg bleu: 28.55 - total_time: 10.836466789245605 - avg_eos_idx: 25.19
+2026-11-12 08:22:33.158475 Val loss calculation done
+2026-11-12 08:24:50.858227: [epoch 7] batch 19999 loss_value: 3.1825, batch_time (s): 0.065, data_loading_time (ms): 4.205, tokens/sec: 252,930.612
+2026-11-12 08:27:07.925658: [epoch 7] batch 21999 loss_value: 2.7067, batch_time (s): 0.061, data_loading_time (ms): 3.926, tokens/sec: 109,122.237
+2026-11-12 08:29:25.086018: [epoch 7] batch 23999 loss_value: 2.9021, batch_time (s): 0.067, data_loading_time (ms): 2.599, tokens/sec: 149,945.148
+2026-11-12 08:29:25.086986 Saving mid-epoch to: ./runs/wmt14/run_1//model_7_in_batch.pt
+2026-11-12 08:29:26.013212 started calculating bleu
+2026-11-12 08:29:36.198389 finished calculating bleu - avg bleu: 28.76 - total_time: 10.184983253479004 - avg_eos_idx: 25.38
+2026-11-12 08:29:36.199101 Val loss calculation done
+2026-11-12 08:31:53.564537: [epoch 7] batch 25999 loss_value: 2.8323, batch_time (s): 0.061, data_loading_time (ms): 2.262, tokens/sec: 128,081.871
+2026-11-12 08:34:11.661097: [epoch 7] batch 27999 loss_value: 2.8315, batch_time (s): 0.065, data_loading_time (ms): 2.345, tokens/sec: 154,048.511
+2026-11-12 08:36:35.857479: [epoch 7] batch 29999 loss_value: 2.8099, batch_time (s): 0.060, data_loading_time (ms): 2.740, tokens/sec: 139,386.835
+2026-11-12 08:36:35.858450 Saving mid-epoch to: ./runs/wmt14/run_1//model_7_in_batch.pt
+2026-11-12 08:36:36.779908 started calculating bleu
+2026-11-12 08:36:47.187589 finished calculating bleu - avg bleu: 28.88 - total_time: 10.407486915588379 - avg_eos_idx: 25.52
+2026-11-12 08:36:47.188318 Val loss calculation done
+2026-11-12 08:39:12.738897: [epoch 7] batch 31999 loss_value: 2.9120, batch_time (s): 0.060, data_loading_time (ms): 3.016, tokens/sec: 123,150.140
+2026-11-12 08:40:35.921606 started calculating bleu
+2026-11-12 08:40:47.313004 finished calculating bleu - avg bleu: 28.86 - total_time: 11.391191482543945 - avg_eos_idx: 25.24
+2026-11-12 08:40:47.313433: [epoch 7]: tokens_trained_so_far: 1,071,328,832 avg_loss: 2.9826, non_smoothed_loss_fn: 1.868, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.783, bleu_calculations_val: 0.289, avg_vloss: 2.9308, avg_time (s): 0.065, epoch_time (s): 2,369.190
+2026-11-12 08:40:51.024215: [epoch 7]: Config saved
+2026-11-12 08:40:51.025734: Epoch: 8
+2026-11-12 08:43:11.778463: [epoch 8] batch 1999 loss_value: 2.7672, batch_time (s): 0.062, data_loading_time (ms): 3.913, tokens/sec: 80,899.976
+2026-11-12 08:45:32.711871: [epoch 8] batch 3999 loss_value: 2.7618, batch_time (s): 0.059, data_loading_time (ms): 2.655, tokens/sec: 88,705.021
+2026-11-12 08:47:48.403549: [epoch 8] batch 5999 loss_value: 2.6013, batch_time (s): 0.066, data_loading_time (ms): 3.202, tokens/sec: 80,873.193
+2026-11-12 08:47:48.404442 Saving mid-epoch to: ./runs/wmt14/run_1//model_8_in_batch.pt
+2026-11-12 08:47:49.323686 started calculating bleu
+2026-11-12 08:47:58.204138 finished calculating bleu - avg bleu: 28.93 - total_time: 8.880239248275757 - avg_eos_idx: 25.25
+2026-11-12 08:47:58.204932 Val loss calculation done
+2026-11-12 08:50:17.700326: [epoch 8] batch 7999 loss_value: 3.1140, batch_time (s): 0.065, data_loading_time (ms): 2.890, tokens/sec: 174,467.731
+2026-11-12 08:52:34.095806: [epoch 8] batch 9999 loss_value: 2.7256, batch_time (s): 0.070, data_loading_time (ms): 3.922, tokens/sec: 72,625.202
+2026-11-12 08:54:50.438948: [epoch 8] batch 11999 loss_value: 3.0343, batch_time (s): 0.071, data_loading_time (ms): 3.836, tokens/sec: 141,310.901
+2026-11-12 08:54:50.439984 Saving mid-epoch to: ./runs/wmt14/run_1//model_8_in_batch.pt
+2026-11-12 08:54:51.387438 started calculating bleu
+2026-11-12 08:55:01.713523 finished calculating bleu - avg bleu: 29.00 - total_time: 10.325868844985962 - avg_eos_idx: 25.34
+2026-11-12 08:55:01.714384 Val loss calculation done
+2026-11-12 08:57:23.113664: [epoch 8] batch 13999 loss_value: 2.6398, batch_time (s): 0.060, data_loading_time (ms): 2.957, tokens/sec: 83,602.715
+2026-11-12 08:59:39.713886: [epoch 8] batch 15999 loss_value: 2.8991, batch_time (s): 0.060, data_loading_time (ms): 2.878, tokens/sec: 148,167.482
+2026-11-12 09:01:59.003055: [epoch 8] batch 17999 loss_value: 2.1881, batch_time (s): 0.060, data_loading_time (ms): 4.155, tokens/sec: 59,255.640
+2026-11-12 09:01:59.004034 Saving mid-epoch to: ./runs/wmt14/run_1//model_8_in_batch.pt
+2026-11-12 09:01:59.927481 started calculating bleu
+2026-11-12 09:02:10.543215 finished calculating bleu - avg bleu: 28.84 - total_time: 10.615549087524414 - avg_eos_idx: 25.41
+2026-11-12 09:02:10.543990 Val loss calculation done
+2026-11-12 09:04:29.535026: [epoch 8] batch 19999 loss_value: 2.7692, batch_time (s): 0.072, data_loading_time (ms): 2.544, tokens/sec: 79,473.115
+2026-11-12 09:06:44.052477: [epoch 8] batch 21999 loss_value: 3.0299, batch_time (s): 0.064, data_loading_time (ms): 2.220, tokens/sec: 157,967.314
+2026-11-12 09:09:00.570072: [epoch 8] batch 23999 loss_value: 2.9136, batch_time (s): 0.062, data_loading_time (ms): 4.066, tokens/sec: 133,007.670
+2026-11-12 09:09:00.571058 Saving mid-epoch to: ./runs/wmt14/run_1//model_8_in_batch.pt
+2026-11-12 09:09:01.496298 started calculating bleu
+2026-11-12 09:09:11.984642 finished calculating bleu - avg bleu: 28.74 - total_time: 10.488141775131226 - avg_eos_idx: 25.29
+2026-11-12 09:09:11.985328 Val loss calculation done
+2026-11-12 09:11:32.244614: [epoch 8] batch 25999 loss_value: 2.5759, batch_time (s): 0.062, data_loading_time (ms): 3.063, tokens/sec: 74,652.672
+2026-11-12 09:13:50.735501: [epoch 8] batch 27999 loss_value: 3.4541, batch_time (s): 0.086, data_loading_time (ms): 2.957, tokens/sec: 377,299.824
+2026-11-12 09:16:09.241266: [epoch 8] batch 29999 loss_value: 3.1602, batch_time (s): 0.064, data_loading_time (ms): 3.516, tokens/sec: 199,447.547
+2026-11-12 09:16:09.242527 Saving mid-epoch to: ./runs/wmt14/run_1//model_8_in_batch.pt
+2026-11-12 09:16:10.183851 started calculating bleu
+2026-11-12 09:16:20.885357 finished calculating bleu - avg bleu: 28.76 - total_time: 10.701310157775879 - avg_eos_idx: 25.43
+2026-11-12 09:16:20.886209 Val loss calculation done
+2026-11-12 09:18:38.051029: [epoch 8] batch 31999 loss_value: 3.0079, batch_time (s): 0.061, data_loading_time (ms): 3.240, tokens/sec: 135,900.278
+2026-11-12 09:19:58.765424 started calculating bleu
+2026-11-12 09:20:09.979971 finished calculating bleu - avg bleu: 29.13 - total_time: 11.214322566986084 - avg_eos_idx: 25.33
+2026-11-12 09:20:09.980724: [epoch 8]: tokens_trained_so_far: 1,205,244,936 avg_loss: 2.9740, non_smoothed_loss_fn: 1.858, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.774, bleu_calculations_val: 0.291, avg_vloss: 2.9225, avg_time (s): 0.065, epoch_time (s): 2,346.840
+2026-11-12 09:20:13.530372: [epoch 8]: Config saved
+2026-11-12 09:20:13.531486: Epoch: 9
+2026-11-12 09:22:33.685638: [epoch 9] batch 1999 loss_value: 3.0144, batch_time (s): 0.076, data_loading_time (ms): 3.803, tokens/sec: 136,738.098
+2026-11-12 09:24:57.891491: [epoch 9] batch 3999 loss_value: 3.4238, batch_time (s): 0.091, data_loading_time (ms): 2.827, tokens/sec: 360,491.574
+2026-11-12 09:27:15.013283: [epoch 9] batch 5999 loss_value: 2.7931, batch_time (s): 0.063, data_loading_time (ms): 5.379, tokens/sec: 122,148.444
+2026-11-12 09:27:15.014453 Saving mid-epoch to: ./runs/wmt14/run_1//model_9_in_batch.pt
+2026-11-12 09:27:15.963882 started calculating bleu
+2026-11-12 09:27:26.529103 finished calculating bleu - avg bleu: 28.93 - total_time: 10.564990758895874 - avg_eos_idx: 25.23
+2026-11-12 09:27:26.530188 Val loss calculation done
+2026-11-12 09:29:41.226346: [epoch 9] batch 7999 loss_value: 2.7389, batch_time (s): 0.066, data_loading_time (ms): 3.767, tokens/sec: 71,530.204
+2026-11-12 09:32:00.646293: [epoch 9] batch 9999 loss_value: 3.2043, batch_time (s): 0.074, data_loading_time (ms): 2.498, tokens/sec: 234,876.022
+2026-11-12 09:34:20.675463: [epoch 9] batch 11999 loss_value: 2.7469, batch_time (s): 0.068, data_loading_time (ms): 2.702, tokens/sec: 90,582.777
+2026-11-12 09:34:20.676403 Saving mid-epoch to: ./runs/wmt14/run_1//model_9_in_batch.pt
+2026-11-12 09:34:21.616355 started calculating bleu
+2026-11-12 09:34:31.101943 finished calculating bleu - avg bleu: 28.61 - total_time: 9.485387325286865 - avg_eos_idx: 25.32
+2026-11-12 09:34:31.102675 Val loss calculation done
+2026-11-12 09:36:47.773615: [epoch 9] batch 13999 loss_value: 2.9415, batch_time (s): 0.072, data_loading_time (ms): 3.720, tokens/sec: 120,222.819
+2026-11-12 09:39:04.004121: [epoch 9] batch 15999 loss_value: 3.0734, batch_time (s): 0.060, data_loading_time (ms): 3.136, tokens/sec: 295,720.455
+2026-11-12 09:41:22.040584: [epoch 9] batch 17999 loss_value: 3.0837, batch_time (s): 0.071, data_loading_time (ms): 2.977, tokens/sec: 213,962.867
+2026-11-12 09:41:22.041486 Saving mid-epoch to: ./runs/wmt14/run_1//model_9_in_batch.pt
+2026-11-12 09:41:22.960694 started calculating bleu
+2026-11-12 09:41:31.792079 finished calculating bleu - avg bleu: 28.97 - total_time: 8.831198692321777 - avg_eos_idx: 25.40
+2026-11-12 09:41:31.793073 Val loss calculation done
+2026-11-12 09:43:49.160398: [epoch 9] batch 19999 loss_value: 3.3453, batch_time (s): 0.060, data_loading_time (ms): 2.810, tokens/sec: 262,232.161
+2026-11-12 09:46:04.467970: [epoch 9] batch 21999 loss_value: 3.0694, batch_time (s): 0.061, data_loading_time (ms): 3.001, tokens/sec: 200,842.456
+2026-11-12 09:48:22.839502: [epoch 9] batch 23999 loss_value: 3.2474, batch_time (s): 0.070, data_loading_time (ms): 2.969, tokens/sec: 199,416.357
+2026-11-12 09:48:22.840582 Saving mid-epoch to: ./runs/wmt14/run_1//model_9_in_batch.pt
+2026-11-12 09:48:23.683845 started calculating bleu
+2026-11-12 09:48:32.527817 finished calculating bleu - avg bleu: 28.75 - total_time: 8.84377384185791 - avg_eos_idx: 25.28
+2026-11-12 09:48:32.528500 Val loss calculation done
+2026-11-12 09:50:55.610031: [epoch 9] batch 25999 loss_value: 2.9818, batch_time (s): 0.075, data_loading_time (ms): 3.721, tokens/sec: 154,009.193
+2026-11-12 09:53:20.648908: [epoch 9] batch 27999 loss_value: 2.7493, batch_time (s): 0.060, data_loading_time (ms): 4.747, tokens/sec: 100,677.621
+2026-11-12 09:55:42.539549: [epoch 9] batch 29999 loss_value: 3.1295, batch_time (s): 0.065, data_loading_time (ms): 3.546, tokens/sec: 232,781.710
+2026-11-12 09:55:42.540517 Saving mid-epoch to: ./runs/wmt14/run_1//model_9_in_batch.pt
+2026-11-12 09:55:43.453607 started calculating bleu
+2026-11-12 09:55:52.390447 finished calculating bleu - avg bleu: 28.65 - total_time: 8.936639070510864 - avg_eos_idx: 25.25
+2026-11-12 09:55:52.391180 Val loss calculation done
+2026-11-12 09:58:12.000247: [epoch 9] batch 31999 loss_value: 3.0781, batch_time (s): 0.066, data_loading_time (ms): 4.015, tokens/sec: 169,515.417
+2026-11-12 09:59:34.915008 started calculating bleu
+2026-11-12 09:59:45.897498 finished calculating bleu - avg bleu: 29.02 - total_time: 10.982309341430664 - avg_eos_idx: 25.42
+2026-11-12 09:59:45.898122: [epoch 9]: tokens_trained_so_far: 1,339,161,040 avg_loss: 2.9678, non_smoothed_loss_fn: 1.851, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.766, bleu_calculations_val: 0.290, avg_vloss: 2.9207, avg_time (s): 0.065, epoch_time (s): 2,360.439
+2026-11-12 09:59:50.058321: [epoch 9]: Config saved
+2026-11-12 09:59:50.059393: Epoch: 10
+2026-11-12 10:02:11.622205: [epoch 10] batch 1999 loss_value: 3.0078, batch_time (s): 0.068, data_loading_time (ms): 3.150, tokens/sec: 234,481.908
+2026-11-12 10:04:34.281244: [epoch 10] batch 3999 loss_value: 2.9464, batch_time (s): 0.061, data_loading_time (ms): 2.292, tokens/sec: 172,854.368
+2026-11-12 10:06:54.397652: [epoch 10] batch 5999 loss_value: 2.7504, batch_time (s): 0.062, data_loading_time (ms): 2.403, tokens/sec: 92,437.159
+2026-11-12 10:06:54.398652 Saving mid-epoch to: ./runs/wmt14/run_1//model_10_in_batch.pt
+2026-11-12 10:06:55.329819 started calculating bleu
+2026-11-12 10:07:04.577653 finished calculating bleu - avg bleu: 28.95 - total_time: 9.247639894485474 - avg_eos_idx: 25.38
+2026-11-12 10:07:04.578324 Val loss calculation done
+2026-11-12 10:09:23.641302: [epoch 10] batch 7999 loss_value: 2.7930, batch_time (s): 0.062, data_loading_time (ms): 2.915, tokens/sec: 172,185.700
+2026-11-12 10:11:42.619508: [epoch 10] batch 9999 loss_value: 3.3167, batch_time (s): 0.064, data_loading_time (ms): 3.997, tokens/sec: 264,921.236
+2026-11-12 10:14:03.587185: [epoch 10] batch 11999 loss_value: 3.0362, batch_time (s): 0.061, data_loading_time (ms): 4.228, tokens/sec: 145,733.823
+2026-11-12 10:14:03.588212 Saving mid-epoch to: ./runs/wmt14/run_1//model_10_in_batch.pt
+2026-11-12 10:14:04.532762 started calculating bleu
+2026-11-12 10:14:15.046098 finished calculating bleu - avg bleu: 29.01 - total_time: 10.513135194778442 - avg_eos_idx: 25.29
+2026-11-12 10:14:15.046846 Val loss calculation done
+2026-11-12 10:16:34.889526: [epoch 10] batch 13999 loss_value: 3.1389, batch_time (s): 0.061, data_loading_time (ms): 3.742, tokens/sec: 216,517.983
+2026-11-12 10:18:55.014884: [epoch 10] batch 15999 loss_value: 3.1151, batch_time (s): 0.061, data_loading_time (ms): 4.708, tokens/sec: 204,300.801
+2026-11-12 10:21:14.129033: [epoch 10] batch 17999 loss_value: 3.1548, batch_time (s): 0.065, data_loading_time (ms): 2.363, tokens/sec: 233,693.372
+2026-11-12 10:21:14.129893 Saving mid-epoch to: ./runs/wmt14/run_1//model_10_in_batch.pt
+2026-11-12 10:21:14.921548 started calculating bleu
+2026-11-12 10:21:25.804636 finished calculating bleu - avg bleu: 28.73 - total_time: 10.882864952087402 - avg_eos_idx: 25.39
+2026-11-12 10:21:25.805331 Val loss calculation done
+2026-11-12 10:23:45.732619: [epoch 10] batch 19999 loss_value: 2.9646, batch_time (s): 0.060, data_loading_time (ms): 3.201, tokens/sec: 205,747.241
+2026-11-12 10:26:03.646124: [epoch 10] batch 21999 loss_value: 2.5193, batch_time (s): 0.075, data_loading_time (ms): 4.075, tokens/sec: 56,478.138
+2026-11-12 10:28:22.880764: [epoch 10] batch 23999 loss_value: 3.1296, batch_time (s): 0.110, data_loading_time (ms): 5.223, tokens/sec: 116,872.657
+2026-11-12 10:28:22.881722 Saving mid-epoch to: ./runs/wmt14/run_1//model_10_in_batch.pt
+2026-11-12 10:28:23.802659 started calculating bleu
+2026-11-12 10:28:33.756641 finished calculating bleu - avg bleu: 28.95 - total_time: 9.95375943183899 - avg_eos_idx: 25.29
+2026-11-12 10:28:33.757417 Val loss calculation done
+2026-11-12 10:30:54.844107: [epoch 10] batch 25999 loss_value: 2.9356, batch_time (s): 0.091, data_loading_time (ms): 4.883, tokens/sec: 114,884.250
+2026-11-12 10:33:12.465106: [epoch 10] batch 27999 loss_value: 2.6220, batch_time (s): 0.064, data_loading_time (ms): 2.243, tokens/sec: 65,753.446
+2026-11-12 10:35:31.510316: [epoch 10] batch 29999 loss_value: 2.6248, batch_time (s): 0.062, data_loading_time (ms): 2.254, tokens/sec: 80,742.119
+2026-11-12 10:35:31.511618 Saving mid-epoch to: ./runs/wmt14/run_1//model_10_in_batch.pt
+2026-11-12 10:35:32.451913 started calculating bleu
+2026-11-12 10:35:42.221541 finished calculating bleu - avg bleu: 28.96 - total_time: 9.769435405731201 - avg_eos_idx: 25.39
+2026-11-12 10:35:42.222269 Val loss calculation done
+2026-11-12 10:38:02.142662: [epoch 10] batch 31999 loss_value: 3.0828, batch_time (s): 0.067, data_loading_time (ms): 2.541, tokens/sec: 154,374.020
+2026-11-12 10:39:25.143620 started calculating bleu
+2026-11-12 10:39:35.037699 finished calculating bleu - avg bleu: 29.01 - total_time: 9.893890380859375 - avg_eos_idx: 25.46
+2026-11-12 10:39:35.038312: [epoch 10]: tokens_trained_so_far: 1,473,077,144 avg_loss: 2.9619, non_smoothed_loss_fn: 1.844, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.759, bleu_calculations_val: 0.290, avg_vloss: 2.9125, avg_time (s): 0.066, epoch_time (s): 2,374.165
+2026-11-12 10:39:39.224623: [epoch 10]: Config saved
+2026-11-12 10:39:39.225752: Epoch: 11
+2026-11-12 10:41:59.579876: [epoch 11] batch 1999 loss_value: 3.0996, batch_time (s): 0.063, data_loading_time (ms): 3.229, tokens/sec: 152,254.277
+2026-11-12 10:44:16.305638: [epoch 11] batch 3999 loss_value: 2.9368, batch_time (s): 0.066, data_loading_time (ms): 2.451, tokens/sec: 140,349.235
+2026-11-12 10:46:35.121319: [epoch 11] batch 5999 loss_value: 2.9117, batch_time (s): 0.061, data_loading_time (ms): 3.615, tokens/sec: 153,229.763
+2026-11-12 10:46:35.122695 Saving mid-epoch to: ./runs/wmt14/run_1//model_11_in_batch.pt
+2026-11-12 10:46:36.038782 started calculating bleu
+2026-11-12 10:46:45.446223 finished calculating bleu - avg bleu: 28.93 - total_time: 9.407247304916382 - avg_eos_idx: 25.28
+2026-11-12 10:46:45.446945 Val loss calculation done
+2026-11-12 10:49:05.329580: [epoch 11] batch 7999 loss_value: 3.0054, batch_time (s): 0.067, data_loading_time (ms): 3.008, tokens/sec: 100,618.326
+2026-11-12 10:51:22.455641: [epoch 11] batch 9999 loss_value: 2.5413, batch_time (s): 0.047, data_loading_time (ms): 2.461, tokens/sec: 95,493.192
+2026-11-12 10:53:44.207785: [epoch 11] batch 11999 loss_value: 2.7785, batch_time (s): 0.068, data_loading_time (ms): 2.834, tokens/sec: 90,119.334
+2026-11-12 10:53:44.208704 Saving mid-epoch to: ./runs/wmt14/run_1//model_11_in_batch.pt
+2026-11-12 10:53:45.136855 started calculating bleu
+2026-11-12 10:53:55.001381 finished calculating bleu - avg bleu: 29.28 - total_time: 9.864354610443115 - avg_eos_idx: 25.40
+2026-11-12 10:53:55.002098 Val loss calculation done
+2026-11-12 10:56:14.126500: [epoch 11] batch 13999 loss_value: 3.7165, batch_time (s): 0.091, data_loading_time (ms): 4.647, tokens/sec: 359,061.808
+2026-11-12 10:58:34.062514: [epoch 11] batch 15999 loss_value: 2.5072, batch_time (s): 0.069, data_loading_time (ms): 3.352, tokens/sec: 51,814.908
+2026-11-12 11:00:54.823944: [epoch 11] batch 17999 loss_value: 2.4081, batch_time (s): 0.068, data_loading_time (ms): 2.783, tokens/sec: 67,885.541
+2026-11-12 11:00:54.824944 Saving mid-epoch to: ./runs/wmt14/run_1//model_11_in_batch.pt
+2026-11-12 11:00:55.460761 started calculating bleu
+2026-11-12 11:01:04.254825 finished calculating bleu - avg bleu: 29.02 - total_time: 8.79386043548584 - avg_eos_idx: 25.28
+2026-11-12 11:01:04.255606 Val loss calculation done
+2026-11-12 11:03:24.383734: [epoch 11] batch 19999 loss_value: 2.8620, batch_time (s): 0.072, data_loading_time (ms): 2.976, tokens/sec: 109,025.290
+2026-11-12 11:05:41.039969: [epoch 11] batch 21999 loss_value: 3.0317, batch_time (s): 0.073, data_loading_time (ms): 3.807, tokens/sec: 188,477.739
+2026-11-12 11:08:03.233764: [epoch 11] batch 23999 loss_value: 3.1044, batch_time (s): 0.069, data_loading_time (ms): 2.732, tokens/sec: 165,372.288
+2026-11-12 11:08:03.234739 Saving mid-epoch to: ./runs/wmt14/run_1//model_11_in_batch.pt
+2026-11-12 11:08:04.169377 started calculating bleu
+2026-11-12 11:08:16.097170 finished calculating bleu - avg bleu: 28.76 - total_time: 11.927615404129028 - avg_eos_idx: 25.53
+2026-11-12 11:08:16.098293 Val loss calculation done
+2026-11-12 11:10:37.219224: [epoch 11] batch 25999 loss_value: 3.0480, batch_time (s): 0.072, data_loading_time (ms): 2.302, tokens/sec: 210,144.263
+2026-11-12 11:12:53.585402: [epoch 11] batch 27999 loss_value: 2.9505, batch_time (s): 0.059, data_loading_time (ms): 3.872, tokens/sec: 193,906.666
+2026-11-12 11:15:07.453306: [epoch 11] batch 29999 loss_value: 2.9177, batch_time (s): 0.053, data_loading_time (ms): 2.233, tokens/sec: 188,601.436
+2026-11-12 11:15:07.453895 Saving mid-epoch to: ./runs/wmt14/run_1//model_11_in_batch.pt
+2026-11-12 11:15:08.434201 started calculating bleu
+2026-11-12 11:15:17.545254 finished calculating bleu - avg bleu: 28.84 - total_time: 9.110859870910645 - avg_eos_idx: 25.34
+2026-11-12 11:15:17.546000 Val loss calculation done
+2026-11-12 11:17:37.917898: [epoch 11] batch 31999 loss_value: 3.1684, batch_time (s): 0.062, data_loading_time (ms): 3.336, tokens/sec: 209,788.223
+2026-11-12 11:19:02.299801 started calculating bleu
+2026-11-12 11:19:11.704693 finished calculating bleu - avg bleu: 28.96 - total_time: 9.404674291610718 - avg_eos_idx: 25.35
+2026-11-12 11:19:11.705329: [epoch 11]: tokens_trained_so_far: 1,606,993,248 avg_loss: 2.9574, non_smoothed_loss_fn: 1.839, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.752, bleu_calculations_val: 0.290, avg_vloss: 2.9068, avg_time (s): 0.065, epoch_time (s): 2,362.119
+2026-11-12 11:19:15.528855: [epoch 11]: Config saved
+2026-11-12 11:19:15.529892: Epoch: 12
+2026-11-12 11:21:42.080393: [epoch 12] batch 1999 loss_value: 2.8028, batch_time (s): 0.064, data_loading_time (ms): 3.275, tokens/sec: 153,795.724
+2026-11-12 11:23:56.965673: [epoch 12] batch 3999 loss_value: 3.1726, batch_time (s): 0.061, data_loading_time (ms): 2.713, tokens/sec: 325,133.196
+2026-11-12 11:26:14.530493: [epoch 12] batch 5999 loss_value: 3.3520, batch_time (s): 0.071, data_loading_time (ms): 4.243, tokens/sec: 364,181.732
+2026-11-12 11:26:14.531640 Saving mid-epoch to: ./runs/wmt14/run_1//model_12_in_batch.pt
+2026-11-12 11:26:15.486680 started calculating bleu
+2026-11-12 11:26:25.507640 finished calculating bleu - avg bleu: 29.15 - total_time: 10.020734071731567 - avg_eos_idx: 25.23
+2026-11-12 11:26:25.508535 Val loss calculation done
+2026-11-12 11:28:44.668939: [epoch 12] batch 7999 loss_value: 3.1519, batch_time (s): 0.061, data_loading_time (ms): 4.609, tokens/sec: 163,502.492
+2026-11-12 11:30:58.274226: [epoch 12] batch 9999 loss_value: 2.7330, batch_time (s): 0.065, data_loading_time (ms): 3.076, tokens/sec: 156,363.443
+2026-11-12 11:33:13.120682: [epoch 12] batch 11999 loss_value: 2.8764, batch_time (s): 0.071, data_loading_time (ms): 4.124, tokens/sec: 130,043.249
+2026-11-12 11:33:13.121666 Saving mid-epoch to: ./runs/wmt14/run_1//model_12_in_batch.pt
+2026-11-12 11:33:14.037170 started calculating bleu
+2026-11-12 11:33:25.480285 finished calculating bleu - avg bleu: 28.73 - total_time: 11.442928314208984 - avg_eos_idx: 25.26
+2026-11-12 11:33:25.481003 Val loss calculation done
+2026-11-12 11:35:46.825485: [epoch 12] batch 13999 loss_value: 3.0287, batch_time (s): 0.062, data_loading_time (ms): 4.807, tokens/sec: 194,826.066
+2026-11-12 11:38:03.773222: [epoch 12] batch 15999 loss_value: 2.7454, batch_time (s): 0.063, data_loading_time (ms): 2.863, tokens/sec: 112,191.481
+2026-11-12 11:40:22.334998: [epoch 12] batch 17999 loss_value: 3.0033, batch_time (s): 0.063, data_loading_time (ms): 2.215, tokens/sec: 198,166.148
+2026-11-12 11:40:22.336164 Saving mid-epoch to: ./runs/wmt14/run_1//model_12_in_batch.pt
+2026-11-12 11:40:23.330555 started calculating bleu
+2026-11-12 11:40:32.749126 finished calculating bleu - avg bleu: 29.11 - total_time: 9.418375492095947 - avg_eos_idx: 25.35
+2026-11-12 11:40:32.749874 Val loss calculation done
+2026-11-12 11:42:52.026161: [epoch 12] batch 19999 loss_value: 3.1202, batch_time (s): 0.063, data_loading_time (ms): 3.715, tokens/sec: 306,961.123
+2026-11-12 11:45:15.894461: [epoch 12] batch 21999 loss_value: 3.4028, batch_time (s): 0.064, data_loading_time (ms): 3.172, tokens/sec: 322,806.419
+2026-11-12 11:47:36.783956: [epoch 12] batch 23999 loss_value: 2.8911, batch_time (s): 0.063, data_loading_time (ms): 2.519, tokens/sec: 132,606.558
+2026-11-12 11:47:36.784921 Saving mid-epoch to: ./runs/wmt14/run_1//model_12_in_batch.pt
+2026-11-12 11:47:37.722636 started calculating bleu
+2026-11-12 11:47:47.670002 finished calculating bleu - avg bleu: 29.02 - total_time: 9.947176694869995 - avg_eos_idx: 25.16
+2026-11-12 11:47:47.670914 Val loss calculation done
+2026-11-12 11:50:02.214441: [epoch 12] batch 25999 loss_value: 3.0185, batch_time (s): 0.064, data_loading_time (ms): 2.324, tokens/sec: 253,728.278
+2026-11-12 11:52:18.946478: [epoch 12] batch 27999 loss_value: 2.9956, batch_time (s): 0.058, data_loading_time (ms): 2.712, tokens/sec: 126,736.915
+2026-11-12 11:54:33.751047: [epoch 12] batch 29999 loss_value: 2.6652, batch_time (s): 0.061, data_loading_time (ms): 3.948, tokens/sec: 73,954.109
+2026-11-12 11:54:33.751938 Saving mid-epoch to: ./runs/wmt14/run_1//model_12_in_batch.pt
+2026-11-12 11:54:34.674466 started calculating bleu
+2026-11-12 11:54:44.222583 finished calculating bleu - avg bleu: 29.12 - total_time: 9.547910928726196 - avg_eos_idx: 25.24
+2026-11-12 11:54:44.223302 Val loss calculation done
+2026-11-12 11:57:05.767621: [epoch 12] batch 31999 loss_value: 3.3086, batch_time (s): 0.080, data_loading_time (ms): 3.898, tokens/sec: 194,638.101
+2026-11-12 11:58:27.122027 started calculating bleu
+2026-11-12 11:58:37.596307 finished calculating bleu - avg bleu: 28.98 - total_time: 10.473816394805908 - avg_eos_idx: 25.31
+2026-11-12 11:58:37.597615: [epoch 12]: tokens_trained_so_far: 1,740,909,352 avg_loss: 2.9521, non_smoothed_loss_fn: 1.833, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.760, bleu_calculations_val: 0.290, avg_vloss: 2.9085, avg_time (s): 0.065, epoch_time (s): 2,350.637
+2026-11-12 11:58:37.597836: [epoch 12]: epoch did not improve!
+2026-11-12 11:58:37.597856: [epoch 12]: Still not better than max epoch.
+2026-11-12 11:58:39.716219: [epoch 12]: Config saved
+2026-11-12 11:58:39.718155: Epoch: 13
+2026-11-12 12:00:59.267143: [epoch 13] batch 1999 loss_value: 3.2303, batch_time (s): 0.101, data_loading_time (ms): 6.350, tokens/sec: 195,700.978
+2026-11-12 12:03:21.324212: [epoch 13] batch 3999 loss_value: 2.7138, batch_time (s): 0.061, data_loading_time (ms): 4.316, tokens/sec: 107,742.196
+2026-11-12 12:05:40.782710: [epoch 13] batch 5999 loss_value: 2.9076, batch_time (s): 0.061, data_loading_time (ms): 2.786, tokens/sec: 196,337.405
+2026-11-12 12:05:40.783719 Saving mid-epoch to: ./runs/wmt14/run_1//model_13_in_batch.pt
+2026-11-12 12:05:41.746816 started calculating bleu
+2026-11-12 12:05:51.037754 finished calculating bleu - avg bleu: 28.81 - total_time: 9.290701627731323 - avg_eos_idx: 25.25
+2026-11-12 12:05:51.038774 Val loss calculation done
+2026-11-12 12:08:11.463939: [epoch 13] batch 7999 loss_value: 2.1951, batch_time (s): 0.060, data_loading_time (ms): 3.100, tokens/sec: 55,104.767
+2026-11-12 12:10:29.874730: [epoch 13] batch 9999 loss_value: 3.1772, batch_time (s): 0.072, data_loading_time (ms): 3.087, tokens/sec: 151,409.371
+2026-11-12 12:12:50.340595: [epoch 13] batch 11999 loss_value: 2.9058, batch_time (s): 0.059, data_loading_time (ms): 2.784, tokens/sec: 152,158.892
+2026-11-12 12:12:50.341580 Saving mid-epoch to: ./runs/wmt14/run_1//model_13_in_batch.pt
+2026-11-12 12:12:51.270286 started calculating bleu
+2026-11-12 12:13:00.789076 finished calculating bleu - avg bleu: 28.91 - total_time: 9.51841950416565 - avg_eos_idx: 25.19
+2026-11-12 12:13:00.790497 Val loss calculation done
+2026-11-12 12:15:27.447597: [epoch 13] batch 13999 loss_value: 2.5076, batch_time (s): 0.058, data_loading_time (ms): 3.440, tokens/sec: 74,762.082
+2026-11-12 12:17:45.962140: [epoch 13] batch 15999 loss_value: 2.8888, batch_time (s): 0.063, data_loading_time (ms): 4.763, tokens/sec: 179,121.165
+2026-11-12 12:20:03.283233: [epoch 13] batch 17999 loss_value: 2.8223, batch_time (s): 0.061, data_loading_time (ms): 3.288, tokens/sec: 135,323.575
+2026-11-12 12:20:03.284249 Saving mid-epoch to: ./runs/wmt14/run_1//model_13_in_batch.pt
+2026-11-12 12:20:04.234200 started calculating bleu
+2026-11-12 12:20:15.148779 finished calculating bleu - avg bleu: 29.10 - total_time: 10.914364337921143 - avg_eos_idx: 25.37
+2026-11-12 12:20:15.149515 Val loss calculation done
+2026-11-12 12:22:41.537061: [epoch 13] batch 19999 loss_value: 2.9567, batch_time (s): 0.063, data_loading_time (ms): 4.350, tokens/sec: 219,797.188
+2026-11-12 12:25:00.886961: [epoch 13] batch 21999 loss_value: 2.5632, batch_time (s): 0.062, data_loading_time (ms): 4.205, tokens/sec: 82,666.746
+2026-11-12 12:27:22.473223: [epoch 13] batch 23999 loss_value: 3.0712, batch_time (s): 0.059, data_loading_time (ms): 3.116, tokens/sec: 206,779.596
+2026-11-12 12:27:22.474121 Saving mid-epoch to: ./runs/wmt14/run_1//model_13_in_batch.pt
+2026-11-12 12:27:23.412178 started calculating bleu
+2026-11-12 12:27:33.464982 finished calculating bleu - avg bleu: 29.16 - total_time: 10.052600860595703 - avg_eos_idx: 25.28
+2026-11-12 12:27:33.465687 Val loss calculation done
+2026-11-12 12:29:52.892394: [epoch 13] batch 25999 loss_value: 2.8113, batch_time (s): 0.080, data_loading_time (ms): 3.715, tokens/sec: 87,720.357
+2026-11-12 12:32:14.607161: [epoch 13] batch 27999 loss_value: 2.6332, batch_time (s): 0.064, data_loading_time (ms): 3.253, tokens/sec: 101,802.208
+2026-11-12 12:34:25.819584: [epoch 13] batch 29999 loss_value: 2.9597, batch_time (s): 0.064, data_loading_time (ms): 3.613, tokens/sec: 175,545.144
+2026-11-12 12:34:25.820623 Saving mid-epoch to: ./runs/wmt14/run_1//model_13_in_batch.pt
+2026-11-12 12:34:26.771819 started calculating bleu
+2026-11-12 12:34:36.080727 finished calculating bleu - avg bleu: 28.81 - total_time: 9.308705806732178 - avg_eos_idx: 25.19
+2026-11-12 12:34:36.081537 Val loss calculation done
+2026-11-12 12:36:55.282786: [epoch 13] batch 31999 loss_value: 3.0732, batch_time (s): 0.060, data_loading_time (ms): 2.685, tokens/sec: 219,977.420
+2026-11-12 12:38:13.965759 started calculating bleu
+2026-11-12 12:38:22.675060 finished calculating bleu - avg bleu: 29.05 - total_time: 8.709072351455688 - avg_eos_idx: 25.35
+2026-11-12 12:38:22.675798: [epoch 13]: tokens_trained_so_far: 1,874,825,456 avg_loss: 2.9461, non_smoothed_loss_fn: 1.827, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.743, bleu_calculations_val: 0.291, avg_vloss: 2.8996, avg_time (s): 0.066, epoch_time (s): 2,373.369
+2026-11-12 12:38:26.624722: [epoch 13]: Config saved
+2026-11-12 12:38:26.626535: Epoch: 14
+2026-11-12 12:40:45.637797: [epoch 14] batch 1999 loss_value: 2.6486, batch_time (s): 0.058, data_loading_time (ms): 4.088, tokens/sec: 79,946.693
+2026-11-12 12:43:03.277067: [epoch 14] batch 3999 loss_value: 3.2010, batch_time (s): 0.069, data_loading_time (ms): 3.710, tokens/sec: 172,982.562
+2026-11-12 12:45:21.027955: [epoch 14] batch 5999 loss_value: 2.7736, batch_time (s): 0.078, data_loading_time (ms): 2.802, tokens/sec: 88,465.501
+2026-11-12 12:45:21.028949 Saving mid-epoch to: ./runs/wmt14/run_1//model_14_in_batch.pt
+2026-11-12 12:45:21.913186 started calculating bleu
+2026-11-12 12:45:31.150786 finished calculating bleu - avg bleu: 29.31 - total_time: 9.237390279769897 - avg_eos_idx: 25.30
+2026-11-12 12:45:31.151474 Val loss calculation done
+2026-11-12 12:47:51.930789: [epoch 14] batch 7999 loss_value: 2.9954, batch_time (s): 0.072, data_loading_time (ms): 2.798, tokens/sec: 193,846.389
+2026-11-12 12:50:13.116023: [epoch 14] batch 9999 loss_value: 3.0649, batch_time (s): 0.060, data_loading_time (ms): 3.219, tokens/sec: 203,825.058
+2026-11-12 12:52:28.695945: [epoch 14] batch 11999 loss_value: 2.7708, batch_time (s): 0.069, data_loading_time (ms): 2.842, tokens/sec: 97,651.418
+2026-11-12 12:52:28.696941 Saving mid-epoch to: ./runs/wmt14/run_1//model_14_in_batch.pt
+2026-11-12 12:52:29.659020 started calculating bleu
+2026-11-12 12:52:40.231620 finished calculating bleu - avg bleu: 29.01 - total_time: 10.572402954101562 - avg_eos_idx: 25.44
+2026-11-12 12:52:40.232348 Val loss calculation done
+2026-11-12 12:54:58.962773: [epoch 14] batch 13999 loss_value: 3.2539, batch_time (s): 0.071, data_loading_time (ms): 2.903, tokens/sec: 372,086.963
+2026-11-12 12:57:19.931674: [epoch 14] batch 15999 loss_value: 2.7895, batch_time (s): 0.061, data_loading_time (ms): 4.553, tokens/sec: 101,042.204
+2026-11-12 12:59:39.595157: [epoch 14] batch 17999 loss_value: 2.9965, batch_time (s): 0.067, data_loading_time (ms): 2.496, tokens/sec: 144,312.379
+2026-11-12 12:59:39.596121 Saving mid-epoch to: ./runs/wmt14/run_1//model_14_in_batch.pt
+2026-11-12 12:59:40.527042 started calculating bleu
+2026-11-12 12:59:49.859233 finished calculating bleu - avg bleu: 28.99 - total_time: 9.332013607025146 - avg_eos_idx: 25.44
+2026-11-12 12:59:49.859971 Val loss calculation done
+2026-11-12 13:02:10.599772: [epoch 14] batch 19999 loss_value: 2.6597, batch_time (s): 0.084, data_loading_time (ms): 4.944, tokens/sec: 50,567.823
+2026-11-12 13:04:32.277575: [epoch 14] batch 21999 loss_value: 2.8067, batch_time (s): 0.061, data_loading_time (ms): 3.221, tokens/sec: 77,931.923
+2026-11-12 13:06:48.019608: [epoch 14] batch 23999 loss_value: 3.0388, batch_time (s): 0.061, data_loading_time (ms): 3.792, tokens/sec: 162,909.038
+2026-11-12 13:06:48.020681 Saving mid-epoch to: ./runs/wmt14/run_1//model_14_in_batch.pt
+2026-11-12 13:06:48.979070 started calculating bleu
+2026-11-12 13:06:58.775231 finished calculating bleu - avg bleu: 28.84 - total_time: 9.795886516571045 - avg_eos_idx: 25.32
+2026-11-12 13:06:58.776344 Val loss calculation done
+2026-11-12 13:09:18.741719: [epoch 14] batch 25999 loss_value: 2.6921, batch_time (s): 0.066, data_loading_time (ms): 2.864, tokens/sec: 101,063.542
+2026-11-12 13:11:39.743353: [epoch 14] batch 27999 loss_value: 3.0421, batch_time (s): 0.062, data_loading_time (ms): 2.855, tokens/sec: 195,086.146
+2026-11-12 13:13:58.223479: [epoch 14] batch 29999 loss_value: 2.9157, batch_time (s): 0.073, data_loading_time (ms): 3.446, tokens/sec: 138,419.821
+2026-11-12 13:13:58.224463 Saving mid-epoch to: ./runs/wmt14/run_1//model_14_in_batch.pt
+2026-11-12 13:13:59.171709 started calculating bleu
+2026-11-12 13:14:09.026762 finished calculating bleu - avg bleu: 29.41 - total_time: 9.854849338531494 - avg_eos_idx: 25.38
+2026-11-12 13:14:09.027534 Val loss calculation done
+2026-11-12 13:16:30.940921: [epoch 14] batch 31999 loss_value: 2.8450, batch_time (s): 0.084, data_loading_time (ms): 4.526, tokens/sec: 80,855.661
+2026-11-12 13:17:54.415637 started calculating bleu
+2026-11-12 13:18:04.955962 finished calculating bleu - avg bleu: 29.14 - total_time: 10.54013180732727 - avg_eos_idx: 25.29
+2026-11-12 13:18:04.956372: [epoch 14]: tokens_trained_so_far: 2,008,741,560 avg_loss: 2.9413, non_smoothed_loss_fn: 1.821, bleu_calculations: 0.000, non_smoothed_loss_fn_val: 1.744, bleu_calculations_val: 0.291, avg_vloss: 2.9002, avg_time (s): 0.065, epoch_time (s): 2,366.856
+2026-11-12 13:18:04.956459: [epoch 14]: epoch did not improve!
+2026-11-12 13:18:04.956471: [epoch 14]: Still not better than max epoch.
+2026-11-12 13:18:06.844774: [epoch 14]: Config saved
+2026-11-12 13:18:06.844829: Done training! 
