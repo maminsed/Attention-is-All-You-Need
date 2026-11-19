@@ -27,7 +27,7 @@ optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = False
+LOAD_PRE_SAVED = True
 VERBOSE = True
 VERBOSE_FREQ = 2_000
 SAVE_FREQ=6_000
@@ -70,7 +70,7 @@ config = {
     "benchmark_mode": False,
     "batch_size": 128,
     "val_batch_size": 64,
-    "epochs": 15,
+    "epochs": 30,
     "early_stopping_limit": 5,
     ## Optimizer
     "optimizer": "adam",  # informational only,
@@ -103,12 +103,12 @@ config = {
     # Device params
     "device": DEVICE,
     "dtype": torch.float32,
-    "seed": 42,
+    "seed": 123, # updating to 123 for continuation, switch back to 42
     ## Multiproccessing
     "use_amp": True,
     "autocast_dtype": torch.bfloat16,
     "num_workers": 2, # will time. 
-    "pin_memory": False,  # doesn't help much in mac and non_blocking weird.
+    "pin_memory": True,
 }
 
 # make all temp changes here to not mess up anything else and forget:

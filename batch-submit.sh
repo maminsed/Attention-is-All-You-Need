@@ -7,8 +7,8 @@
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
-#SBATCH --output=logs/wmt14/run_1.out
-#SBATCH --error=logs/wmt14/run_1.out
+#SBATCH --output=logs/wmt14/run_1_pt2.out
+#SBATCH --error=logs/wmt14/run_1_pt2.out
 #SBATCH --mail-user=m4sedagh@uwaterloo.ca
 #SBATCH --mail-type=ALL
 
