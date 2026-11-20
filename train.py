@@ -22,7 +22,7 @@ import pyarrow as pa
 from torch.utils.data import DataLoader, Dataset
 from huggingface_hub import PyTorchModelHubMixin
 
-save_file_path_root = "./runs/wmt14/run_1/"
+save_file_path_root = "./runs/wmt14/run_1"
 config_path = f"{save_file_path_root}/config.json"
 optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
@@ -506,8 +506,11 @@ class Transformer(
 
         ## KV_Cache:
         self.cache_idx=0
+        self.register_buffer('pos_encs',self.positional_encoding(self.config["context_size"])) # CUDA- S,d_m
 
     def positional_encoding(self, seq_len, n=10000,*,start=0):
+        if getattr(self,'pos_encs',None) is not None:
+            return self.pos_encs[start:start+seq_len,:] # CUDA- S,d_m
         d_model = self.config["d_model"]
         pe = torch.zeros(seq_len, d_model, device=self.config["device"])  # CUDA- S,d_m
         pos = torch.arange(start,end=start+seq_len, device=self.config["device"]).reshape(-1, 1)  # CUDA- S,1
@@ -930,7 +933,7 @@ def lr_update_fn(step):
         lr = config["peak_lr"]*min((1+(step-warmup_steps)/config["tau"])**-0.5,step/config["warmup_steps"])
     return lr
 
-def load_best_model(latest=False):
+def load_best_model(latest=False,restore_if_missing_pos_encs=False):
     global config
     # ONLY USE IN EVALUATION
     assert path.exists(config_path)
@@ -961,13 +964,29 @@ def load_best_model(latest=False):
     print(f"{datetime.now()}: loading best pre saved")
     model_best_path = f"{save_file_path_root}/best/model.pt"
     if path.exists(model_best_path) and not latest:
-        print("best model path found.")
-        model.load_state_dict(torch.load(model_best_path))
+        print(f"best model path found: {model_best_path}")
+        model_path = model_best_path
     else:
         print(f"best model path not found. Loading from: {model_path}")
-        model.load_state_dict(torch.load(model_path))
+    incompatible = model.load_state_dict(torch.load(model_path),strict=False)
+
+    if not (len(incompatible.missing_keys) == 0 or (len(incompatible.missing_keys) == 1 and incompatible.missing_keys[0] == "pos_encs")):
+        raise RuntimeError(f"The only missing key allowed is the register values. Current missing keys: {incompatible.missing_keys}")
+    if len(incompatible.unexpected_keys) != 0:
+        raise RuntimeError("0 unexpected keys allowed")
 
     model.to(config["device"], dtype=config["dtype"])
+    if len(incompatible.missing_keys) == 1 and restore_if_missing_pos_encs:
+        allowed = input("Restoring updated model with the register values populated. Enter Y to continue: ")
+        if allowed.lower() in ["yes","y"]:
+            print("Yes selected.")
+            torch.save(model.state_dict(),model_path)
+        else:
+            print("Restoring skipped.")
+    elif len(incompatible.missing_keys) == 1:
+        print("1 missing key. Skipped")
+    elif restore_if_missing_pos_encs:
+        print("nothing to restore :)")
 
     print(
         f"{datetime.now()}: Starting from pre saved with: start_epoch: {start_epoch}, best_val_loss: {best_val_loss:.4f}, last_epoch_vloss: {last_epoch_vloss:.2f}, non_improve_cnt: {non_improve_cnt:.2f}, best_epoch: {best_epoch}, best_bleu: {best_bleu:.4f}"
