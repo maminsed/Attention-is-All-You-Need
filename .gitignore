@@ -9,4 +9,12 @@ events.out.tfevents.*
 # data
 wmt14_*.csv
 # get your own data
-data/ 
+data/
+
+
+# hf
+*.pt
+# to avoid duplication. 
+hf/*/*.vocab
+hf/*/*.model
+
