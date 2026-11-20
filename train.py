@@ -20,6 +20,7 @@ import pyarrow as pa
 
 # from torchinfo import summary
 from torch.utils.data import DataLoader, Dataset
+from huggingface_hub import PyTorchModelHubMixin
 
 save_file_path_root = "./runs/wmt14/run_1/"
 config_path = f"{save_file_path_root}/config.json"
@@ -460,14 +461,20 @@ class MLP(torch.nn.Module):
         return x
 
 
-class Transformer(torch.nn.Module):
+class Transformer(
+    torch.nn.Module,
+    PyTorchModelHubMixin,
+
+    repo_url="Amin-S/de-en-translator"
+):
     def __init__(self, config):
         super().__init__()
 
         self.config = config
         self.pad_token = self.config["pad_token"]
         self.embedding = torch.nn.Embedding(self.config["vocab_size"], self.config["d_model"])
-        torch.nn.init.uniform_(self.embedding.weight,-SQRT_INV_DM,SQRT_INV_DM)
+        self.SQRT_INV_DM = 1/math.sqrt(self.config["d_model"])
+        torch.nn.init.uniform_(self.embedding.weight,-self.SQRT_INV_DM,self.SQRT_INV_DM)
         self.dropout = torch.nn.Dropout(self.config["drop_post_emb"])
         self.source_word_dropout = torch.nn.Dropout1d(self.config.get("source_word_dropout",0.0))
         self.target_word_dropout = torch.nn.Dropout1d(self.config.get("target_word_dropout",0.0))
@@ -502,9 +509,9 @@ class Transformer(torch.nn.Module):
 
     def positional_encoding(self, seq_len, n=10000,*,start=0):
         d_model = self.config["d_model"]
-        pe = torch.zeros(seq_len, d_model, device=DEVICE)  # CUDA- S,d_m
-        pos = torch.arange(start,end=start+seq_len, device=DEVICE).reshape(-1, 1)  # CUDA- S,1
-        freq = torch.arange(0, d_model, 2, device=DEVICE)  # CUDA, d_m/2
+        pe = torch.zeros(seq_len, d_model, device=self.config["device"])  # CUDA- S,d_m
+        pos = torch.arange(start,end=start+seq_len, device=self.config["device"]).reshape(-1, 1)  # CUDA- S,1
+        freq = torch.arange(0, d_model, 2, device=self.config["device"])  # CUDA, d_m/2
         dim = n ** (freq / d_model)  # CUDA, d_m/2
 
         pe[:, 0::2] = torch.sin(pos / dim)
@@ -536,7 +543,7 @@ class Transformer(torch.nn.Module):
 
         # x embedding
         x = self.embedding(x)  # CUDA- B,S,dm
-        x = x / SQRT_INV_DM  # CUDA- B,S,d_m (INV_INV_SQRT: SQRT_DM)
+        x = x / self.SQRT_INV_DM  # CUDA- B,S,d_m (INV_INV_SQRT: SQRT_DM)
         # positional encoding
         pe = self.positional_encoding(x.shape[1])  # CUDA- S,d_m
         x = x + pe  # CUDA- B,S,d_m
@@ -563,7 +570,7 @@ class Transformer(torch.nn.Module):
         d = y.shape[1]
         if not kv_cache:
             lookahead_mask_constant = torch.triu(
-                torch.ones((d, d), device=DEVICE, requires_grad=False), 1
+                torch.ones((d, d), device=self.config["device"], requires_grad=False), 1
             ).bool()  # CUDA - Sy,Sy
             start=0
         else: 
@@ -574,7 +581,7 @@ class Transformer(torch.nn.Module):
 
         # y embedding
         y = self.embedding(y)  # CUDA- B,Sy,dm
-        y = y / SQRT_INV_DM  # CUDA- B,Sy,d_m
+        y = y / self.SQRT_INV_DM  # CUDA- B,Sy,d_m
         pe = self.positional_encoding(y.shape[1],start=start)  # CUDA- Sy,d_m
         y = y + pe  # CUDA- B,Sy,d_m
         y = self.dropout(y)
