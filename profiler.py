@@ -25,8 +25,6 @@ profiler_config={
 if profiler_config["kv_cache"] == True and profiler_config["seperate_prefill"] == False:
     raise ValueError("kv cache requires seperate prefill")
 
-Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
-
 totals = defaultdict(lambda: {"cpu_us":0,"cuda_us":0,"calls":0})
 target_stages = {"prefill","decode","enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__","calculate_bleu"}
 
@@ -44,8 +42,7 @@ def trace_handler(p):
         print(p.key_averages().table(sort_by="cuda_time_total",row_limit=10))
         p.export_chrome_trace(f"{TRACE_FOLDER}/trace_{step_num}.json")
 
-
-if __name__ == "__main__":
+def main():
     # Loading model
     model, _ = load_best_model()
 
@@ -57,17 +54,6 @@ if __name__ == "__main__":
     train_loader, val_loader, train_token_count = load_data(sp_bpe)
     print(f"Train Token Count: {train_token_count:,}")
     del train_loader
-
-    # Storing config
-    with open(f"{TRACE_FOLDER}/config.json","w") as f:
-        json.dump(
-            {
-                "model_config": serialize_config(train.config),
-                "profiler_config": profiler_config,
-            }
-            ,f,
-            indent=2
-        )
 
     # Num steps ~= 46
     with profile(
@@ -88,4 +74,27 @@ if __name__ == "__main__":
         cuda_ms = stats["cuda_us"] / 1000.0
         print(f"{stage} ({stats['calls']} calls) -> CPU: {cpu_ms:.2f} ms | GPU: {cuda_ms:.2f} ms")
 
+    # Storing config
+    with open(f"{TRACE_FOLDER}/config.json","w") as f:
+        json.dump(
+            {
+                "model_config": serialize_config(train.config),
+                "profiler_config": profiler_config,
+                "target_stages": totals,
+            }
+            ,f,
+            indent=2
+        )
+
     
+
+if __name__ == "__main__":
+    for kv_cache,seperate_prefill in ((False,False),(False,True),(True,True)):
+        profiler_config["kv_cache"] = kv_cache
+        profiler_config["seperate_prefill"] = seperate_prefill
+        TRACE_FOLDER=f"./profiler_trace/{"kv" if kv_cache else "no_kv"}_{"seperate" if seperate_prefill else "combined"}"
+        Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
+        
+        main()
+
+        totals.clear()
