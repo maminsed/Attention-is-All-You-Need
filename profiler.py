@@ -2,9 +2,13 @@ import train
 from train import calculate_bleu, load_best_model, load_data, serialize_config
 from torch.profiler import profile, ProfilerActivity, schedule, record_function
 import sentencepiece as spm
+import torch
 from pathlib import Path
 from collections import defaultdict
+from types import SimpleNamespace
 import json
+import time
+from contextlib import contextmanager
 
 profiler_config={
     "mode": "calculate_bleu",
@@ -12,6 +16,8 @@ profiler_config={
     "wait":4,
     "warmup":1,
     "active":2,
+
+    "wrapper": "time", # profiler or time
 
     "model_root": train.save_file_path_root,
     "note": "first run",
@@ -42,6 +48,30 @@ def trace_handler(p):
         print(p.key_averages().table(sort_by="cuda_time_total",row_limit=10))
         p.export_chrome_trace(f"{TRACE_FOLDER}/trace_{step_num}.json")
 
+@contextmanager
+def time_counter(warmup_steps=0):
+    counter = SimpleNamespace(steps=0,start=None,total=0)
+
+    def step():
+        counter.steps+=1
+        if counter.steps == warmup_steps:
+            torch.cuda.synchronize()
+            counter.start = time.perf_counter()
+
+    counter.step = step
+    
+    if warmup_steps == 0:
+        torch.cuda.synchronize()
+        counter.start = time.perf_counter()
+    
+
+    try:
+        yield counter
+    finally:
+        torch.cuda.synchronize()
+        counter.total = time.perf_counter()-counter.start
+        print(f"total time elapsed: {counter.total:.4f}s")
+
 def main():
     # Loading model
     model, _ = load_best_model()
@@ -58,6 +88,8 @@ def main():
     print(f"Train Token Count: {train_token_count:,}")
     del train_loader
 
+    profiler_mode = profiler_config["wrapper"] == "profiler"
+
     # Num steps ~= 46
     with profile(
         activities=[ProfilerActivity.CPU,ProfilerActivity.CUDA],
@@ -68,14 +100,25 @@ def main():
             active=profiler_config["active"]
         ), # 5 x 7
             on_trace_ready=trace_handler
-    ) as prof:
+    ) if profiler_mode else time_counter(profiler_config["skip_first"]) as prof:
         with record_function("calculate_bleu"):
-            calculate_bleu(val_loader,model,sp_bpe,return_translations=False,step_fn=prof.step,profiler_config=profiler_config) 
+            calculate_bleu(
+                val_loader,
+                model,
+                sp_bpe,
+                return_translations=False,
+                step_fn=prof.step,
+                profiler_config=profiler_config
+            )
 
-    for stage, stats in totals.items():
-        cpu_ms = stats["cpu_us"] / 1000.0
-        cuda_ms = stats["cuda_us"] / 1000.0
-        print(f"{stage} ({stats['calls']} calls) -> CPU: {cpu_ms:.2f} ms | GPU: {cuda_ms:.2f} ms")
+    if profiler_mode:
+        for stage, stats in totals.items():
+            cpu_ms = stats["cpu_us"] / 1000.0
+            cuda_ms = stats["cuda_us"] / 1000.0
+            print(f"{stage} ({stats['calls']} calls) -> CPU: {cpu_ms:.2f} ms | GPU: {cuda_ms:.2f} ms")
+        result = totals
+    else:
+        result = {"total_seconds": prof.total}
 
     # Storing config
     with open(f"{TRACE_FOLDER}/config.json","w") as f:
@@ -83,24 +126,29 @@ def main():
             {
                 "model_config": serialize_config(train.config),
                 "profiler_config": profiler_config,
-                "target_stages": totals,
+                "target_stages": result,
             }
             ,f,
             indent=2
         )
 
+def construct_note():
+    return f"{profiler_config["wrapper"]}_{"kv" if profiler_config["kv_cache"] else "no_kv"}_{"seperate" if profiler_config["seperate_prefill"] else "combined"}_{"precomputedEncs" if profiler_config["precompute_pos_encs"] else "recomputedEncs"}_{"amp" if profiler_config["use_amp"] else "noAmp"}"
     
 
 if __name__ == "__main__":
     MODE="single" # single or all
     if MODE == "all":
         print("running in all mode")
-        for kv_cache,seperate_prefill,pos_encs in ((False,False,False),(False,True,False),(True,True,True)):
+        for kv_cache,seperate_prefill,pos_encs,use_amp in ((False,False,False,False),(True,True,True,False),(True,True,True,True)):
             print("\n\n\n\n===============")
             profiler_config["kv_cache"] = kv_cache
             profiler_config["seperate_prefill"] = seperate_prefill
             profiler_config["precompute_pos_encs"] = pos_encs
-            profiler_config["note"] = f"{"kv" if kv_cache else "no_kv"}_{"seperate" if seperate_prefill else "combined"}_{"precomputedEncs" if pos_encs else "recomputedEncs"}"
+            profiler_config["use_amp"] = use_amp
+
+            profiler_config["note"] = construct_note()
+            
             TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
             Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
 
@@ -109,7 +157,7 @@ if __name__ == "__main__":
             totals.clear()
     else:
         print("running in single mode")
-        profiler_config["note"] = f"{"kv" if profiler_config["kv_cache"] else "no_kv"}_{"seperate" if profiler_config["seperate_prefill"] else "combined"}_{"precomputedEncs" if profiler_config["precompute_pos_encs"] else "recomputedEncs"}_{"amp" if profiler_config["use_amp"] else "noAmp"}"
+        profiler_config["note"] = construct_note()
         TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
         Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
         main()
