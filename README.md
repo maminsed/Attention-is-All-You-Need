@@ -2,9 +2,9 @@
 
 A PyTorch implementation of an encoder–decoder Transformer for German-to-English translation, based on *Attention Is All You Need*. The repository includes data preparation, SentencePiece tokenization, training, evaluation, and inference profiling for IWSLT17 and WMT14 models. For more details on experiments read the Blog. 
 
-**[Blog](#blog-link)** · **[Hugging Face model](#hugging-face-model-link)** · **[Demo](#demo-link)**
+**[Blog](#links)** · **[Hugging Face model](https://huggingface.co/maminsed/de-en-translator)** · **[Demo](https://huggingface.co/spaces/maminsed/de-en-translator-space)**
 
-<!-- Replace the three placeholder destinations above with your URLs. -->
+<!-- Replace the Blog placeholder with your URL when it is available. -->
 
 ## Models
 
@@ -75,6 +75,6 @@ python -m pip install tensorboard jupyter sacrebleu
 
 ## Links
 
-- **Blog:** TODO — add URL. <a id="blog-link"></a>
-- **Hugging Face model:** TODO — add URL. <a id="hugging-face-model-link"></a>
-- **Demo:** TODO — add URL. <a id="demo-link"></a>
+- **Blog:** TODO — add URL.
+- **Model:** [Hugging Face model](https://huggingface.co/maminsed/de-en-translator)
+- **Demo:** [Hugging Face demo](https://huggingface.co/spaces/maminsed/de-en-translator-space)
