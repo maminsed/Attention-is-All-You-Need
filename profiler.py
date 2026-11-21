@@ -6,8 +6,6 @@ from pathlib import Path
 from collections import defaultdict
 import json
 
-TRACE_FOLDER="./profiler_trace/nov_20/"
-
 profiler_config={
     "mode": "calculate_bleu",
     "skip_first":11,
@@ -21,12 +19,13 @@ profiler_config={
     # calculate_bleu flags
     "kv_cache": True,
     "seperate_prefill": True,
+    "precompute_pos_encs": True,
 }
 if profiler_config["kv_cache"] == True and profiler_config["seperate_prefill"] == False:
     raise ValueError("kv cache requires seperate prefill")
 
 totals = defaultdict(lambda: {"cpu_us":0,"cuda_us":0,"calls":0})
-target_stages = {"prefill","decode","enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__","calculate_bleu"}
+target_stages = {"prefill","decode","enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__"}
 
 def trace_handler(p):
     step_num = int(p.step_num)
@@ -35,7 +34,7 @@ def trace_handler(p):
     for event in p.key_averages():
         if event.key in target_stages:
             totals[event.key]["cpu_us"]+=event.cpu_time_total
-            totals[event.key]["cuda_us"]+=event.cuda_time_total
+            totals[event.key]["cuda_us"]+=event.device_time_total
             totals[event.key]["calls"]+= event.count
 
     if step_num == 18 or step_num == 46: # first and last only.
@@ -45,6 +44,9 @@ def trace_handler(p):
 def main():
     # Loading model
     model, _ = load_best_model()
+
+    if profiler_config.get("precompute_pos_encs",False) is False:
+        model.pos_encs = None
 
     # Loading tokenizer
     sp_bpe = spm.SentencePieceProcessor()
@@ -89,12 +91,22 @@ def main():
     
 
 if __name__ == "__main__":
-    for kv_cache,seperate_prefill in ((False,False),(False,True),(True,True)):
-        profiler_config["kv_cache"] = kv_cache
-        profiler_config["seperate_prefill"] = seperate_prefill
-        TRACE_FOLDER=f"./profiler_trace/{"kv" if kv_cache else "no_kv"}_{"seperate" if seperate_prefill else "combined"}"
-        Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
-        
-        main()
+    MODE="single" # single or all
+    if MODE == "all":
+        for kv_cache,seperate_prefill,pos_encs in ((False,False,False),(False,True,False),(True,True,False)):
+            print("\n\n\n\n===============")
+            profiler_config["kv_cache"] = kv_cache
+            profiler_config["seperate_prefill"] = seperate_prefill
+            profiler_config["precompute_pos_encs"] = pos_encs
+            profiler_config["note"] = f"{"kv" if kv_cache else "no_kv"}_{"seperate" if seperate_prefill else "combined"}_{"precomputedEncs" if pos_encs else "recomputedEncs"}"
+            TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
+            Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
 
-        totals.clear()
+            main()
+
+            totals.clear()
+    else:
+        profiler_config["note"] = f"{"kv" if profiler_config["kv_cache"] else "no_kv"}_{"seperate" if profiler_config["seperate_prefill"] else "combined"}_{"precomputedEncs" if profiler_config["pos_encs"] else "recomputedEncs"}"
+        TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
+        Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
+        main()
