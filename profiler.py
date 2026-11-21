@@ -3,6 +3,7 @@ from train import calculate_bleu, load_best_model, load_data, serialize_config
 from torch.profiler import profile, ProfilerActivity, schedule, record_function
 import sentencepiece as spm
 from pathlib import Path
+from collections import defaultdict
 import json
 
 TRACE_FOLDER="./profiler_trace/nov_20/"
@@ -20,11 +21,21 @@ profiler_config={
 
 Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
 
+totals = defaultdict(lambda: {"cpu_us":0,"cuda_us":0,"calls":0})
+target_stages = {"prefill","decode","enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__"}
+
 def trace_handler(p):
     step_num = int(p.step_num)
     print(f"\n\n====step: {step_num} returned.")
-    print(p.key_averages().table(sort_by="cuda_time_total",row_limit=10))
+
+    for event in p.key_averages():
+        if event.key in target_stages:
+            totals[event.key]["cpu_us"]+=event.cpu_time_total
+            totals[event.key]["cuda_us"]+=event.cuda_time_total
+            totals[event.key]["calls"]+= event.count
+
     if step_num == 18 or step_num == 46: # first and last only.
+        print(p.key_averages().table(sort_by="cuda_time_total",row_limit=10))
         p.export_chrome_trace(f"{TRACE_FOLDER}/trace_{step_num}.json")
 
 
@@ -65,5 +76,10 @@ if __name__ == "__main__":
     ) as prof:
         with record_function("calculate_bleu"):
             calculate_bleu(val_loader,model,sp_bpe,return_translations=False,step_fn=prof.step) 
+
+    for stage, stats in totals.items():
+        cpu_ms = stats["cpu_us"] / 1000.0
+        cuda_ms = stats["cuda_us"] / 1000.0
+        print(f"{stage} ({stats['calls']} calls) -> CPU: {cpu_ms:.2f} ms | GPU: {cuda_ms:.2f} ms")
 
     
