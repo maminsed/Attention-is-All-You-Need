@@ -17,12 +17,18 @@ profiler_config={
 
     "model_root": train.save_file_path_root,
     "note": "first run",
+
+    # calculate_bleu flags
+    "kv_cache": True,
+    "seperate_prefill": True,
 }
+if profiler_config["kv_cache"] == True and profiler_config["seperate_prefill"] == False:
+    raise ValueError("kv cache requires seperate prefill")
 
 Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
 
 totals = defaultdict(lambda: {"cpu_us":0,"cuda_us":0,"calls":0})
-target_stages = {"prefill","decode","enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__"}
+target_stages = {"prefill","decode","enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__","calculate_bleu"}
 
 def trace_handler(p):
     step_num = int(p.step_num)
@@ -75,7 +81,7 @@ if __name__ == "__main__":
             on_trace_ready=trace_handler
     ) as prof:
         with record_function("calculate_bleu"):
-            calculate_bleu(val_loader,model,sp_bpe,return_translations=False,step_fn=prof.step) 
+            calculate_bleu(val_loader,model,sp_bpe,return_translations=False,step_fn=prof.step,profiler_config=profiler_config) 
 
     for stage, stats in totals.items():
         cpu_ms = stats["cpu_us"] / 1000.0

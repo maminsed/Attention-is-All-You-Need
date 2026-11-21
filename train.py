@@ -527,9 +527,10 @@ class Transformer(
         # x.shape = CUDA- B,S
         # y.shape = CUDA- B,Sy
         # returns: CUDA- B,Sy,VS
-
-        x,padding_mask_constant = self.encode(x) # CUDA-B,S,dm
-        y = self.decode(x,y,padding_mask_constant) # CUDA-B,Sy,VS
+        with record_function("prefill"):
+            x,padding_mask_constant = self.encode(x) # CUDA-B,S,dm
+        with record_function("decode"):
+            y = self.decode(x,y,padding_mask_constant) # CUDA-B,Sy,VS
 
         return y
 
@@ -619,7 +620,9 @@ class Transformer(
         for c in self.cross_attention:
             c.drop_sentences(keep)
 
-def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translations:bool=False,step_fn=None):
+def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translations:bool=False,step_fn=None,profiler_config=None):
+    kv_cache = profiler_config.get("kv_cache",True) if profiler_config is not None else True
+    seperate_prefill = profiler_config.get("seperate_prefill",True) if profiler_config is not None else True
     start_time = time.time()
     print(f"{datetime.now()} started calculating bleu")
     bleu_fn = SacreBLEUScore(lowercase=True)
@@ -637,8 +640,12 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translat
             final_trans = torch.full((B,CONTEXT_CAP), EOS_ID, dtype=torch.long,device=DEVICE) # (B,CP)
             eos_idx = torch.full((B,), -1,dtype=torch.long,device=DEVICE)
 
-            with record_function("prefill"):
-                cur_x,cur_pmask = model.encode(x)
+            if seperate_prefill:
+                with record_function("prefill"):
+                    cur_x,cur_pmask = model.encode(x)
+            else:
+                cur_x = x
+                cur_pmask = torch.zeros((x.shape[0],),device=DEVICE)
             cur_eng_trans = torch.full((B,1),BOS_ID,dtype=torch.long,device=DEVICE) # (B,Sy)
             cur_y = cur_eng_trans
             cur_indecies = torch.arange(B,device=DEVICE)
@@ -647,14 +654,18 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translat
             cnt=0
             while cnt < CONTEXT_CAP-1 and cur_x.shape[0] > 0:
                 cnt+=1
-                with record_function("decode"):
-                    output = model.decode(cur_x,cur_y,cur_pmask,kv_cache=True)
+                if seperate_prefill:
+                    with record_function("decode"):
+                        output = model.decode(cur_x,cur_y,cur_pmask,kv_cache=kv_cache)
+                else:
+                    output = model.forward(cur_x,cur_y)
+                
                 output = torch.argmax(output[:,-1,:],dim=1,keepdim=True) # B,1
 
                 cur_eng_trans = torch.cat([cur_eng_trans,output],dim=1)
 
                 is_eos = (output.squeeze(1) == EOS_ID)
-                cur_y = output
+                cur_y = output if kv_cache else cur_eng_trans
                 if is_eos.any():
                     finished_indecies = cur_indecies[is_eos]
                     eos_idx[finished_indecies] = cnt
@@ -667,7 +678,8 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translat
                     cur_pmask = cur_pmask[keep]
                     cur_eng_trans = cur_eng_trans[keep]
                     cur_indecies = cur_indecies[keep]
-                    model.drop_sentences(keep)
+                    if kv_cache:
+                        model.drop_sentences(keep)
 
             if cur_x.shape[0] > 0:
                 final_trans[cur_indecies, :cnt+1] = cur_eng_trans
