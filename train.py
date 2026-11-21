@@ -15,6 +15,7 @@ from frozendict import frozendict
 from torch.nn import ModuleList
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.tensorboard import SummaryWriter
+from torch.profiler import record_function
 from torchmetrics.text import BLEUScore,SacreBLEUScore
 import pyarrow as pa
 
@@ -618,7 +619,7 @@ class Transformer(
         for c in self.cross_attention:
             c.drop_sentences(keep)
 
-def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translations:bool=False):
+def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translations:bool=False,step_fn=None):
     start_time = time.time()
     print(f"{datetime.now()} started calculating bleu")
     bleu_fn = SacreBLEUScore(lowercase=True)
@@ -636,7 +637,8 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
             final_trans = torch.full((B,CONTEXT_CAP), EOS_ID, dtype=torch.long,device=DEVICE) # (B,CP)
             eos_idx = torch.full((B,), -1,dtype=torch.long,device=DEVICE)
 
-            cur_x,cur_pmask = model.encode(x)
+            with record_function("prefill"):
+                cur_x,cur_pmask = model.encode(x)
             cur_eng_trans = torch.full((B,1),BOS_ID,dtype=torch.long,device=DEVICE) # (B,Sy)
             cur_y = cur_eng_trans
             cur_indecies = torch.arange(B,device=DEVICE)
@@ -645,7 +647,8 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
             cnt=0
             while cnt < CONTEXT_CAP-1 and cur_x.shape[0] > 0:
                 cnt+=1
-                output = model.decode(cur_x,cur_y,cur_pmask,kv_cache=True)
+                with record_function("decode"):
+                    output = model.decode(cur_x,cur_y,cur_pmask,kv_cache=True)
                 output = torch.argmax(output[:,-1,:],dim=1,keepdim=True) # B,1
 
                 cur_eng_trans = torch.cat([cur_eng_trans,output],dim=1)
@@ -690,6 +693,8 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, return_translatio
                     "dutch": sp_bpe.decode_ids(x[idx].tolist()),
                     "len": (y[idx] != PAD_TOKEN).sum().item(),
                 } for idx in range(B)]
+            if step_fn is not None:
+                step_fn()
     model.reset_cache() # free up space for later. 
     end_time = time.time()
     avg_bleu = bleu_fn.compute()
@@ -754,6 +759,12 @@ def calculate_val_loss(bleu_calc:bool,tokens_so_far):
 
     return avg_vloss, avg_metrics
 
+def serialize_config(config):
+    return {k:(v if (
+            not type(v).__module__.startswith("torch")
+            ) else str(v)) 
+            for k,v in config.items()}
+
 def save_model(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,batches_done=0):
     if model_path and optimizer_path and save_weights:
         torch.save(model.state_dict(), model_path)
@@ -772,10 +783,7 @@ def save_model(model_path=None,tokens_so_far=0,*,save_weights=True,is_best=True,
     with open(config_path, "w") as f:
         json.dump(
             {
-                "config": {k:(v if (
-                    not type(v).__module__.startswith("torch")
-                    ) else str(v)) 
-                    for k,v in config.items()},
+                "config": serialize_config(config),
                 "last_epoch_vloss": str(last_epoch_vloss) if last_epoch_vloss == float("inf") else last_epoch_vloss,
                 "non_improve_cnt": non_improve_cnt,
                 "best_val_loss": str(best_val_loss) if best_val_loss == float("inf") else best_val_loss,

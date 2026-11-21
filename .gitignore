@@ -18,3 +18,5 @@ data/
 hf/*/*.vocab
 hf/*/*.model
 
+# profiler
+profiler_trace/*/trace_*.json
