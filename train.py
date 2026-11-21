@@ -623,6 +623,7 @@ class Transformer(
 def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translations:bool=False,step_fn=None,profiler_config=None):
     kv_cache = profiler_config.get("kv_cache",True) if profiler_config is not None else True
     seperate_prefill = profiler_config.get("seperate_prefill",True) if profiler_config is not None else True
+    use_amp = profiler_config.get("use_amp",True) if profiler_config else config["use_amp"] 
     start_time = time.time()
     print(f"{datetime.now()} started calculating bleu")
     bleu_fn = SacreBLEUScore(lowercase=True)
@@ -632,7 +633,9 @@ def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translat
     EOS_ID = sp_bpe.eos_id()
     BOS_ID = sp_bpe.bos_id()
     translations = []
-    with torch.no_grad():
+    with torch.no_grad(), torch.autocast(
+        device_type=DEVICE, dtype=config["autocast_dtype"], enabled=use_amp
+    ):
         for i,(x, y) in enumerate(loader):
             model.reset_cache()
             x = x.to(device=DEVICE, non_blocking=config["pin_memory"])

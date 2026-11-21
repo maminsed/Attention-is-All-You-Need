@@ -59,7 +59,8 @@
     "model_root": "./runs/wmt14/run_1",
     "note": "kv_seperate",
     "kv_cache": true,
-    "seperate_prefill": true
+    "seperate_prefill": true,
+    "use_amp": false
   },
   "target_stages": {
     "enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__": {
