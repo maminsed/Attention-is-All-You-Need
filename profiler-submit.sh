@@ -7,8 +7,8 @@
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
-#SBATCH --output=logs/profiler_trace/nov_20.out
-#SBATCH --error=logs/profiler_trace/nov_20.out
+#SBATCH --output=logs/profiler_trace/nov_20_v2.out
+#SBATCH --error=logs/profiler_trace/nov_20_v2.out
 #SBATCH --mail-user=m4sedagh@uwaterloo.ca
 #SBATCH --mail-type=ALL
 

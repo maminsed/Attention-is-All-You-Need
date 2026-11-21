@@ -1,0 +1,82 @@
+{
+  "model_config": {
+    "vocab_size": 37000,
+    "d_model": 512,
+    "d_v": 64,
+    "d_k": 64,
+    "d_ff": 2048,
+    "h": 8,
+    "num_enc_layers": 6,
+    "num_dec_layers": 6,
+    "MLP_activation": "relu",
+    "drop_pre_norm": 0.1,
+    "drop_post_emb": 0.1,
+    "source_word_dropout": 0.0,
+    "target_word_dropout": 0.0,
+    "ln_strat": "PRE_LN",
+    "benchmark_mode": false,
+    "batch_size": 128,
+    "val_batch_size": 64,
+    "epochs": 30,
+    "early_stopping_limit": 5,
+    "optimizer": "adam",
+    "lr": 1.0,
+    "optim_betas": [
+      0.9,
+      0.98
+    ],
+    "optim_eps": 1e-09,
+    "warmup_steps": 3000,
+    "peak_lr": 0.0008068715304598784,
+    "warmup_strat": "rise",
+    "tau": -1,
+    "loss": "CrossEntropyLoss",
+    "label_smoothing": 0.1,
+    "context_size": 128,
+    "pad_token": 3,
+    "test_size": 0.2,
+    "val_size": 0.2,
+    "mega_batch_size": 100,
+    "data_source": "wmt14_curated",
+    "filtering_strategy": "drop",
+    "tokenizer_source": "wmt14",
+    "tokenizer_num_threads": 2,
+    "tokenization_cache": true,
+    "device": "cuda",
+    "dtype": "torch.float32",
+    "seed": 123,
+    "use_amp": true,
+    "autocast_dtype": "torch.bfloat16",
+    "num_workers": 2,
+    "pin_memory": true
+  },
+  "profiler_config": {
+    "mode": "calculate_bleu",
+    "skip_first": 11,
+    "wait": 4,
+    "warmup": 1,
+    "active": 2,
+    "model_root": "./runs/wmt14/run_1",
+    "note": "no_kv_combined_recomputedEncs",
+    "kv_cache": false,
+    "seperate_prefill": false,
+    "precompute_pos_encs": false
+  },
+  "target_stages": {
+    "enumerate(DataLoader)#_SingleProcessDataLoaderIter.__next__": {
+      "cpu_us": 28156.29700000005,
+      "cuda_us": 0,
+      "calls": 10
+    },
+    "prefill": {
+      "cpu_us": 2292474.836,
+      "cuda_us": 3907130.0459999936,
+      "calls": 876
+    },
+    "decode": {
+      "cpu_us": 3914636.6999999983,
+      "cuda_us": 5652395.803000033,
+      "calls": 876
+    }
+  }
+}

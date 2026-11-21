@@ -17,9 +17,9 @@ profiler_config={
     "note": "first run",
 
     # calculate_bleu flags
-    "kv_cache": True,
-    "seperate_prefill": True,
-    "precompute_pos_encs": True,
+    "kv_cache": False,
+    "seperate_prefill": False,
+    "precompute_pos_encs": False,
 }
 if profiler_config["kv_cache"] == True and profiler_config["seperate_prefill"] == False:
     raise ValueError("kv cache requires seperate prefill")
@@ -93,7 +93,8 @@ def main():
 if __name__ == "__main__":
     MODE="single" # single or all
     if MODE == "all":
-        for kv_cache,seperate_prefill,pos_encs in ((False,False,False),(False,True,False),(True,True,False)):
+        print("running in all mode")
+        for kv_cache,seperate_prefill,pos_encs in ((False,False,False),(False,True,False),(True,True,True)):
             print("\n\n\n\n===============")
             profiler_config["kv_cache"] = kv_cache
             profiler_config["seperate_prefill"] = seperate_prefill
@@ -106,7 +107,8 @@ if __name__ == "__main__":
 
             totals.clear()
     else:
-        profiler_config["note"] = f"{"kv" if profiler_config["kv_cache"] else "no_kv"}_{"seperate" if profiler_config["seperate_prefill"] else "combined"}_{"precomputedEncs" if profiler_config["pos_encs"] else "recomputedEncs"}"
+        print("running in single mode")
+        profiler_config["note"] = f"{"kv" if profiler_config["kv_cache"] else "no_kv"}_{"seperate" if profiler_config["seperate_prefill"] else "combined"}_{"precomputedEncs" if profiler_config["precompute_pos_encs"] else "recomputedEncs"}"
         TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
         Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
         main()
