@@ -108,6 +108,7 @@ config = {
     "seed": 123, # updating to 123 for continuation, switch back to 42
     ## Multiproccessing
     "use_amp": True,
+    "val_use_amp": False,
     "autocast_dtype": torch.bfloat16,
     "num_workers": 2, # will time. 
     "pin_memory": True,
@@ -623,7 +624,7 @@ class Transformer(
 def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translations:bool=False,step_fn=None,profiler_config=None):
     kv_cache = profiler_config.get("kv_cache",True) if profiler_config is not None else True
     seperate_prefill = profiler_config.get("seperate_prefill",True) if profiler_config is not None else True
-    use_amp = profiler_config.get("use_amp",True) if profiler_config else config["use_amp"] 
+    use_amp = profiler_config.get("use_amp",True) if profiler_config else config["val_use_amp"] 
     start_time = time.time()
     print(f"{datetime.now()} started calculating bleu")
     bleu_fn = SacreBLEUScore(lowercase=True)

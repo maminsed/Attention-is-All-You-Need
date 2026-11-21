@@ -49,7 +49,7 @@ def trace_handler(p):
         p.export_chrome_trace(f"{TRACE_FOLDER}/trace_{step_num}.json")
 
 @contextmanager
-def time_counter(warmup_steps=0):
+def time_counter(warmup_steps=0,total_steps=47):
     counter = SimpleNamespace(steps=0,start=None,total=0)
 
     def step():
@@ -57,6 +57,10 @@ def time_counter(warmup_steps=0):
         if counter.steps == warmup_steps:
             torch.cuda.synchronize()
             counter.start = time.perf_counter()
+        if counter.steps == total_steps:
+            torch.cuda.synchronize()
+            counter.total = time.perf_counter()-counter.start
+        
 
     counter.step = step
     
@@ -68,8 +72,9 @@ def time_counter(warmup_steps=0):
     try:
         yield counter
     finally:
-        torch.cuda.synchronize()
-        counter.total = time.perf_counter()-counter.start
+        if counter.total == 0:
+            torch.cuda.synchronize()
+            counter.total = time.perf_counter()-counter.start
         print(f"total time elapsed: {counter.total:.4f}s")
 
 def main():
@@ -100,7 +105,7 @@ def main():
             active=profiler_config["active"]
         ), # 5 x 7
             on_trace_ready=trace_handler
-    ) if profiler_mode else time_counter(profiler_config["skip_first"]) as prof:
+    ) if profiler_mode else time_counter(profiler_config["skip_first"],len(val_loader)) as prof:
         with record_function("calculate_bleu"):
             calculate_bleu(
                 val_loader,
@@ -118,7 +123,7 @@ def main():
             print(f"{stage} ({stats['calls']} calls) -> CPU: {cpu_ms:.2f} ms | GPU: {cuda_ms:.2f} ms")
         result = totals
     else:
-        result = {"total_seconds": prof.total}
+        result = {"total_seconds": prof.total,"total_steps": prof.steps}
 
     # Storing config
     with open(f"{TRACE_FOLDER}/config.json","w") as f:
@@ -137,7 +142,7 @@ def construct_note():
     
 
 if __name__ == "__main__":
-    MODE="single" # single or all
+    MODE="all" # single or all
     if MODE == "all":
         print("running in all mode")
         for kv_cache,seperate_prefill,pos_encs,use_amp in ((False,False,False,False),(True,True,True,False),(True,True,True,True)):
