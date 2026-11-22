@@ -29,7 +29,7 @@ optimizer_path = f"{save_file_path_root}/optimizer.pt"
 scheduler_path = f"{save_file_path_root}/scheduler.pt"
 tensorboard_dir = f"{save_file_path_root}/runs/{datetime.now().strftime("%Y_%m_%d_%H")}"
 
-LOAD_PRE_SAVED = True
+LOAD_PRE_SAVED = False
 VERBOSE = True
 VERBOSE_FREQ = 2_000
 SAVE_FREQ=6_000
@@ -278,17 +278,19 @@ def encode_ds(sp_bpe,data_path:str,cache_path:str,nrows=None,num_threads=None):
     )
 
 
-def load_data(sp_bpe) -> tuple[DataLoader, DataLoader]:
+def load_data(sp_bpe,*,load_test=False,load_train=True) -> tuple[DataLoader, DataLoader]:
 
-    print(f"{datetime.now()}: encoding train started")
-    X_train,Y_train,X_train_offset,Y_train_offset,dropped_train = encode_ds(
-        sp_bpe,
-        f"data/{config['data_source']}/train_df.csv",
-        f"data/{config['data_source']}/train_{config["tokenizer_source"]}.parquet",
-        nrows=1000 if config["benchmark_mode"] else None,
-        num_threads=config["tokenizer_num_threads"],
-    )
+    if load_train:
+        print(f"{datetime.now()}: encoding train started")
+        X_train,Y_train,X_train_offset,Y_train_offset,dropped_train = encode_ds(
+            sp_bpe,
+            f"data/{config['data_source']}/train_df.csv",
+            f"data/{config['data_source']}/train_{config["tokenizer_source"]}.parquet",
+            nrows=1000 if config["benchmark_mode"] else None,
+            num_threads=config["tokenizer_num_threads"],
+        )
 
+    
     print(f"{datetime.now()}: encoding val started")
     X_val, Y_val,X_val_offset,Y_val_offset, dropped_val = encode_ds(
         sp_bpe,
@@ -297,40 +299,70 @@ def load_data(sp_bpe) -> tuple[DataLoader, DataLoader]:
         num_threads=config["tokenizer_num_threads"],
     )
 
-    print(f"{datetime.now()}: # train size: #Tokens: X: {len(X_train):,} Y: {len(Y_train):,} #Sentences: {len(X_train_offset)-1:,}, num_dropped: {dropped_train:,}")
-    print(f"{datetime.now()}: # val size: #Tokens: X: {len(X_val):,} Y: {len(Y_val):,} #Sentences: {len(X_val_offset)-1:,}, num_dropped: {dropped_val:,}")
+    if load_test:
+        print(f"{datetime.now()}: encoding test started")
+        X_test, Y_test,X_test_offset,Y_test_offset, dropped_test = encode_ds(
+            sp_bpe,
+            f"data/{config['data_source']}/test_df.csv",
+            f"data/{config['data_source']}/test_{config["tokenizer_source"]}.parquet",
+            num_threads=config["tokenizer_num_threads"],
+        )
 
-    global NUM_BATCHES
-    NUM_BATCHES = math.ceil((len(X_train_offset)-1) / config["batch_size"])
-    print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}. LR peak: {config["peak_lr"]}")
-    if NUM_BATCHES * config["epochs"] * 0.5 < config["warmup_steps"]:
-        print(f"{datetime.now()}: WARNING: more than half of epochs are warmup steps. ")
+    if load_train:
+        print(f"{datetime.now()}: # train size: #Tokens: X: {len(X_train):,} Y: {len(Y_train):,} #Sentences: {len(X_train_offset)-1:,}, num_dropped: {dropped_train:,}")
+    print(f"{datetime.now()}: # val size: #Tokens: X: {len(X_val):,} Y: {len(Y_val):,} #Sentences: {len(X_val_offset)-1:,}, num_dropped: {dropped_val:,}")
+    if load_test:
+        print(f"{datetime.now()}: # test size: #Tokens: X: {len(X_test):,} Y: {len(Y_test):,} #Sentences: {len(X_test_offset)-1:,}, num_dropped: {dropped_test:,}")
+
+    if load_train:
+        global NUM_BATCHES
+        NUM_BATCHES = math.ceil((len(X_train_offset)-1) / config["batch_size"])
+        print(f"{datetime.now()}: batches/epoch: {NUM_BATCHES:,}. LR peak: {config["peak_lr"]}")
+        if NUM_BATCHES * config["epochs"] * 0.5 < config["warmup_steps"]:
+            print(f"{datetime.now()}: WARNING: more than half of epochs are warmup steps. ")
 
     # setting up the data
 
-    train_set = AttnDataset(X_train, Y_train, X_train_offset, Y_train_offset)
+    if load_train:
+        train_set = AttnDataset(X_train, Y_train, X_train_offset, Y_train_offset)
     val_set = AttnDataset(X_val, Y_val, X_val_offset, Y_val_offset)
-    # test_set = AttnDataset(X_test,y_test)
+    if load_test:
+       test_set = AttnDataset(X_test, Y_test, X_test_offset, Y_test_offset)
 
-    train_lengths=np.diff(Y_train_offset)
-    global batch_sampler
-    batch_sampler = ShuffledNearSampler(train_set,config["batch_size"],lengths=train_lengths)
-    train_loader = DataLoader(
-        train_set,
-        # batch_size=config["batch_size"],
-        # shuffle=True,
-        batch_sampler=batch_sampler,
-        collate_fn=collate_fn,
-        pin_memory=config["pin_memory"],
-        num_workers=config["num_workers"],
-        persistent_workers=bool(config["num_workers"]),
-    )
+    if load_train:
+        train_lengths=np.diff(Y_train_offset)
+        global batch_sampler
+        batch_sampler = ShuffledNearSampler(train_set,config["batch_size"],lengths=train_lengths)
+        train_loader = DataLoader(
+            train_set,
+            # batch_size=config["batch_size"],
+            # shuffle=True,
+            batch_sampler=batch_sampler,
+            collate_fn=collate_fn,
+            pin_memory=config["pin_memory"],
+            num_workers=config["num_workers"],
+            persistent_workers=bool(config["num_workers"]),
+        )
 
     val_loader = DataLoader(
         val_set, batch_size=config["val_batch_size"], collate_fn=collate_fn, pin_memory=config["pin_memory"]
     )
-    return train_loader, val_loader, len(X_train)
 
+    if load_test:
+        test_loader = DataLoader(
+            test_set, batch_size=config["val_batch_size"], collate_fn=collate_fn, pin_memory=config["pin_memory"]
+        )
+
+    res = []
+    if load_train:
+        res.append(train_loader)
+    res.append(val_loader)
+    if load_test:
+        res.append(test_loader)
+    if load_train:
+        res.append(len(X_train))
+    return tuple(res) if len(res) != 0 else res[0]
+    
 
 def activation_lookup(activation="relu"):
     # will add more activations if required
@@ -624,7 +656,7 @@ class Transformer(
 def calculate_bleu(loader:DataLoader,model:Transformer,sp_bpe, *,return_translations:bool=False,step_fn=None,profiler_config=None):
     kv_cache = profiler_config.get("kv_cache",True) if profiler_config is not None else True
     seperate_prefill = profiler_config.get("seperate_prefill",True) if profiler_config is not None else True
-    use_amp = profiler_config.get("use_amp",True) if profiler_config else config["val_use_amp"] 
+    use_amp = profiler_config.get("use_amp",True) if profiler_config else config.get("val_use_amp",False) 
     start_time = time.time()
     print(f"{datetime.now()} started calculating bleu")
     bleu_fn = SacreBLEUScore(lowercase=True)

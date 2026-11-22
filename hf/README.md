@@ -14,6 +14,57 @@ tags:
 - encoder-decoder
 - sentencepiece
 - trained-from-scratch
+metrics:
+- sacrebleu
+model-index:
+- name: IWSLT17
+  results:
+  - task:
+      type: translation
+      name: German-to-English translation
+    dataset:
+      type: IWSLT/iwslt2017
+      name: IWSLT17
+      split: test
+    metrics:
+    - type: sacrebleu
+      name: SacreBLEU
+      value: 33.74
+  - task:
+      type: translation
+      name: German-to-English translation
+    dataset:
+      type: wmt/wmt14
+      name: WMT14
+      split: test
+    metrics:
+    - type: sacrebleu
+      name: SacreBLEU
+      value: 18.93
+- name: WMT14
+  results:
+  - task:
+      type: translation
+      name: German-to-English translation
+    dataset:
+      type: IWSLT/iwslt2017
+      name: IWSLT17
+      split: test
+    metrics:
+    - type: sacrebleu
+      name: SacreBLEU
+      value: 30.91
+  - task:
+      type: translation
+      name: German-to-English translation
+    dataset:
+      type: wmt/wmt14
+      name: WMT14
+      split: test
+    metrics:
+    - type: sacrebleu
+      name: SacreBLEU
+      value: 28.49
 ---
 # German → English Transformer
 
@@ -22,8 +73,6 @@ A PyTorch encoder–decoder Transformer based on *Attention Is All You Need*.
 ## Training and evaluation
 
 Both models translate German into English. The WMT14 model was trained on the German–English training split of WMT14, and the IWSLT17 model was trained on the corresponding IWSLT17 training split. Each model used its dataset's validation split for validation.
-
-Evaluation details will be added here.
 
 ## How to use
 
