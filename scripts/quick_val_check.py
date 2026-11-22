@@ -1,6 +1,12 @@
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if __package__ in (None, ""):
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import train
 from train import load_best_model, calculate_bleu, load_data, calculate_val_loss
-from pathlib import Path
 import sentencepiece
 from torchmetrics.text import SacreBLEUScore
 import torch
@@ -58,7 +64,7 @@ for entry in directory.iterdir():
         print(metrics[0])
         values[entry.name] = {"bleu":bleu,"val_loss":val_loss,"non_smoothed":metrics[0]}
 
-results_path = Path(__file__).resolve().parent / "artifacts" / "experiment_metrics.json"
+results_path = PROJECT_ROOT / "artifacts" / "experiment_metrics.json"
 results_path.parent.mkdir(parents=True, exist_ok=True)
 with results_path.open("w") as f:
    json.dump(values,f,indent=2)

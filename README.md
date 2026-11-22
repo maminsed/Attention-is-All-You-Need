@@ -51,15 +51,17 @@ These are configuration values, not evaluation results.
 | --- | --- |
 | [train.py](train.py) | Transformer implementation, data loading, training, checkpointing, and validation |
 | [data.ipynb](data.ipynb) | Dataset preparation and curation |
-| [tokenizer.py](tokenizer.py) | SentencePiece BPE tokenizer training |
+| [scripts/tokenizer.py](scripts/tokenizer.py) | SentencePiece BPE tokenizer training |
 | [evaluation.ipynb](evaluation.ipynb) | Decoding, translation examples, and evaluation |
-| [profiler.py](profiler.py) | Inference profiling |
+| [scripts/profiler.py](scripts/profiler.py) | Inference profiling |
 | [artifacts/](artifacts/) | Experiment PNGs, comparison CSV, and validation metrics in `experiment_metrics.json` |
 | [artifacts/profiler_trace/](artifacts/profiler_trace/) | Profiler configurations, timing summaries, Chrome traces, and console logs |
 | [hf/](hf/) | Model configurations and Hugging Face packaging directory |
 | [requirements.txt](requirements.txt) | Pinned dependencies |
 
 ## Running locally
+
+Run these commands from the repository root. Utility scripts support both `python scripts/<name>.py` and `python -m scripts.<name>`.
 
 
 ```bash
@@ -70,7 +72,7 @@ python -m pip install tensorboard jupyter sacrebleu
 ```
 
 1. Prepare the data using `data.ipynb`. Training reads `train_df.csv` and `val_df.csv` from `data/<data_source>/`, with `detext` and `entext` columns.
-2. Configure `tokenizer.py` and `train.py` for the same dataset and vocabulary size. Run `python tokenizer.py` to create `tokenizers/<tokenizer_source>/bpe.model`.
+2. Configure `scripts/tokenizer.py` and `train.py` for the same dataset and vocabulary size. Run `python scripts/tokenizer.py` to create `tokenizers/<tokenizer_source>/bpe.model`.
 3. Set the run directory and configuration at the top of `train.py`. For a fresh run, set `LOAD_PRE_SAVED = False`; the current default resumes a checkpoint and requires its model, optimizer, scheduler, and configuration files. Ensure the run directory's parent directories exist.
 4. Run `python train.py`. Use `evaluation.ipynb` for evaluation after setting its checkpoint and tokenizer paths.
 

@@ -1,9 +1,15 @@
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if __package__ in (None, ""):
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import train
 from train import calculate_bleu, load_best_model, load_data, serialize_config
 from torch.profiler import profile, ProfilerActivity, schedule, record_function
 import sentencepiece as spm
 import torch
-from pathlib import Path
 from collections import defaultdict
 from types import SimpleNamespace
 import json
