@@ -54,6 +54,8 @@ These are configuration values, not evaluation results.
 | [tokenizer.py](tokenizer.py) | SentencePiece BPE tokenizer training |
 | [evaluation.ipynb](evaluation.ipynb) | Decoding, translation examples, and evaluation |
 | [profiler.py](profiler.py) | Inference profiling |
+| [artifacts/](artifacts/) | Experiment PNGs, comparison CSV, and validation metrics in `experiment_metrics.json` |
+| [artifacts/profiler_trace/](artifacts/profiler_trace/) | Profiler configurations, timing summaries, Chrome traces, and console logs |
 | [hf/](hf/) | Model configurations and Hugging Face packaging directory |
 | [requirements.txt](requirements.txt) | Pinned dependencies |
 

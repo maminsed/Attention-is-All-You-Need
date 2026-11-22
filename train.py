@@ -361,7 +361,7 @@ def load_data(sp_bpe,*,load_test=False,load_train=True) -> tuple[DataLoader, Dat
         res.append(test_loader)
     if load_train:
         res.append(len(X_train))
-    return tuple(res) if len(res) != 0 else res[0]
+    return tuple(res) if len(res) != 1 else res[0]
     
 
 def activation_lookup(activation="relu"):

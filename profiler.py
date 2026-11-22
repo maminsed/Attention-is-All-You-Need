@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
             profiler_config["note"] = construct_note()
             
-            TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
+            TRACE_FOLDER=f"./artifacts/profiler_trace/{profiler_config["note"]}"
             Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
 
             main()
@@ -163,6 +163,6 @@ if __name__ == "__main__":
     else:
         print("running in single mode")
         profiler_config["note"] = construct_note()
-        TRACE_FOLDER=f"./profiler_trace/{profiler_config["note"]}"
+        TRACE_FOLDER=f"./artifacts/profiler_trace/{profiler_config["note"]}"
         Path(TRACE_FOLDER).mkdir(parents=True,exist_ok=True)
         main()
