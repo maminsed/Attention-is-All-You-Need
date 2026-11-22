@@ -68,7 +68,13 @@ model-index:
 ---
 # German → English Transformer
 
+![de-en translator project banner with a white dachshund on a black background](project-photo.png)
+
 A PyTorch encoder–decoder Transformer based on *Attention Is All You Need*.
+
+**[Blog](https://medium.com/@maminsed/building-a-german-to-english-transformer-in-pytorch-experiments-and-inference-optimizations-8840a53fd706)** · **[Project repository](https://github.com/maminsed/Attention-is-All-You-Need)** · **[Demo](https://huggingface.co/spaces/maminsed/de-en-translator-space)**
+
+Read [Building a German-to-English Transformer in PyTorch: Experiments and Inference Optimizations](https://medium.com/@maminsed/building-a-german-to-english-transformer-in-pytorch-experiments-and-inference-optimizations-8840a53fd706) for the experiments and inference optimizations.
 
 ## Training and evaluation
 

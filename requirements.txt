@@ -22,6 +22,7 @@ httpcore2==2.13.1
 httpx2==2.13.1
 huggingface_hub==2.2.0
 idna==3.20
+ipykernel==7.3.0
 Jinja2==3.1.6
 kiwisolver==1.5.1
 lightning-utilities==0.15.3
@@ -55,10 +56,12 @@ pyarrow==26.0.0
 pyparsing==3.3.3
 python-dateutil==2.9.0.post0
 PyYAML==6.0.3
+sacrebleu==2.6.0
 sentencepiece==0.2.2
 setuptools==84.0.0
 six==1.17.0
 sympy==1.14.0
+tensorboard==2.21.0
 torch==2.14.1+cu132
 torchmetrics==1.9.0
 torchvision==0.29.1+cu132

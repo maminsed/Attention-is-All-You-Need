@@ -1,10 +1,10 @@
 # German → English Translator
 
-A PyTorch implementation of an encoder–decoder Transformer for German-to-English translation, based on *Attention Is All You Need*. The repository includes data preparation, SentencePiece tokenization, training, evaluation, and inference profiling for IWSLT17 and WMT14 models. For more details on experiments read the Blog. 
+![de-en translator project banner with a white dachshund on a black background](project-photo.png)
 
-**[Blog](#links)** · **[Hugging Face model](https://huggingface.co/maminsed/de-en-translator)** · **[Demo](https://huggingface.co/spaces/maminsed/de-en-translator-space)**
+A PyTorch implementation of an encoder–decoder Transformer for German-to-English translation, based on *Attention Is All You Need*. The repository includes data preparation, SentencePiece tokenization, training, evaluation, and inference profiling for IWSLT17 and WMT14 models. Read the blog for details on the experiments and inference optimizations.
 
-<!-- Replace the Blog placeholder with your URL when it is available. -->
+**[Blog](https://medium.com/@maminsed/building-a-german-to-english-transformer-in-pytorch-experiments-and-inference-optimizations-8840a53fd706)** · **[Hugging Face model](https://huggingface.co/maminsed/de-en-translator)** · **[Demo](https://huggingface.co/spaces/maminsed/de-en-translator-space)**
 
 ## Models
 
@@ -68,7 +68,6 @@ Run these commands from the repository root. Utility scripts support both `pytho
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python -m pip install tensorboard jupyter sacrebleu
 ```
 
 1. Prepare the data using `data.ipynb`. Training reads `train_df.csv` and `val_df.csv` from `data/<data_source>/`, with `detext` and `entext` columns.
@@ -79,6 +78,6 @@ python -m pip install tensorboard jupyter sacrebleu
 
 ## Links
 
-- **Blog:** TODO — add URL.
+- **Blog:** [Building a German-to-English Transformer in PyTorch: Experiments and Inference Optimizations](https://medium.com/@maminsed/building-a-german-to-english-transformer-in-pytorch-experiments-and-inference-optimizations-8840a53fd706)
 - **Model:** [Hugging Face model](https://huggingface.co/maminsed/de-en-translator)
 - **Demo:** [Hugging Face demo](https://huggingface.co/spaces/maminsed/de-en-translator-space)
